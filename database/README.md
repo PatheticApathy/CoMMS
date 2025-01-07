@@ -1,6 +1,6 @@
 # Database
 
-This is the file containing everything related to the database code maintenance with the exception of to go code that is used closer to the server.
+This is the file containing everything related to the database code maintenance with the exception of the go code that is used closer to the server.
 
 You should also create a file called `materials.db` in this directory.
 
@@ -14,7 +14,7 @@ Run `goose create <name> sql` to create a migration.
 
 ### Up and Down
 
-Goose files have comments such as `--+goose up` to define a update and each migration file must also include a down section(with exception) that will undo the update.
+Goose files have comments such as `-- +goose up` to define a update and each migration file must also include a down section(with exception) that will undo the update.
 <br>
 
 Ex.
@@ -34,7 +34,7 @@ DROP TABLE post;
 
 ### Applying Updates
 
-`goose up` upgrades updates.
+`goose up` upgrades db.
 `goose down` downgrades db.
 Other commands can be found on the [goose README](https://github.com/pressly/goose).
 
