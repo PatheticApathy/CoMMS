@@ -1,2 +1,8 @@
 -- name: GetAllUsers :many
-SELECT * FROM Users;
+SELECT id, username, site_id, role FROM Users;
+
+-- name: GetUser :one
+SELECT id, username, site_id, role FROM Users WHERE id = ?;
+
+-- name: AddUser :one
+INSERT INTO Users(id, username, site_id, role) VALUES (?,?,?,?) RETURNING *;
