@@ -2,7 +2,7 @@
 -- +goose StatementBegin
 CREATE TABLE JobSites (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT,
+  name TEXT NOT NULL,
   addr TEXT,
   location_lat FLOAT,
   location_lng FLOAT
