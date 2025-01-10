@@ -8,7 +8,23 @@ SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_s
 SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site, last_checked_out FROM Materials WHERE job_site=?;
 
 -- name: GetMaterialsByQuantity :many
-SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site, last_checked_out FROM Materials WHERE quantity=? AND unit=?;
+SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site, last_checked_out
+FROM Materials 
+WHERE quantity=? AND unit=?;
 
 -- name: AddMaterial :one
-INSERT INTO Materials(id,name,type,quantity,unit,status,location_lat,location_lng,job_site) VALUES (?,?,?,?,?,?,?,?,?) RETURNING *; 
+INSERT INTO Materials(name,type,quantity,unit,status,location_lat,location_lng,job_site)
+VALUES (?,?,?,?,?,?,?,?)
+RETURNING *;
+
+-- name: ChangeQuantity :one
+UPDATE Materials
+  SET quantity = ?
+  WHERE  id = ?
+RETURNING *;
+
+-- name: ChangeStatus :one
+UPDATE Materials
+  SET status = ?
+  WHERE  id = ?
+RETURNING *;

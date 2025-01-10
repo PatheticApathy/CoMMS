@@ -35,7 +35,7 @@ DROP TABLE post;
 ### Applying Updates
 
 `goose up` upgrades db.
-`goose down` downgrades db.
+`goose down` downgrades db by one update.
 Other commands can be found on the [goose README](https://github.com/pressly/goose).
 
 ## sqlc.yaml
