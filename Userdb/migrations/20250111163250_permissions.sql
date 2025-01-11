@@ -3,7 +3,7 @@
 CREATE TABLE Permissions (
   permission INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
-  descripion TEXT NOT NULL,
+  descripion TEXT NOT NULL
 );
 -- +goose StatementEnd
 
