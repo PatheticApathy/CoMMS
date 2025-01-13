@@ -1,0 +1,9 @@
+version: "2"
+sql:
+  - engine: sqlite
+    queries: ./queries/
+    schema: ./migrations/
+    gen:
+      go:
+        package: material_db
+        out: ../pkg/database/<sub-dir>/
