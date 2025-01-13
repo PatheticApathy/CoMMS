@@ -44,6 +44,15 @@ func (q *Queries) AddUser(ctx context.Context, arg AddUserParams) (User, error) 
 	return i, err
 }
 
+const deleteUser = `-- name: DeleteUser :exec
+DELETE FROM Users WHERE id = ?
+`
+
+func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
+	_, err := q.db.ExecContext(ctx, deleteUser, id)
+	return err
+}
+
 const getAllUsers = `-- name: GetAllUsers :many
 SELECT id, username, name, company, site, role FROM Users
 `

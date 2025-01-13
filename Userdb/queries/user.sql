@@ -9,3 +9,6 @@ INSERT INTO Users(username, password, name, company, site, role) VALUES (?,?,?,?
 
 -- name: UpdateUser :one
 UPDATE Users SET username = ?, password = ?, name = ?, company = ?, site = ?, role = ? WHERE id = ? RETURNING *;
+
+-- name: DeleteUser :exec
+DELETE FROM Users WHERE id = ?;
