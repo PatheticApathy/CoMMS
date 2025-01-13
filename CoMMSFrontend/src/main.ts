@@ -11,4 +11,4 @@ app.use(router)
 
 app.mount('#app')
 
-router.replace({ path: '/home' })
+router.replace({ path: '/welcome' })

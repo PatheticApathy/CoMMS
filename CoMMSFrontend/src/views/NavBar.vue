@@ -28,16 +28,6 @@ import { RouterLink } from 'vue-router'
               </div>
             </RouterLink>
           </nav>
-          <nav class="leftNavBarNav" aria-label="Primary" role="Navigation">
-            <RouterLink to="/welcome">
-              <div class="leftNavBarDiv2">
-                <div class="leftNavBarDiv3">
-                </div>
-                <div class="leftNavBarDiv4">
-                </div>Welcome
-              </div>
-            </RouterLink>
-          </nav>
         </div>
 
       </div>
@@ -77,7 +67,7 @@ nav a {
   width: 80%;
   position: relative;
   left: 20%;
-  top: 0%;
+  top: 3%;
 }
 
 .leftNavBarDiv2 {
@@ -87,10 +77,12 @@ nav a {
   font-weight: 900;
 }
 
+.leftNavBarDiv2:hover {
+  background-color: hsla(160, 100%, 37%, 0.2);
+}
 
 .leftNavBarDiv3 {
   height: 26.25px;
-  width: 26.25px;
 }
 
 .leftNavBarDiv4 {
@@ -101,18 +93,5 @@ nav a {
 .leftNavBarSpan {
   height: 100%;
   width: 100%;
-}
-
-
-@media (min-width: 1024px) {
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
 }
 </style>
