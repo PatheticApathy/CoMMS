@@ -3,25 +3,18 @@ package main
 import (
 
 	// Imported for hashing
-	"crypto/sha256"
-	"encoding/hex"
-
-	// Imported for testing
 	"context"
+	"crypto/sha256"
 	"database/sql"
-	_ "embed"
+	"encoding/hex"
+	"fmt"
+	"log"
 
 	_ "modernc.org/sqlite"
 
 	// Importing for verification
 	user_db "github.com/PatheticApathy/CoMMS/pkg/database"
-
-	"fmt"
-	"log"
 )
-
-//go:embed Userdb/migrations/*
-var ddl string
 
 // Hashing function
 func hash(input string) string {
@@ -31,8 +24,8 @@ func hash(input string) string {
 }
 
 // takes a username and pass and checks the password against the database to verify the account.
-func checkUserAndPass(queries *user_db.Queries, ctx context.Context, username, password string) {
-	realhash, err := queries.GetUserAndPass(ctx, username)
+func checkUserAndPass(queries *user_db.Queries, ctxt context.Context, username, password string) {
+	realhash, err := queries.GetUserAndPass(ctxt, username)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -45,18 +38,15 @@ func checkUserAndPass(queries *user_db.Queries, ctx context.Context, username, p
 }
 
 func main() {
-	db, err := sql.Open("sqlite", "./foo.db")
+	ctxt := context.Background()
+
+	db, err := sql.Open("sqlite", "./Userdb/user.db")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
-	ctx := context.Background()
-	if _, err := db.ExecContext(ctx, ddl); err != nil {
-		log.Fatal(err)
-	}
-
 	queries := user_db.New(db)
 
-	checkUserAndPass(queries, ctx, "tempUser", "tempPass")
+	checkUserAndPass(queries, ctxt, "tempUser", "tempPass")
 }
