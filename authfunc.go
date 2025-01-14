@@ -1,4 +1,4 @@
-package auth
+package main
 
 import (
 
@@ -14,13 +14,13 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 
 	// Importing for verification
-	"github.com/PatheticApathy/CoMMS/pkg/database/user_db"
+	user_db "github.com/PatheticApathy/CoMMS/pkg/database"
 
 	"fmt"
 	"log"
 )
 
-//go:embed Userdb/migrations/*.sql
+//go:embed Userdb/migrations/*
 var ddl string
 
 // Hashing function
@@ -31,10 +31,13 @@ func hash(input string) string {
 }
 
 // takes a username and pass and checks the password against the database to verify the account.
-func checkUserAndPass(queries *user_db.Queries, username, password string) {
-	hash := queries.GetUserAndPass(username)
+func checkUserAndPass(queries *user_db.Queries, ctx context.Context, username, password string) {
+	realhash, err := queries.GetUserAndPass(ctx, username)
+	if err != nil {
+		log.Fatal(err)
+	}
 	hashedpass := hash(password)
-	if hashedpass == hash {
+	if hashedpass == realhash {
 		fmt.Println("Valid")
 	} else {
 		fmt.Println("Invalid")
@@ -55,5 +58,5 @@ func main() {
 
 	queries := user_db.New(db)
 
-	queries.GetUserAndPass()
+	checkUserAndPass(queries, ctx, "tempUser", "tempPass")
 }
