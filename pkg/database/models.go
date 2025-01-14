@@ -4,46 +4,12 @@
 
 package user_db
 
-import (
-	"database/sql"
-	"time"
-)
-
-type Permission struct {
-	Permission int64
-	Name       string
-	Descripion string
-}
-
-type Role struct {
-	Role        int64
-	Name        string
-	Description string
-	CreatedAt   time.Time
-}
-
-type RolePermission struct {
-	ID           int64
-	RoleID       sql.NullInt64
-	PermissionID sql.NullInt64
-}
-
 type User struct {
-	ID        int64
-	Username  string
-	Password  string
-	Name      string
-	Company   string
-	Site      string
-	Role      string
-	CreatedAt time.Time
-}
-
-type UserSession struct {
-	ID         int64
-	UserID     sql.NullInt64
-	IpAddress  sql.NullString
-	DeviceInfo sql.NullString
-	LoginTime  sql.NullTime
-	LogoutTime interface{}
+	ID       int64
+	Username string
+	Password string
+	Name     string
+	Company  string
+	Site     string
+	Role     string
 }
