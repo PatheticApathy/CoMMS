@@ -40,7 +40,7 @@ func checkUserAndPass(queries *user_db.Queries, ctxt context.Context, username, 
 func main() {
 	ctxt := context.Background()
 
-	db, err := sql.Open("sqlite", "./Userdb/user.db")
+	db, err := sql.Open("sqlite", "./databases/Userdb/user.db")
 	if err != nil {
 		log.Fatal(err)
 	}
