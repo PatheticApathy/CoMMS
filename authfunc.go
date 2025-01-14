@@ -11,7 +11,7 @@ import (
 	"database/sql"
 	_ "embed"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
 
 	// Importing for verification
 	user_db "github.com/PatheticApathy/CoMMS/pkg/database"
@@ -45,7 +45,7 @@ func checkUserAndPass(queries *user_db.Queries, ctx context.Context, username, p
 }
 
 func main() {
-	db, err := sql.Open("sqlite3", "./foo.db")
+	db, err := sql.Open("sqlite", "./foo.db")
 	if err != nil {
 		log.Fatal(err)
 	}
