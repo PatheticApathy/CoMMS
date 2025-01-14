@@ -62,6 +62,11 @@ nav a {
   width: 90%
 }
 
+.leftNavBarNav:hover {
+  background-color: hsla(160, 100%, 37%, 0.2);
+}
+
+
 .leftNavBarDiv1 {
   height: 80%;
   width: 80%;
@@ -75,10 +80,6 @@ nav a {
   width: 90%;
   font-family: 'Verdana', 'sans-serif';
   font-weight: 900;
-}
-
-.leftNavBarDiv2:hover {
-  background-color: hsla(160, 100%, 37%, 0.2);
 }
 
 .leftNavBarDiv3 {
