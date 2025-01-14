@@ -6,4 +6,4 @@ sql:
     gen:
       go:
         package: material_db
-        out: ../pkg/database/
+        out: ../../pkg/databases/materialdb
