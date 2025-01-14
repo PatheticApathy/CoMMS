@@ -13,7 +13,7 @@ import (
 	_ "modernc.org/sqlite"
 
 	// Importing for verification
-	user_db "github.com/PatheticApathy/CoMMS/pkg/database"
+	user_db "github.com/PatheticApathy/CoMMS/pkg/databases/userdb"
 )
 
 // Hashing function
