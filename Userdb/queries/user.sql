@@ -5,4 +5,4 @@ SELECT id, username, site, role FROM Users;
 SELECT id, username, site, role FROM Users WHERE id = ?;
 
 -- name: AddUser :one
-INSERT INTO Users(username, site, role) VALUES (?,?) RETURNING *;
+INSERT INTO Users(username, site, role) VALUES (?,?,?) RETURNING *;
