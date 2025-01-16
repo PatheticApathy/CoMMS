@@ -5,6 +5,5 @@
 docker volume create osm-data
 docker run -v ./Louisiana.osm.pbf:/data/region.osm.pbf -v osm-data:/data/database/ overv/openstreetmap-tile-server import
 
-##copy to systemd to run on boot
-cp ./map.service /etc/systemd/system/
-chmod 664 /etc/systemd/system/map.service
+#Start server and start on boot
+docker run --rm --restart always docker run -p 8080:80 -v osm-data:/data/database -d overv/openstreetmap-tile-server run

@@ -23,9 +23,5 @@ If something goes wrong and you don't see something like "INFO:root: Import comp
 You'll need to remove the docker container and volume named "osm-data", then restart the script.
 
 
-3. To run
-   `systemctl start map.service` to run start at boot,
-   `systemctl enable map.service`
-
 Now check the http address `http://your.server.ip.address:8080/tile/0/0/0.png`.
 A zoomable map should be at `http://your.server.ip.address:8080`.
