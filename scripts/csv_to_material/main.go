@@ -1,0 +1,89 @@
+// This program populates the materail database with a given csv
+package main
+
+import (
+	"context"
+	"database/sql"
+	"encoding/csv"
+	"fmt"
+	"io"
+	"os"
+	"strconv"
+
+	material_db "github.com/PatheticApathy/CoMMS/pkg/databases/materialdb"
+	_ "modernc.org/sqlite"
+)
+
+func main() {
+	ctxt := context.Background()
+
+	// connect to db
+	db, err := sql.Open("sqlite", "./databases/Materialdb/materials.db")
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer db.Close()
+
+	material_queries := material_db.New(db)
+
+	// open file for reading as csv
+	values, err := os.Open(os.Args[1])
+	if err != nil {
+		fmt.Println(err)
+	}
+	rows := csv.NewReader(values)
+
+	// first row is ignored
+	_, err = rows.Read()
+
+	if err == io.EOF {
+		return
+	}
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	for {
+		row, err := rows.Read()
+
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		quantity, err := strconv.Atoi(row[2])
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		material := material_db.AddMaterialParams{
+			Name: sql.NullString{
+				String: row[0],
+				Valid:  true,
+			},
+			Type: sql.NullString{
+				String: row[1],
+				Valid:  true,
+			},
+			Quantity: int64(quantity),
+			Unit:     row[3],
+			Status:   row[4],
+			LocationLat: sql.NullFloat64{
+				Valid: false,
+			},
+			LocationLng: sql.NullFloat64{
+				Valid: false,
+			},
+			JobSite: sql.NullInt64{
+				Valid: false,
+			},
+		}
+
+		material_queries.AddMaterial(ctxt, material)
+		fmt.Printf("%v added\n", row)
+	}
+}

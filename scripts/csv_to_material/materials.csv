@@ -1,0 +1,37 @@
+name,type,quantity,unit,status
+Portland Cement,Building Material,100,bags,In Stock
+Reinforcement Steel Bars,Reinforcement,50,pieces,In Stock
+Red Clay Bricks,Masonry,5000,pieces,In Stock
+Acrylic Wall Paint,Finishing Material,20,cans,Low Stock
+Gypsum Plasterboard Sheets,Building Material,75,sheets,In Stock
+Ceramic Floor Tiles,Flooring,200,boxes,In Stock
+Treated Wooden Beams,Structural,30,pieces,Out of Stock
+PVC Plumbing Pipes,Plumbing,150,meters,In Stock
+Galvanized Steel Nails,Hardware,500,kg,In Stock
+Phillips Head Screws,Hardware,800,boxes,Low Stock
+Crushed Gravel,Building Material,3000,kg,In Stock
+Fine River Sand,Building Material,2000,kg,In Stock
+Ready-Mix Concrete Bags,Building Material,400,bags,In Stock
+Tempered Glass Panels,Finishing Material,25,sheets,Low Stock
+Solid Wood Door Frames,Structural,60,pieces,In Stock
+Aluminum Window Frames,Structural,45,pieces,Out of Stock
+Fiberglass Insulation Rolls,Building Material,150,rolls,In Stock
+Marine Grade Plywood,Building Material,70,sheets,Low Stock
+Copper Electrical Wires,Electrical,1200,meters,In Stock
+Corrugated Roofing Sheets,Roofing,80,sheets,Out of Stock
+Industrial Adhesive Glue,Finishing Material,40,liters,Low Stock
+Silicone Sealant Tubes,Finishing Material,30,cans,In Stock
+Heavy-Duty Door Locks,Hardware,200,pieces,In Stock
+Stainless Steel Hinges,Hardware,1000,pieces,Low Stock
+High-Density PVC Water Pipes,Plumbing,300,meters,In Stock
+Hydraulic Oil,Industrial Liquid,150,liters,In Stock
+Epoxy Resin,Industrial Liquid,200,liters,Low Stock
+Paint Thinner,Finishing Liquid,120,liters,In Stock
+Concrete Curing Compound,Construction Liquid,100,liters,In Stock
+Cleaning Solvent,Industrial Liquid,50,liters,Out of Stock
+Waterproofing Sealant,Finishing Liquid,75,liters,In Stock
+Lubricating Grease,Industrial Liquid,300,kg,In Stock
+Wood Stain,Finishing Liquid,80,liters,Low Stock
+Polyurethane Coating,Finishing Liquid,60,liters,In Stock
+Silicone Caulk,Finishing Liquid,90,cans,Low Stock
+
