@@ -27,11 +27,11 @@ func main() {
 	material_queries := material_db.New(db)
 
 	// open file for reading as csv
-	values, err := os.Open(os.Args[1])
+	file, err := os.Open(os.Args[1])
 	if err != nil {
 		fmt.Println(err)
 	}
-	rows := csv.NewReader(values)
+	rows := csv.NewReader(file)
 
 	// first row is ignored
 	_, err = rows.Read()
