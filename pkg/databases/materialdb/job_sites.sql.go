@@ -3,7 +3,7 @@
 //   sqlc v1.27.0
 // source: job_sites.sql
 
-package material_db
+package materialdb
 
 import (
 	"context"
@@ -15,10 +15,10 @@ INSERT INTO JobSites(name, addr, location_lat, location_lng) VALUES (?,?,?,?) RE
 `
 
 type AddJobSiteParams struct {
-	Name        string
-	Addr        sql.NullString
-	LocationLat sql.NullFloat64
-	LocationLng sql.NullFloat64
+	Name        string          `json:"name"`
+	Addr        sql.NullString  `json:"addr"`
+	LocationLat sql.NullFloat64 `json:"location_lat"`
+	LocationLng sql.NullFloat64 `json:"location_lng"`
 }
 
 func (q *Queries) AddJobSite(ctx context.Context, arg AddJobSiteParams) (JobSite, error) {

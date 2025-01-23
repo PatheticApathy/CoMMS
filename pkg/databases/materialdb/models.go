@@ -2,7 +2,7 @@
 // versions:
 //   sqlc v1.27.0
 
-package material_db
+package materialdb
 
 import (
 	"database/sql"
@@ -10,47 +10,47 @@ import (
 )
 
 type CheckoutLog struct {
-	ID           int64
-	ItemID       int64
-	UserID       int64
-	CheckinTime  time.Time
-	CheckoutTime time.Time
+	ID           int64     `json:"id"`
+	ItemID       int64     `json:"item_id"`
+	UserID       int64     `json:"user_id"`
+	CheckinTime  time.Time `json:"checkin_time"`
+	CheckoutTime time.Time `json:"checkout_time"`
 }
 
 type JobSite struct {
-	ID          int64
-	Name        string
-	Addr        sql.NullString
-	LocationLat sql.NullFloat64
-	LocationLng sql.NullFloat64
+	ID          int64           `json:"id"`
+	Name        string          `json:"name"`
+	Addr        sql.NullString  `json:"addr"`
+	LocationLat sql.NullFloat64 `json:"location_lat"`
+	LocationLng sql.NullFloat64 `json:"location_lng"`
 }
 
 type Material struct {
-	ID             int64
-	Name           sql.NullString
-	Type           sql.NullString
-	Quantity       int64
-	Unit           string
-	Status         string
-	LocationLat    sql.NullFloat64
-	LocationLng    sql.NullFloat64
-	LastCheckedOut interface{}
-	JobSite        sql.NullInt64
+	ID             int64           `json:"id"`
+	Name           sql.NullString  `json:"name"`
+	Type           sql.NullString  `json:"type"`
+	Quantity       int64           `json:"quantity"`
+	Unit           string          `json:"unit"`
+	Status         string          `json:"status"`
+	LocationLat    sql.NullFloat64 `json:"location_lat"`
+	LocationLng    sql.NullFloat64 `json:"location_lng"`
+	LastCheckedOut interface{}     `json:"last_checked_out"`
+	JobSite        sql.NullInt64   `json:"job_site"`
 }
 
 type MaterialLog struct {
-	ID             int64
-	MaterialID     int64
-	Note           sql.NullString
-	Status         string
-	QuantityChange int64
-	Timestamp      time.Time
+	ID             int64          `json:"id"`
+	MaterialID     int64          `json:"material_id"`
+	Note           sql.NullString `json:"note"`
+	Status         string         `json:"status"`
+	QuantityChange int64          `json:"quantity_change"`
+	Timestamp      time.Time      `json:"timestamp"`
 }
 
 type User struct {
-	ID       int64
-	SiteID   sql.NullInt64
-	Username string
-	Password string
-	Role     string
+	ID       int64         `json:"id"`
+	SiteID   sql.NullInt64 `json:"site_id"`
+	Username string        `json:"username"`
+	Password string        `json:"password"`
+	Role     string        `json:"role"`
 }

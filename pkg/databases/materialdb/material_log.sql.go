@@ -3,7 +3,7 @@
 //   sqlc v1.27.0
 // source: material_log.sql
 
-package material_db
+package materialdb
 
 import (
 	"context"
@@ -18,10 +18,10 @@ RETURNING id, material_id, note, status, quantity_change, timestamp
 `
 
 type AddMaterialLogParams struct {
-	MaterialID     int64
-	Note           sql.NullString
-	Status         string
-	QuantityChange int64
+	MaterialID     int64          `json:"material_id"`
+	Note           sql.NullString `json:"note"`
+	Status         string         `json:"status"`
+	QuantityChange int64          `json:"quantity_change"`
 }
 
 func (q *Queries) AddMaterialLog(ctx context.Context, arg AddMaterialLogParams) (MaterialLog, error) {
@@ -51,8 +51,8 @@ RETURNING id, material_id, note, status, quantity_change, timestamp
 `
 
 type ChangeMaterialNoteParams struct {
-	Note sql.NullString
-	ID   int64
+	Note sql.NullString `json:"note"`
+	ID   int64          `json:"id"`
 }
 
 func (q *Queries) ChangeMaterialNote(ctx context.Context, arg ChangeMaterialNoteParams) (MaterialLog, error) {

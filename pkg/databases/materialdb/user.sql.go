@@ -3,7 +3,7 @@
 //   sqlc v1.27.0
 // source: user.sql
 
-package material_db
+package materialdb
 
 import (
 	"context"
@@ -15,9 +15,9 @@ INSERT INTO Users(username, site_id, role) VALUES (?,?,?) RETURNING id, site_id,
 `
 
 type AddUserParams struct {
-	Username string
-	SiteID   sql.NullInt64
-	Role     string
+	Username string        `json:"username"`
+	SiteID   sql.NullInt64 `json:"site_id"`
+	Role     string        `json:"role"`
 }
 
 func (q *Queries) AddUser(ctx context.Context, arg AddUserParams) (User, error) {
@@ -38,10 +38,10 @@ SELECT id, username, site_id, role FROM Users
 `
 
 type GetAllUsersRow struct {
-	ID       int64
-	Username string
-	SiteID   sql.NullInt64
-	Role     string
+	ID       int64         `json:"id"`
+	Username string        `json:"username"`
+	SiteID   sql.NullInt64 `json:"site_id"`
+	Role     string        `json:"role"`
 }
 
 func (q *Queries) GetAllUsers(ctx context.Context) ([]GetAllUsersRow, error) {
@@ -77,10 +77,10 @@ SELECT id, username, site_id, role FROM Users WHERE id = ?
 `
 
 type GetUserRow struct {
-	ID       int64
-	Username string
-	SiteID   sql.NullInt64
-	Role     string
+	ID       int64         `json:"id"`
+	Username string        `json:"username"`
+	SiteID   sql.NullInt64 `json:"site_id"`
+	Role     string        `json:"role"`
 }
 
 func (q *Queries) GetUser(ctx context.Context, id int64) (GetUserRow, error) {
