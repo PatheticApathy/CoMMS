@@ -1,7 +1,7 @@
 // Nominatim contains the interface for using the Nominatim geoddata api in go
 package nominatim
 
-// Geodata is the the what is returned form the Nominatim api
+// Geodata is what is returned form the Nominatim api
 type GeoData struct {
 	// PlaceId should not be relied on b/c it changes between servers,
 	// Non perminent.

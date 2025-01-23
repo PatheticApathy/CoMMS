@@ -6,6 +6,7 @@ import (
 	"net/http"
 )
 
+// Search takes a query string and the api host, then returnd relevant geodata
 func Search(query string, options Options, api string) ([]GeoData, error) {
 	var geo []GeoData
 
@@ -77,6 +78,7 @@ func SearchStructured(query StructuredQuery, options Options, api string) ([]Geo
 	return geo, nil
 }
 
+// Uses search for geodata based on latitude and longitude coords
 func Reverse(query ReverseQuery, options Options, api string) (GeoData, error) {
 	var geo GeoData
 

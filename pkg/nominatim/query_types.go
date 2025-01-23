@@ -2,7 +2,7 @@ package nominatim
 
 import "fmt"
 
-// Options are possible option for all queries
+// Options are possible options for all queries
 type Options struct {
 	Addressdeatils bool
 	Extratags      bool
