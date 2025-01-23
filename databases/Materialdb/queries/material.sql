@@ -7,6 +7,9 @@ SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_s
 -- name: GetMaterialsBySite :many
 SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site, last_checked_out FROM Materials WHERE job_site=?;
 
+-- name: GetMaterialsByID :many
+SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site, last_checked_out FROM Materials WHERE id=?;
+
 -- name: GetMaterialsByQuantity :many
 SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site, last_checked_out
 FROM Materials 
