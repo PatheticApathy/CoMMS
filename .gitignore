@@ -1,2 +1,2 @@
-./database/materials.db
-./Userdb/user.db
+databases/*/*.db
+go.sum
