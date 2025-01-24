@@ -5,11 +5,14 @@
 package user_db
 
 type User struct {
-	ID       int64
-	Username string
-	Password string
-	Name     string
-	Company  string
-	Site     string
-	Role     string
+	ID        int64
+	Username  string
+	Password  string
+	Firstname string
+	Lastname  string
+	Company   string
+	Site      string
+	Role      string
+	Email     string
+	Phone     string
 }

@@ -10,36 +10,45 @@ import (
 )
 
 const addUser = `-- name: AddUser :one
-INSERT INTO Users(username, password, name, company, site, role) VALUES (?,?,?,?,?,?) RETURNING id, username, password, name, company, site, role
+INSERT INTO Users(username, password, firstname, lastname, company, site, role, email, phone) VALUES (?,?,?,?,?,?,?,?,?) RETURNING id, username, password, firstname, lastname, company, site, role, email, phone
 `
 
 type AddUserParams struct {
-	Username string
-	Password string
-	Name     string
-	Company  string
-	Site     string
-	Role     string
+	Username  string
+	Password  string
+	Firstname string
+	Lastname  string
+	Company   string
+	Site      string
+	Role      string
+	Email     string
+	Phone     string
 }
 
 func (q *Queries) AddUser(ctx context.Context, arg AddUserParams) (User, error) {
 	row := q.db.QueryRowContext(ctx, addUser,
 		arg.Username,
 		arg.Password,
-		arg.Name,
+		arg.Firstname,
+		arg.Lastname,
 		arg.Company,
 		arg.Site,
 		arg.Role,
+		arg.Email,
+		arg.Phone,
 	)
 	var i User
 	err := row.Scan(
 		&i.ID,
 		&i.Username,
 		&i.Password,
-		&i.Name,
+		&i.Firstname,
+		&i.Lastname,
 		&i.Company,
 		&i.Site,
 		&i.Role,
+		&i.Email,
+		&i.Phone,
 	)
 	return i, err
 }
@@ -54,16 +63,19 @@ func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
 }
 
 const getAllUsers = `-- name: GetAllUsers :many
-SELECT id, username, name, company, site, role FROM Users
+SELECT id, username, firstname, lastname, company, site, role, email, phone FROM Users
 `
 
 type GetAllUsersRow struct {
-	ID       int64
-	Username string
-	Name     string
-	Company  string
-	Site     string
-	Role     string
+	ID        int64
+	Username  string
+	Firstname string
+	Lastname  string
+	Company   string
+	Site      string
+	Role      string
+	Email     string
+	Phone     string
 }
 
 func (q *Queries) GetAllUsers(ctx context.Context) ([]GetAllUsersRow, error) {
@@ -78,10 +90,13 @@ func (q *Queries) GetAllUsers(ctx context.Context) ([]GetAllUsersRow, error) {
 		if err := rows.Scan(
 			&i.ID,
 			&i.Username,
-			&i.Name,
+			&i.Firstname,
+			&i.Lastname,
 			&i.Company,
 			&i.Site,
 			&i.Role,
+			&i.Email,
+			&i.Phone,
 		); err != nil {
 			return nil, err
 		}
@@ -97,16 +112,19 @@ func (q *Queries) GetAllUsers(ctx context.Context) ([]GetAllUsersRow, error) {
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, username, name, company, site, role FROM Users WHERE id = ?
+SELECT id, username, firstname, lastname, company, site, role, email, phone FROM Users WHERE id = ?
 `
 
 type GetUserRow struct {
-	ID       int64
-	Username string
-	Name     string
-	Company  string
-	Site     string
-	Role     string
+	ID        int64
+	Username  string
+	Firstname string
+	Lastname  string
+	Company   string
+	Site      string
+	Role      string
+	Email     string
+	Phone     string
 }
 
 func (q *Queries) GetUser(ctx context.Context, id int64) (GetUserRow, error) {
@@ -115,36 +133,45 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (GetUserRow, error) {
 	err := row.Scan(
 		&i.ID,
 		&i.Username,
-		&i.Name,
+		&i.Firstname,
+		&i.Lastname,
 		&i.Company,
 		&i.Site,
 		&i.Role,
+		&i.Email,
+		&i.Phone,
 	)
 	return i, err
 }
 
 const updateUser = `-- name: UpdateUser :one
-UPDATE Users SET username = ?, password = ?, name = ?, company = ?, site = ?, role = ? WHERE id = ? RETURNING id, username, password, name, company, site, role
+UPDATE Users SET username = ?, password = ?, firstname = ?, lastname = ?, company = ?, site = ?, role = ?, email = ?, phone = ? WHERE id = ? RETURNING id, username, password, firstname, lastname, company, site, role, email, phone
 `
 
 type UpdateUserParams struct {
-	Username string
-	Password string
-	Name     string
-	Company  string
-	Site     string
-	Role     string
-	ID       int64
+	Username  string
+	Password  string
+	Firstname string
+	Lastname  string
+	Company   string
+	Site      string
+	Role      string
+	Email     string
+	Phone     string
+	ID        int64
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
 	row := q.db.QueryRowContext(ctx, updateUser,
 		arg.Username,
 		arg.Password,
-		arg.Name,
+		arg.Firstname,
+		arg.Lastname,
 		arg.Company,
 		arg.Site,
 		arg.Role,
+		arg.Email,
+		arg.Phone,
 		arg.ID,
 	)
 	var i User
@@ -152,10 +179,13 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		&i.ID,
 		&i.Username,
 		&i.Password,
-		&i.Name,
+		&i.Firstname,
+		&i.Lastname,
 		&i.Company,
 		&i.Site,
 		&i.Role,
+		&i.Email,
+		&i.Phone,
 	)
 	return i, err
 }
