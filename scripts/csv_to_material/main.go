@@ -26,6 +26,11 @@ func main() {
 
 	material_queries := material_db.New(db)
 
+	if len(os.Args) < 2 {
+		fmt.Println("Please choose a file as an argument")
+		return
+	}
+
 	// open file for reading as csv
 	file, err := os.Open(os.Args[1])
 	if err != nil {

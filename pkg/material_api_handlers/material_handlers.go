@@ -1,6 +1,5 @@
 package materialhandlers
 
-// TODO: Add material logging when user adds a material and when they change quantity of material
 // TODO: Add get all materials route
 import (
 	"database/sql"
@@ -190,28 +189,12 @@ func (e *Env) changeMaterialQuantity(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if material.Quantity < 30 && material.Quantity != 0 {
+	if material.Quantity < 30 && material.Quantity <= 0 {
 		log.Printf(`Low material count for %v, changing status`, material.Name)
-
-		mat, err := e.Queries.ChangeStatus(r.Context(), material_db.ChangeStatusParams{Status: "Low Stock", ID: material.ID})
-		if err != nil {
-			log.Printf(`Could not change status, reason %e`, err)
-			http.Error(w, `Failed status change`, http.StatusInternalServerError)
-			return
-		}
-		material.Status = mat.Status
 	}
 
 	if material.Quantity <= 0 {
-		log.Printf(`Out of material %v, changing status`, material.Name)
-
-		mat, err := e.Queries.ChangeStatus(r.Context(), material_db.ChangeStatusParams{Status: "Out of Stock", ID: material.ID})
-		if err != nil {
-			log.Printf(`Could not change status, reason %e`, err)
-			http.Error(w, `Failed status change`, http.StatusInternalServerError)
-			return
-		}
-		material.Status = mat.Status
+		log.Printf(`Out of material %v, changing status changed`, material.Name)
 	}
 
 	if err := json.NewEncoder(w).Encode(&material); err != nil {
