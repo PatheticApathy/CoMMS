@@ -1,14 +1,14 @@
 -- name: GetAllUsers :many
-SELECT id, username, name, company, site, role FROM Users;
+SELECT id, username, firstname, lastname, company, site, role, email, phone FROM Users;
 
 -- name: GetUser :one
-SELECT id, username, name, company, site, role FROM Users WHERE id = ?;
+SELECT id, username, firstname, lastname, company, site, role, email, phone FROM Users WHERE id = ?;
 
 -- name: AddUser :one
-INSERT INTO Users(username, password, name, company, site, role) VALUES (?,?,?,?,?,?) RETURNING *;
+INSERT INTO Users(username, password, firstname, lastname, company, site, role, email, phone) VALUES (?,?,?,?,?,?,?,?,?) RETURNING *;
 
 -- name: UpdateUser :one
-UPDATE Users SET username = ?, password = ?, name = ?, company = ?, site = ?, role = ? WHERE id = ? RETURNING *;
+UPDATE Users SET username = ?, password = ?, firstname = ?, lastname = ?, company = ?, site = ?, role = ?, email = ?, phone = ? WHERE id = ? RETURNING *;
 
 -- name: DeleteUser :exec
 DELETE FROM Users WHERE id = ?;

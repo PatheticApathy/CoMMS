@@ -6,7 +6,7 @@ CREATE TABLE Materials (
   type TEXT,
   quantity INTEGER NOT NULL,
   unit TEXT NOT NULL,
-  status TEXT NOT NULL,
+  status TEXT CHECK (status IN ("In Stock","Out of Stock","Low Stock")  ) NOT NULL,
   location_lat FLOAT,
   location_lng FLOAT,
   last_checked_out DATEIME,
