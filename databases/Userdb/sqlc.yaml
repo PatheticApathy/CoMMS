@@ -6,4 +6,4 @@ sql:
     gen:
       go:
         package: user_db
-        out: ../pkg/database/
+        out: ../../pkg/databases/userdb
