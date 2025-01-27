@@ -1,3 +1,4 @@
+// main for starting user api server
 package main
 
 import (
@@ -12,7 +13,6 @@ import (
 )
 
 func main() {
-
 	db, err := sql.Open("sqlite", "./databases/Userdb/user.db")
 	if err != nil {
 		log.Fatal(err)
@@ -24,5 +24,4 @@ func main() {
 
 	fmt.Println("Server is running on port 8080")
 	http.ListenAndServe(":8080", nil)
-
 }
