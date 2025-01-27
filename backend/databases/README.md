@@ -2,7 +2,7 @@
 
 This is the file containing everything related to the database code maintenance with the exception of the go code that is used closer to the server.
 
-In each file, you'll will need to create the database file yourself
+To setup everything fast, simply run `goose up` which will create the database and populate it with all updates so far.
 
 ## /migrations
 

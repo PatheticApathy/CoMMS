@@ -2,7 +2,7 @@
 // versions:
 //   sqlc v1.27.0
 
-package user_db
+package userdb
 
 type User struct {
 	ID        int64
