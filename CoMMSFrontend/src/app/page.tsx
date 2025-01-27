@@ -13,8 +13,8 @@ export default function Welcome() {
           is designed to be used through this website for easy accessibility.
         </div>
         <div className={styles.WelcomeButtonDiv}>
-          <Link href="/home">
-            <button className={styles.buttonWelcome}>Go To Home</button>
+          <Link href="/login">
+            <button className={styles.buttonWelcome}>Go To Login</button>
           </Link>
         </div>
       </div>
