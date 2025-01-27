@@ -5,7 +5,8 @@ import NavBar from "../navbar/page"
 export default function Home() {
   return (
     <main className={styles.main}>
-      <div className={styles.headerDivHome1}>CoMMS
+      <div className={styles.headerDivHome1}>
+        CoMMS
       </div>
       <NavBar />
     </main>
