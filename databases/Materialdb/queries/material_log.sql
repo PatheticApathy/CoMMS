@@ -6,7 +6,7 @@ SELECT id, material_id, note, status, quantity_change, timestamp
 FROM MaterialLogs
 WHERE id = ?;
 
--- name: GetMaterialLogsByMaterial :one
+-- name: GetMaterialLogsByMaterial :many
 SELECT id, material_id, note, status, quantity_change, timestamp
 FROM MaterialLogs
 WHERE material_id = ?;

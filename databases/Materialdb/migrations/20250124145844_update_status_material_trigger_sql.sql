@@ -5,8 +5,8 @@ FOR EACH ROW
 BEGIN
   UPDATE Materials 
   SET status = CASE
-    WHEN quantity <= 0 THEN `Out of Stock`
-    WHEN quantity < 30 THEN `Low Stock`
+    WHEN quantity <= 0 THEN 'Out of Stock'
+    WHEN quantity < 30 THEN 'Low Stock'
     ELSE old.status
   END
   WHERE id = new.id;
