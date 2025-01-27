@@ -48,9 +48,6 @@ type MaterialLog struct {
 }
 
 type User struct {
-	ID       int64         `json:"id"`
-	SiteID   sql.NullInt64 `json:"site_id"`
-	Username string        `json:"username"`
-	Password string        `json:"password"`
-	Role     string        `json:"role"`
+	ID     int64         `json:"id"`
+	SiteID sql.NullInt64 `json:"site_id"`
 }

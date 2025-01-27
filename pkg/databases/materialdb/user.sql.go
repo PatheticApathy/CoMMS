@@ -11,54 +11,35 @@ import (
 )
 
 const addUser = `-- name: AddUser :one
-INSERT INTO Users(username, site_id, role) VALUES (?,?,?) RETURNING id, site_id, username, password, role
+INSERT INTO Users(id,site_id) VALUES (?,?) RETURNING id, site_id
 `
 
 type AddUserParams struct {
-	Username string        `json:"username"`
-	SiteID   sql.NullInt64 `json:"site_id"`
-	Role     string        `json:"role"`
+	ID     int64         `json:"id"`
+	SiteID sql.NullInt64 `json:"site_id"`
 }
 
 func (q *Queries) AddUser(ctx context.Context, arg AddUserParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, addUser, arg.Username, arg.SiteID, arg.Role)
+	row := q.db.QueryRowContext(ctx, addUser, arg.ID, arg.SiteID)
 	var i User
-	err := row.Scan(
-		&i.ID,
-		&i.SiteID,
-		&i.Username,
-		&i.Password,
-		&i.Role,
-	)
+	err := row.Scan(&i.ID, &i.SiteID)
 	return i, err
 }
 
 const getAllUsers = `-- name: GetAllUsers :many
-SELECT id, username, site_id, role FROM Users
+SELECT id,site_id FROM Users
 `
 
-type GetAllUsersRow struct {
-	ID       int64         `json:"id"`
-	Username string        `json:"username"`
-	SiteID   sql.NullInt64 `json:"site_id"`
-	Role     string        `json:"role"`
-}
-
-func (q *Queries) GetAllUsers(ctx context.Context) ([]GetAllUsersRow, error) {
+func (q *Queries) GetAllUsers(ctx context.Context) ([]User, error) {
 	rows, err := q.db.QueryContext(ctx, getAllUsers)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetAllUsersRow
+	var items []User
 	for rows.Next() {
-		var i GetAllUsersRow
-		if err := rows.Scan(
-			&i.ID,
-			&i.Username,
-			&i.SiteID,
-			&i.Role,
-		); err != nil {
+		var i User
+		if err := rows.Scan(&i.ID, &i.SiteID); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -73,24 +54,12 @@ func (q *Queries) GetAllUsers(ctx context.Context) ([]GetAllUsersRow, error) {
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, username, site_id, role FROM Users WHERE id = ?
+SELECT id, site_id FROM Users WHERE id = ?
 `
 
-type GetUserRow struct {
-	ID       int64         `json:"id"`
-	Username string        `json:"username"`
-	SiteID   sql.NullInt64 `json:"site_id"`
-	Role     string        `json:"role"`
-}
-
-func (q *Queries) GetUser(ctx context.Context, id int64) (GetUserRow, error) {
+func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
 	row := q.db.QueryRowContext(ctx, getUser, id)
-	var i GetUserRow
-	err := row.Scan(
-		&i.ID,
-		&i.Username,
-		&i.SiteID,
-		&i.Role,
-	)
+	var i User
+	err := row.Scan(&i.ID, &i.SiteID)
 	return i, err
 }

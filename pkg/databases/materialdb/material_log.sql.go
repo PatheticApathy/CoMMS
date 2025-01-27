@@ -123,22 +123,38 @@ func (q *Queries) GetMaterialLogsByID(ctx context.Context, id int64) (MaterialLo
 	return i, err
 }
 
-const getMaterialLogsByMaterial = `-- name: GetMaterialLogsByMaterial :one
+const getMaterialLogsByMaterial = `-- name: GetMaterialLogsByMaterial :many
 SELECT id, material_id, note, status, quantity_change, timestamp
 FROM MaterialLogs
 WHERE material_id = ?
 `
 
-func (q *Queries) GetMaterialLogsByMaterial(ctx context.Context, materialID int64) (MaterialLog, error) {
-	row := q.db.QueryRowContext(ctx, getMaterialLogsByMaterial, materialID)
-	var i MaterialLog
-	err := row.Scan(
-		&i.ID,
-		&i.MaterialID,
-		&i.Note,
-		&i.Status,
-		&i.QuantityChange,
-		&i.Timestamp,
-	)
-	return i, err
+func (q *Queries) GetMaterialLogsByMaterial(ctx context.Context, materialID int64) ([]MaterialLog, error) {
+	rows, err := q.db.QueryContext(ctx, getMaterialLogsByMaterial, materialID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []MaterialLog
+	for rows.Next() {
+		var i MaterialLog
+		if err := rows.Scan(
+			&i.ID,
+			&i.MaterialID,
+			&i.Note,
+			&i.Status,
+			&i.QuantityChange,
+			&i.Timestamp,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
