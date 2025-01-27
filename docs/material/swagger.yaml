@@ -1,0 +1,643 @@
+basePath: /
+definitions:
+  materialdb.AddCheckoutLogParams:
+    properties:
+      item_id:
+        type: integer
+      user_id:
+        type: integer
+    type: object
+  materialdb.AddJobSiteParams:
+    properties:
+      addr:
+        $ref: '#/definitions/sql.NullString'
+      location_lat:
+        $ref: '#/definitions/sql.NullFloat64'
+      location_lng:
+        $ref: '#/definitions/sql.NullFloat64'
+      name:
+        type: string
+    type: object
+  materialdb.AddMaterialLogParams:
+    properties:
+      material_id:
+        type: integer
+      note:
+        $ref: '#/definitions/sql.NullString'
+      quantity_change:
+        type: integer
+      status:
+        type: string
+    type: object
+  materialdb.AddMaterialParams:
+    properties:
+      job_site:
+        $ref: '#/definitions/sql.NullInt64'
+      location_lat:
+        $ref: '#/definitions/sql.NullFloat64'
+      location_lng:
+        $ref: '#/definitions/sql.NullFloat64'
+      name:
+        $ref: '#/definitions/sql.NullString'
+      quantity:
+        type: integer
+      status:
+        type: string
+      type:
+        $ref: '#/definitions/sql.NullString'
+      unit:
+        type: string
+    type: object
+  materialdb.AddUserParams:
+    properties:
+      id:
+        type: integer
+      site_id:
+        $ref: '#/definitions/sql.NullInt64'
+    type: object
+  materialdb.ChangeMaterialNoteParams:
+    properties:
+      id:
+        type: integer
+      note:
+        $ref: '#/definitions/sql.NullString'
+    type: object
+  materialdb.ChangeQuantityParams:
+    properties:
+      id:
+        type: integer
+      quantity:
+        type: integer
+    type: object
+  materialdb.CheckoutLog:
+    properties:
+      checkin_time:
+        type: string
+      checkout_time:
+        type: string
+      id:
+        type: integer
+      item_id:
+        type: integer
+      user_id:
+        type: integer
+    type: object
+  materialdb.JobSite:
+    properties:
+      addr:
+        $ref: '#/definitions/sql.NullString'
+      id:
+        type: integer
+      location_lat:
+        $ref: '#/definitions/sql.NullFloat64'
+      location_lng:
+        $ref: '#/definitions/sql.NullFloat64'
+      name:
+        type: string
+    type: object
+  materialdb.Material:
+    properties:
+      id:
+        type: integer
+      job_site:
+        $ref: '#/definitions/sql.NullInt64'
+      last_checked_out: {}
+      location_lat:
+        $ref: '#/definitions/sql.NullFloat64'
+      location_lng:
+        $ref: '#/definitions/sql.NullFloat64'
+      name:
+        $ref: '#/definitions/sql.NullString'
+      quantity:
+        type: integer
+      status:
+        type: string
+      type:
+        $ref: '#/definitions/sql.NullString'
+      unit:
+        type: string
+    type: object
+  materialdb.MaterialLog:
+    properties:
+      id:
+        type: integer
+      material_id:
+        type: integer
+      note:
+        $ref: '#/definitions/sql.NullString'
+      quantity_change:
+        type: integer
+      status:
+        type: string
+      timestamp:
+        type: string
+    type: object
+  materialdb.User:
+    properties:
+      id:
+        type: integer
+      site_id:
+        $ref: '#/definitions/sql.NullInt64'
+    type: object
+  sql.NullFloat64:
+    properties:
+      float64:
+        type: number
+      valid:
+        description: Valid is true if Float64 is not NULL
+        type: boolean
+    type: object
+  sql.NullInt64:
+    properties:
+      int64:
+        type: integer
+      valid:
+        description: Valid is true if Int64 is not NULL
+        type: boolean
+    type: object
+  sql.NullString:
+    properties:
+      string:
+        type: string
+      valid:
+        description: Valid is true if String is not NULL
+        type: boolean
+    type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+host: localhost:8080
+info:
+  contact:
+    name: Comms group
+    url: http://github.com/PatheticApathy/CoMMS
+  description: This is the material tracking application's api for dealing with the
+    materials
+  termsOfService: http://swagger.io/terms/
+  title: Material Tracker API
+  version: "1.0"
+paths:
+  /checkouts/all:
+    get:
+      description: gets all checkout logs if they exist
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: checkout logs
+          schema:
+            items:
+              $ref: '#/definitions/materialdb.CheckoutLog'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: fetches all checkout logs
+      tags:
+      - checkout logs
+  /checkouts/in:
+    put:
+      consumes:
+      - application/json
+      description: Adds material log  to the database using valid json structure
+      parameters:
+      - description: id of checkoutlog
+        in: body
+        name: logid
+        required: true
+        schema:
+          type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: checkout log
+          schema:
+            $ref: '#/definitions/materialdb.CheckoutLog'
+        "400":
+          description: bad request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: post material log to database
+      tags:
+      - checkout logs
+  /checkouts/out:
+    post:
+      consumes:
+      - application/json
+      description: Adds checkout log for a materials
+      parameters:
+      - description: Format of add ckeckout log
+        in: body
+        name: checkoutlg
+        required: true
+        schema:
+          $ref: '#/definitions/materialdb.AddCheckoutLogParams'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: checkout log
+          schema:
+            $ref: '#/definitions/materialdb.CheckoutLog'
+        "400":
+          description: bad request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: post checkout of material
+      tags:
+      - checkout logs
+  /material/add:
+    post:
+      description: Adds materials to the database using valid json structure
+      parameters:
+      - description: Format of add material request
+        in: body
+        name: material
+        required: true
+        schema:
+          $ref: '#/definitions/materialdb.AddMaterialParams'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: material
+          schema:
+            $ref: '#/definitions/materialdb.Material'
+        "400":
+          description: bad request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: post materials to database
+      tags:
+      - material
+  /material/all:
+    get:
+      description: Gets all material form database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: material
+          schema:
+            items:
+              $ref: '#/definitions/materialdb.Material'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: gets all materials from database
+      tags:
+      - material
+  /material/change:
+    put:
+      description: changes the quantity of the given material using it's id
+      parameters:
+      - description: Format of changing material quantity
+        in: body
+        name: material
+        required: true
+        schema:
+          $ref: '#/definitions/materialdb.ChangeQuantityParams'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: material
+          schema:
+            $ref: '#/definitions/materialdb.Material'
+        "400":
+          description: bad request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: adjust quantity based on the requested amount
+      tags:
+      - material
+  /material/search:
+    get:
+      description: Can get material using its id, quantity and unit, type, or job
+        site
+      parameters:
+      - description: id of material
+        in: query
+        name: id
+        type: integer
+      - description: quantity of material, must be combined with unit
+        in: query
+        name: quantity
+        type: integer
+      - description: unit of the quantity, must be combined with quantity
+        in: query
+        name: unit
+        type: string
+      - description: type of material
+        in: query
+        name: type
+        type: string
+      - description: site id of which material belongs to
+        in: query
+        name: site
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: material
+          schema:
+            items:
+              $ref: '#/definitions/materialdb.Material'
+            type: array
+        "400":
+          description: bad request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: fetches material based on given  query parameters
+      tags:
+      - material
+  /mlogs/add:
+    post:
+      consumes:
+      - application/json
+      description: Adds material log  to the database using valid json structure
+      parameters:
+      - description: Format of add material log request
+        in: body
+        name: materiallog
+        required: true
+        schema:
+          $ref: '#/definitions/materialdb.AddMaterialLogParams'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: material log
+          schema:
+            items:
+              $ref: '#/definitions/materialdb.MaterialLog'
+            type: array
+        "400":
+          description: bad request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: post material log to database
+      tags:
+      - material logs
+  /mlogs/all:
+    get:
+      description: gets all material logs if they exist
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: material logs
+          schema:
+            items:
+              $ref: '#/definitions/materialdb.MaterialLog'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: fetches all material logs
+      tags:
+      - material logs
+  /mlogs/note:
+    put:
+      consumes:
+      - application/json
+      description: changes the not field of a materiallog
+      parameters:
+      - description: Format of changing matterial note request
+        in: body
+        name: note_and-id
+        required: true
+        schema:
+          $ref: '#/definitions/materialdb.ChangeMaterialNoteParams'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: material log
+          schema:
+            $ref: '#/definitions/materialdb.MaterialLog'
+        "400":
+          description: bad request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: post changes not on a existing material log
+      tags:
+      - material logs
+  /mlogs/search:
+    get:
+      description: Can get material using it's id, or the material it relates to
+      parameters:
+      - description: id of material log
+        in: query
+        name: id
+        type: integer
+      - description: id of material
+        in: query
+        name: material
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: material log
+          schema:
+            $ref: '#/definitions/materialdb.MaterialLog'
+        "400":
+          description: bad request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: fetches material logs based on given query parameters
+      tags:
+      - material logs
+  /sites/add:
+    post:
+      consumes:
+      - application/json
+      description: Adds job_site to the database using valid json structure
+      parameters:
+      - description: Format of add jobsite request
+        in: body
+        name: jobsite
+        required: true
+        schema:
+          $ref: '#/definitions/materialdb.AddJobSiteParams'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: jobsite
+          schema:
+            $ref: '#/definitions/materialdb.JobSite'
+        "400":
+          description: bad request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: post job_site to database
+      tags:
+      - sites
+  /sites/all:
+    get:
+      description: Get all jobsites
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: job site
+          schema:
+            items:
+              $ref: '#/definitions/materialdb.JobSite'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: fetches all job_sites
+      tags:
+      - sites
+  /sites/search:
+    get:
+      description: Gets jobsites using id(may add more parameters later)
+      parameters:
+      - description: jobsite's identification number
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: job site
+          schema:
+            $ref: '#/definitions/materialdb.JobSite'
+        "400":
+          description: bad request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: fetches job_site based on given paremeters
+      tags:
+      - sites
+  /user/{id}:
+    get:
+      description: gets user from db
+      parameters:
+      - in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: user
+          schema:
+            $ref: '#/definitions/materialdb.User'
+        "400":
+          description: bad request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: get user from the material database
+      tags:
+      - user
+  /user/add:
+    post:
+      description: The use defined in the material database is only the bear essentials
+        for logging
+      parameters:
+      - description: Format of add user request
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/materialdb.AddUserParams'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: user
+          schema:
+            $ref: '#/definitions/materialdb.User'
+        "400":
+          description: bad request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: adds user to the material database
+      tags:
+      - user
+  /user/all:
+    get:
+      description: gets all users from db
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: user
+          schema:
+            items:
+              $ref: '#/definitions/materialdb.User'
+            type: array
+        "400":
+          description: bad request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: gets all users from the material database
+      tags:
+      - user
+swagger: "2.0"
