@@ -6,6 +6,7 @@ import (
 	"testing"
 )
 
+// Constants may need to be updated when OSM nominatim updates data
 const (
 	API_URL              = "https://nominatim.openstreetmap.org"
 	SearchShreveportJson = `[
@@ -25,7 +26,7 @@ const (
     "display_name": "Shreveport, Caddo Parish, Louisiana, United States",
     "boundingbox": [
       "32.3326915",
-      "32.5898665",
+      "32.5898672",
       "-93.9478451",
       "-93.6797150"
     ]
@@ -70,7 +71,7 @@ const (
     "display_name": "Shreveport, Caddo Parish, Louisiana, United States",
     "boundingbox": [
       "32.3326915",
-      "32.5898665",
+      "32.5898672",
       "-93.9478451",
       "-93.6797150"
     ]
@@ -96,8 +97,8 @@ const (
       "-93.8032450"
     ]
   }
-  ]
-  `
+]  `
+	// City level
 	REVERSESHRVEPORT = `{
   "place_id": 308856190,
   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
@@ -122,7 +123,7 @@ const (
   },
   "boundingbox": [
     "32.3326915",
-    "32.5898665",
+    "32.5898672",
     "-93.9478451",
     "-93.6797150"
   ]
