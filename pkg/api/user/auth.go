@@ -42,3 +42,17 @@ func (e *Env) authenticate(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
+
+func (e *Env) loggout(w http.ResponseWriter, _ *http.Request) {
+	cookie := &http.Cookie{
+		Name:     "LoginCookie",
+		Value:    "",
+		Path:     "/",
+		MaxAge:   -1,
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+	}
+
+	http.SetCookie(w, cookie)
+}
