@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
+	auth "github.com/PatheticApathy/CoMMS/pkg/auth"
 	user_db "github.com/PatheticApathy/CoMMS/pkg/databases/userdb"
 
 	_ "modernc.org/sqlite"
@@ -82,6 +83,7 @@ func (e *Env) getUsers(w http.ResponseWriter, r *http.Request) {
 //	@Router			/user/create [post]
 func (e *Env) SignUp(w http.ResponseWriter, r *http.Request) {
 	var params user_db.SignUpParams
+	auth.Hash(params.Password)
 	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
 		log.Println(err)
 		http.Error(w, "Invalid input", http.StatusBadRequest)
