@@ -2,6 +2,7 @@ package handler
 
 import (
 	"bytes"
+	"context"
 	"database/sql"
 	"encoding/json"
 	"net/http"
@@ -11,22 +12,41 @@ import (
 	_ "modernc.org/sqlite"
 
 	"github.com/PatheticApathy/CoMMS/pkg/auth"
+	user_db "github.com/PatheticApathy/CoMMS/pkg/databases/userdb"
 )
 
-func AuthTest(t *testing.T) {
-	db, err := sql.Open("sqlite", "./databases/Userdb/user.db")
+func TestAuth(t *testing.T) {
+	db, err := sql.Open("sqlite", "../../../databases/Userdb/user.db")
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer db.Close()
 	env := NewEnv(db)
+
+	passwrd := auth.Hash("bassword")
+	adduser := user_db.AddUserParams{
+		Username:  "bob",
+		Password:  passwrd,
+		Firstname: "Bob",
+		Lastname:  "Bobbert",
+		Company:   "BobbyBuilds",
+		Site:      "Bobbytown",
+		Role:      "user",
+		Email:     "bobbert@gmail.com",
+		Phone:     "1",
+	}
+	user, err := env.Queries.AddUser(context.Background(), adduser)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	ts := httptest.NewServer(http.HandlerFunc(env.authenticate))
 
 	defer ts.Close()
 
 	usernpass := auth.UserAndPass{
 		Username: "bob",
-		Password: "bob",
+		Password: "bassword",
 	}
 
 	jdata, err := json.Marshal(usernpass)
@@ -40,6 +60,10 @@ func AuthTest(t *testing.T) {
 		t.Fatal(err)
 	}
 	cookies := res.Cookies()
+
+	if err = env.Queries.DeleteUser(context.Background(), user.ID); err != nil {
+		t.Fatal(err)
+	}
 
 	t.Log(cookies[0].Name)
 
