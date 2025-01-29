@@ -3,10 +3,11 @@
 //   sqlc v1.27.0
 // source: user.sql
 
-package user_db
+package userdb
 
 import (
 	"context"
+	"database/sql"
 )
 
 const addUser = `-- name: AddUser :one
@@ -16,11 +17,11 @@ INSERT INTO Users(username, password, firstname, lastname, company, site, role, 
 type AddUserParams struct {
 	Username  string
 	Password  string
-	Firstname string
-	Lastname  string
-	Company   string
-	Site      string
-	Role      string
+	Firstname sql.NullString
+	Lastname  sql.NullString
+	Company   sql.NullString
+	Site      sql.NullString
+	Role      sql.NullString
 	Email     string
 	Phone     string
 }
@@ -69,11 +70,11 @@ SELECT id, username, firstname, lastname, company, site, role, email, phone FROM
 type GetAllUsersRow struct {
 	ID        int64
 	Username  string
-	Firstname string
-	Lastname  string
-	Company   string
-	Site      string
-	Role      string
+	Firstname sql.NullString
+	Lastname  sql.NullString
+	Company   sql.NullString
+	Site      sql.NullString
+	Role      sql.NullString
 	Email     string
 	Phone     string
 }
@@ -118,11 +119,11 @@ SELECT id, username, firstname, lastname, company, site, role, email, phone FROM
 type GetUserRow struct {
 	ID        int64
 	Username  string
-	Firstname string
-	Lastname  string
-	Company   string
-	Site      string
-	Role      string
+	Firstname sql.NullString
+	Lastname  sql.NullString
+	Company   sql.NullString
+	Site      sql.NullString
+	Role      sql.NullString
 	Email     string
 	Phone     string
 }
@@ -144,6 +145,40 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (GetUserRow, error) {
 	return i, err
 }
 
+const signUp = `-- name: SignUp :one
+INSERT INTO Users(username, password, email, phone) VALUES (?,?,?,?) RETURNING id, username, password, firstname, lastname, company, site, role, email, phone
+`
+
+type SignUpParams struct {
+	Username string
+	Password string
+	Email    string
+	Phone    string
+}
+
+func (q *Queries) SignUp(ctx context.Context, arg SignUpParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, signUp,
+		arg.Username,
+		arg.Password,
+		arg.Email,
+		arg.Phone,
+	)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Password,
+		&i.Firstname,
+		&i.Lastname,
+		&i.Company,
+		&i.Site,
+		&i.Role,
+		&i.Email,
+		&i.Phone,
+	)
+	return i, err
+}
+
 const updateUser = `-- name: UpdateUser :one
 UPDATE Users SET username = ?, password = ?, firstname = ?, lastname = ?, company = ?, site = ?, role = ?, email = ?, phone = ? WHERE id = ? RETURNING id, username, password, firstname, lastname, company, site, role, email, phone
 `
@@ -151,11 +186,11 @@ UPDATE Users SET username = ?, password = ?, firstname = ?, lastname = ?, compan
 type UpdateUserParams struct {
 	Username  string
 	Password  string
-	Firstname string
-	Lastname  string
-	Company   string
-	Site      string
-	Role      string
+	Firstname sql.NullString
+	Lastname  sql.NullString
+	Company   sql.NullString
+	Site      sql.NullString
+	Role      sql.NullString
 	Email     string
 	Phone     string
 	ID        int64

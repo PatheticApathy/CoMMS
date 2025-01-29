@@ -2,17 +2,21 @@
 // versions:
 //   sqlc v1.27.0
 
-package user_db
+package userdb
+
+import (
+	"database/sql"
+)
 
 type User struct {
 	ID        int64
 	Username  string
 	Password  string
-	Firstname string
-	Lastname  string
-	Company   string
-	Site      string
-	Role      string
+	Firstname sql.NullString
+	Lastname  sql.NullString
+	Company   sql.NullString
+	Site      sql.NullString
+	Role      sql.NullString
 	Email     string
 	Phone     string
 }
