@@ -1,4 +1,4 @@
-package handler_test
+package handler
 
 import (
 	"bytes"
@@ -10,7 +10,6 @@ import (
 
 	_ "modernc.org/sqlite"
 
-	handler "github.com/PatheticApathy/CoMMS/pkg/api/user"
 	"github.com/PatheticApathy/CoMMS/pkg/auth"
 )
 
@@ -20,8 +19,8 @@ func AuthTest(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer db.Close()
-	env := handler.NewEnv(db)
-	ts := httptest.NewServer(env.authenticate)
+	env := NewEnv(db)
+	ts := httptest.NewServer(http.HandlerFunc(env.authenticate))
 
 	defer ts.Close()
 
@@ -31,8 +30,17 @@ func AuthTest(t *testing.T) {
 	}
 
 	jdata, err := json.Marshal(usernpass)
+	if err != nil {
+		t.Fatal(err)
+	}
 	buffer := bytes.NewReader(jdata)
 
-	res, err := http.Post(ts.URL, "ContntType", buffer)
+	res, err := http.Post(ts.URL, "application/json", buffer)
+	if err != nil {
+		t.Fatal(err)
+	}
+	cookies := res.Cookies()
+
+	t.Log(cookies[0].Name)
 
 }
