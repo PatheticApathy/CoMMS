@@ -4,6 +4,7 @@ package main
 import (
 	"database/sql"
 	"log"
+	"net"
 	"net/http"
 	"os"
 
@@ -13,47 +14,38 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-// if nominatim host not set in .env, default to osm
-func getNomAddr() string {
-	nominatim_host, nominatim_port := os.Getenv("NOMINATIM_HOST"), os.Getenv("NOMINATIM_HOST")
-	if nominatim_host == "" || nominatim_port == "" {
-		log.Printf("WARNING: Nominatim api host or port not set, defaulting to website. Using default")
-		return "https://nominatim.openstreetmap.org"
-	} else {
-		return nominatim_host + nominatim_port
-	}
-}
-
-// get material api address. If not set, skip
-func getMatAddr() string {
-	host, port := os.Getenv("MATERIAL_HOST"), os.Getenv("MATERIAL_PORT")
-	if host == "" || port == "" {
-		log.Printf("WARNING: Material api host or port not set, skipping")
-		return ""
-	} else {
-		return host + port
-	}
-}
-
 func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Fatalf("No .env file found LOL: %e", err)
 	}
 
 	// goes to osm if not set in .env
-	nominatim := getNomAddr()
+	nhost, nport, err := net.SplitHostPort(os.Getenv("NOMINATIM_HOST"))
+	if err != nil {
+		log.Println("WARNING: Nominatim api host not set or invalid syntax, defaulting to osm website")
+		nhost = "https://nominatim.openstreetmap.org"
+		nport = ""
+	}
+	nominatim := nhost + nport
 
 	// prints warning if not set
-	material := getMatAddr()
+	mhost, mport, err := net.SplitHostPort(os.Getenv("MATERIAL_HOST"))
+	if err != nil {
+		log.Printf("Warning: material api host not set: %e", err)
+	}
+	material := mhost + mport
 
 	secret := os.Getenv("SECRETKEY")
 	if secret == "" {
 		log.Fatal("No secret set in environment variable")
 	}
+	if len([]byte(secret)) != 16 {
+		log.Fatal("Error: Invalid secret length(must be 16 charcaters)")
+	}
 
-	port := os.Getenv("USER_PORT")
-	if port == "" {
-		log.Fatal("No port set in environment variable")
+	_, port, err := net.SplitHostPort(os.Getenv("USER_HOST"))
+	if err != nil {
+		log.Fatal("No port for server set in environment variable or invalid syntax")
 	}
 
 	db_path := os.Getenv("USERDB")

@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"log"
+	"net"
 	"net/http"
 	"os"
 
@@ -32,9 +33,9 @@ func main() {
 		log.Fatalf("No .env file found LOL: %e", err)
 	}
 
-	port := os.Getenv("MATERIAL_PORT")
-	if port == "" {
-		log.Fatal("No port set in environment variable")
+	_, port, err := net.SplitHostPort(os.Getenv("MATERIAL_HOST"))
+	if err != nil {
+		log.Fatal("No port set in environment variable for material api host")
 	}
 
 	db_path := os.Getenv("MATERIALDB")
