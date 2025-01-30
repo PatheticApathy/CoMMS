@@ -4,15 +4,15 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
+	"os"
 
 	_ "github.com/PatheticApathy/CoMMS/docs/material"
 	"github.com/PatheticApathy/CoMMS/pkg/api/material"
 	"github.com/PatheticApathy/CoMMS/pkg/middleware" // http-swagger middleware
-	httpSwagger "github.com/swaggo/http-swagger"     // http-swagger middleware
+	"github.com/joho/godotenv"
+	httpSwagger "github.com/swaggo/http-swagger" // http-swagger middleware
 	_ "modernc.org/sqlite"
 )
-
-// TODO: Use nominatim to convert address to latitude and longitude coords when somthinf added to db
 
 //	@title			Material Tracker API
 //	@version		1.0
@@ -28,9 +28,21 @@ import (
 // @externalDocs.description	OpenAPI
 // @externalDocs.url			https://swagger.io/resources/open-api/
 func main() {
-	port := ":8080"
+	if err := godotenv.Load(); err != nil {
+		log.Fatalf("No .env file found LOL: %e", err)
+	}
 
-	db, err := sql.Open("sqlite", "./databases/Materialdb/materials.db")
+	port := os.Getenv("MATERIAL_PORT")
+	if port == "" {
+		log.Fatal("No port set in environment variable")
+	}
+
+	db_path := os.Getenv("MATERIALDB")
+	if db_path == "" {
+		log.Fatal("No database path set in environment variable")
+	}
+
+	db, err := sql.Open("sqlite", db_path)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -44,12 +56,12 @@ func main() {
 	})
 
 	serv := http.Server{
-		Addr:    port,
+		Addr:    ":" + port,
 		Handler: middleware.Middlewares(middleware.Json, middleware.Logger)(router),
 	}
 
 	defer serv.Close()
 
-	log.Printf("Running on port %s", serv.Addr)
+	log.Printf("Running on port %s", port)
 	log.Fatal(serv.ListenAndServe())
 }
