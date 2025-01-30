@@ -65,6 +65,5 @@ func TestAuth(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	t.Log(cookies[0].Name)
-
+	t.Logf("Cookie name: %s, Cookie value: %s", cookies[0].Name, cookies[0].Value)
 }
