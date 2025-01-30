@@ -8,12 +8,18 @@ import (
 )
 
 type Env struct {
-	Queries *user_db.Queries
+	Queries         *user_db.Queries
+	Secret          string
+	MaterialApiHost string
+	NominatimHost   string
 }
 
-func NewEnv(db *sql.DB) Env {
+func NewEnv(db *sql.DB, secret, material_host, nominatim_host string) Env {
 	return Env{
-		Queries: user_db.New(db),
+		Queries:         user_db.New(db),
+		Secret:          secret,
+		MaterialApiHost: material_host,
+		NominatimHost:   nominatim_host,
 	}
 }
 

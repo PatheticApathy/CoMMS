@@ -21,7 +21,7 @@ func (e *Env) externalQueryHandler(w http.ResponseWriter, r *http.Request) {
 
 	// verify token
 
-	// PAss request to appropriate server
+	// pass request to appropriate server
 
 	// return resp
 }

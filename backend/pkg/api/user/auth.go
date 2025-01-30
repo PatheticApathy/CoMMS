@@ -10,8 +10,6 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-const SECRETKEY = "secretsecretpass"
-
 func (e *Env) authenticate(w http.ResponseWriter, r *http.Request) {
 	var userandpass auth.UserAndPass
 	if err := json.NewDecoder(r.Body).Decode(&userandpass); err != nil {
@@ -35,12 +33,11 @@ func (e *Env) authenticate(w http.ResponseWriter, r *http.Request) {
 		SameSite: http.SameSiteLaxMode,
 	}
 
-	err = auth.WriteEncrypted(w, cookie, []byte(SECRETKEY))
+	err = auth.WriteEncrypted(w, cookie, []byte(e.Secret))
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "server error", http.StatusInternalServerError)
 	}
-
 }
 
 func (e *Env) loggout(w http.ResponseWriter, _ *http.Request) {
