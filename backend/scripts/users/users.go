@@ -12,24 +12,27 @@ import (
 )
 
 func main() {
-	// Connect to the SQLite database
-	conn, err := sql.Open("sqlite", "./databases/Userdb/user.db")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer conn.Close()
 
-	// Create a new Queries instance
-	queries := user_db.New(conn)
+	// connect to db
+	db, err := sql.Open("sqlite", "./databases/Userdb/user.db")
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer db.Close()
+
+	queries := user_db.New(db)
 
 	// Create a new user
 	AddUserParams := user_db.AddUserParams{
-		Username: "johndoe",
-		Password: "password",
-		Name:     "John Doe",
-		Company:  "Acme Inc",
-		Site:     "acme.com",
-		Role:     "admin",
+		Username:  "johndoe",
+		Password:  "password",
+		Firstname: "John",
+		Lastname:  "Doe",
+		Company:   "Acme Inc",
+		Site:      "acme.com",
+		Role:      "admin",
+		Email:     "test@gmail.com",
+		Phone:     "1234567890",
 	}
 	user, err := queries.AddUser(context.Background(), AddUserParams)
 	if err != nil {
@@ -52,15 +55,18 @@ func main() {
 	}
 	fmt.Printf("List of users: %+v\n", users)
 
-	// Example: Update a user
+	// Update a user
 	updateParams := user_db.UpdateUserParams{
-		ID:       userID,
-		Username: "john_doe_updated",
-		Password: "new_password",
-		Name:     "John Doe Updated",
-		Company:  "Acme Inc",
-		Site:     "acme.com",
-		Role:     "admin",
+		ID:        userID,
+		Username:  "john_doe_updated",
+		Password:  "new_password",
+		Firstname: "John_updated",
+		Lastname:  "Doe_updated",
+		Company:   "Acme Inc",
+		Site:      "acme.com",
+		Role:      "admin",
+		Email:     "test@gmail.com",
+		Phone:     "1234567890",
 	}
 	updatedUser, err := queries.UpdateUser(context.Background(), updateParams)
 	if err != nil {
@@ -69,9 +75,9 @@ func main() {
 	fmt.Printf("Updated user: %+v\n", updatedUser)
 
 	// Delete a user
-	//err = queries.DeleteUser(context.Background(), userID)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//fmt.Println("Deleted user")
+	err = queries.DeleteUser(context.Background(), userID)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Deleted user")
 }

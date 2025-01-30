@@ -3,15 +3,19 @@
 This file contains everything needed to start an instance of the open street maps
 and start it on boot.
 
+> [!NOTE]
+> Plan is to switch all this over to a simple docker compose file
+
 ## Prerequisites
 
 Docker and the map data in this file.
 
-## Quick Start
+## Quick Start for production
 
-1. Download the slice form OSM by the slice and rename it to `Louisiana.osm.pbf`
-2. Run the setup script.
-   <br>
+### Map Of Louisiana
+
+Run the setup script.
+<br>
 
 ```bash
 bash setup.sh
@@ -25,3 +29,21 @@ You'll need to remove the docker container and volume named "osm-data", then res
 
 Now check the http address `http://your.server.ip.address:8080/tile/0/0/0.png`.
 A zoomable map should be at `http://your.server.ip.address:8080`.
+<<<<<<< Updated upstream
+=======
+
+### Geocoding services
+
+Run the setup script.
+<br>
+
+```bash
+bash geo.sh
+```
+
+You should be able to
+
+```Bash
+`curl localhost/search\?q\=Louisiana\&format\=json`
+```
+>>>>>>> Stashed changes

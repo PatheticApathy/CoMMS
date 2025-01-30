@@ -4,7 +4,6 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"net/http"
 
 	handler "github.com/PatheticApathy/CoMMS/pkg/api/user"
@@ -15,7 +14,7 @@ import (
 func main() {
 	db, err := sql.Open("sqlite", "./databases/Userdb/user.db")
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 	defer db.Close()
 
