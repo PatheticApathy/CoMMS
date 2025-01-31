@@ -1,69 +1,88 @@
 basePath: /
 definitions:
-  user_db.AddUserParams:
+  sql.NullString:
+    properties:
+      string:
+        type: string
+      valid:
+        description: Valid is true if String is not NULL
+        type: boolean
+    type: object
+  userdb.AddUserParams:
     properties:
       company:
-        type: string
+        $ref: '#/definitions/sql.NullString'
       email:
         type: string
       firstname:
-        type: string
+        $ref: '#/definitions/sql.NullString'
       lastname:
-        type: string
+        $ref: '#/definitions/sql.NullString'
       password:
         type: string
       phone:
         type: string
       role:
-        type: string
+        $ref: '#/definitions/sql.NullString'
       site:
+        $ref: '#/definitions/sql.NullString'
+      username:
+        type: string
+    type: object
+  userdb.SignUpParams:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      phone:
         type: string
       username:
         type: string
     type: object
-  user_db.UpdateUserParams:
+  userdb.UpdateUserParams:
     properties:
       company:
-        type: string
+        $ref: '#/definitions/sql.NullString'
       email:
         type: string
       firstname:
-        type: string
+        $ref: '#/definitions/sql.NullString'
       id:
         type: integer
       lastname:
-        type: string
+        $ref: '#/definitions/sql.NullString'
       password:
         type: string
       phone:
         type: string
       role:
-        type: string
+        $ref: '#/definitions/sql.NullString'
       site:
-        type: string
+        $ref: '#/definitions/sql.NullString'
       username:
         type: string
     type: object
-  user_db.User:
+  userdb.User:
     properties:
       company:
-        type: string
+        $ref: '#/definitions/sql.NullString'
       email:
         type: string
       firstname:
-        type: string
+        $ref: '#/definitions/sql.NullString'
       id:
         type: integer
       lastname:
-        type: string
+        $ref: '#/definitions/sql.NullString'
       password:
         type: string
       phone:
         type: string
       role:
-        type: string
+        $ref: '#/definitions/sql.NullString'
       site:
-        type: string
+        $ref: '#/definitions/sql.NullString'
       username:
         type: string
     type: object
@@ -89,7 +108,7 @@ paths:
         "200":
           description: users
           schema:
-            $ref: '#/definitions/user_db.User'
+            $ref: '#/definitions/userdb.User'
         "500":
           description: Faliled to get users
           schema:
@@ -108,14 +127,14 @@ paths:
         name: users
         required: true
         schema:
-          $ref: '#/definitions/user_db.AddUserParams'
+          $ref: '#/definitions/userdb.AddUserParams'
       produces:
       - application/json
       responses:
         "200":
           description: users
           schema:
-            $ref: '#/definitions/user_db.User'
+            $ref: '#/definitions/userdb.User'
         "400":
           description: Invalid input
           schema:
@@ -142,7 +161,7 @@ paths:
         "200":
           description: users
           schema:
-            $ref: '#/definitions/user_db.User'
+            $ref: '#/definitions/userdb.User'
         "400":
           description: Invalid user ID
           schema:
@@ -169,7 +188,7 @@ paths:
         "200":
           description: users
           schema:
-            $ref: '#/definitions/user_db.User'
+            $ref: '#/definitions/userdb.User'
         "400":
           description: Invalid id
           schema:
@@ -181,6 +200,36 @@ paths:
       summary: fetches user based on given paremeters
       tags:
       - users
+  /user/signup:
+    post:
+      consumes:
+      - application/json
+      description: Adds user to the database using valid json structure
+      parameters:
+      - description: Format of signup user request
+        in: body
+        name: users
+        required: true
+        schema:
+          $ref: '#/definitions/userdb.SignUpParams'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: users
+          schema:
+            $ref: '#/definitions/userdb.User'
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "500":
+          description: Failed to signup user
+          schema:
+            type: string
+      summary: post user to database
+      tags:
+      - users
   /user/update:
     put:
       description: Updates user using id(may add more parameters later)
@@ -190,14 +239,14 @@ paths:
         name: users
         required: true
         schema:
-          $ref: '#/definitions/user_db.UpdateUserParams'
+          $ref: '#/definitions/userdb.UpdateUserParams'
       produces:
       - application/json
       responses:
         "200":
           description: users
           schema:
-            $ref: '#/definitions/user_db.User'
+            $ref: '#/definitions/userdb.User'
         "400":
           description: Invalid input
           schema:

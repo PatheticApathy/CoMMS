@@ -78,8 +78,8 @@ func TestSignUp(t *testing.T) {
 	defer ts.Close()
 
 	// Test case: Valid user data
-	userData := `{"username": "testuser", "password": "testpass", "email": "test@example.com"}`
-	resp, err := http.Post(ts.URL+"/user/create", "application/json", strings.NewReader(userData))
+	userData := `{"username": "testuser", "password": "testpass", "email": "testuser@example.com", "phone": "098897800"}`
+	resp, err := http.Post(ts.URL+"/user/signup", "application/json", strings.NewReader(userData))
 	if err != nil {
 		t.Fatalf("Failed to make POST request: %v", err)
 	}
@@ -90,7 +90,7 @@ func TestSignUp(t *testing.T) {
 	}
 
 	// Test case: Invalid user data
-	invalidUserData := `{"username": "", "password": "", "email": ""}`
+	invalidUserData := `{"username": "", "password": "", "email": "", "phone": ""}`
 	resp, err = http.Post(ts.URL+"/user/create", "application/json", strings.NewReader(invalidUserData))
 	if err != nil {
 		t.Fatalf("Failed to make POST request: %v", err)
@@ -114,7 +114,7 @@ func TestCreateUser(t *testing.T) {
 	defer ts.Close()
 
 	// Test case: Valid user data
-	userData := `{"username": "testuser", "password": "testpass", "email": "test@example.com"}`
+	userData := `{"username": "testuser2", "password": "testpass2", "email": "test2@example.com", "phone": "23876543"}`
 	resp, err := http.Post(ts.URL+"/user/create", "application/json", strings.NewReader(userData))
 	if err != nil {
 		t.Fatalf("Failed to make POST request: %v", err)
@@ -126,7 +126,7 @@ func TestCreateUser(t *testing.T) {
 	}
 
 	// Test case: Invalid user data
-	invalidUserData := `{"username": "", "password": "", "email": ""}`
+	invalidUserData := `{"username": "", "password": "", "email": "", "phone": ""}`
 	resp, err = http.Post(ts.URL+"/user/create", "application/json", strings.NewReader(invalidUserData))
 	if err != nil {
 		t.Fatalf("Failed to make POST request: %v", err)
@@ -150,7 +150,7 @@ func TestUpdateUser(t *testing.T) {
 	defer ts.Close()
 
 	// Test case: Valid user data
-	userData := `{"id": 1, "username": "updateduser", "password": "updatedpass", "email": "updated@example.com"}`
+	userData := `{"id": 1, "username": "updateduser", "password": "updatedpass", "email": "updated@example.com", "phone": "876543675"}`
 	req, err := http.NewRequest("PUT", ts.URL+"/user/update", strings.NewReader(userData))
 	if err != nil {
 		t.Fatalf("Failed to create PUT request: %v", err)
@@ -169,7 +169,7 @@ func TestUpdateUser(t *testing.T) {
 	}
 
 	// Test case: Invalid user data
-	invalidUserData := `{"id": 1, "username": "", "password": "", "email": ""}`
+	invalidUserData := `{"id": 1, "username": "", "password": "", "email": "", "phone": ""}`
 	req, err = http.NewRequest("PUT", ts.URL+"/user/update", strings.NewReader(invalidUserData))
 	if err != nil {
 		t.Fatalf("Failed to create PUT request: %v", err)

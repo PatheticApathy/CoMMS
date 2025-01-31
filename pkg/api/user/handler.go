@@ -76,11 +76,11 @@ func (e *Env) getUsers(w http.ResponseWriter, r *http.Request) {
 //	@Tags			users
 //	@Accept			json
 //	@Produce		json
-//	@Param			users	body		user_db.AddUserParams	true	"Format of add user request"
+//	@Param			users	body		user_db.SignUpParams	true	"Format of signup user request"
 //	@Success		200		{object}	user_db.User			"users"
 //	@Failure		400		{string}	string					"Invalid input"
 //	@Failure		500		{string}	string					"Failed to signup user"
-//	@Router			/user/create [post]
+//	@Router			/user/signup [post]
 func (e *Env) SignUp(w http.ResponseWriter, r *http.Request) {
 	var params user_db.SignUpParams
 	auth.Hash(params.Password)
