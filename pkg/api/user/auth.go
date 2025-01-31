@@ -10,7 +10,7 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-const SECRETKEY = "secret"
+const SECRETKEY = "secretsecretpass"
 
 func (e *Env) authenticate(w http.ResponseWriter, r *http.Request) {
 	var userandpass auth.UserAndPass
