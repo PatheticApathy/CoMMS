@@ -25,9 +25,15 @@ func (e *Env) authenticate(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid User or Password", http.StatusBadRequest)
 		return
 	}
+
+	jsonUserandPass, err := json.Marshal(userandpass)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "Server Error", http.StatusInternalServerError)
+	}
 	cookie := http.Cookie{
 		Name:     "LoginCookie",
-		Value:    userandpass.Username,
+		Value:    string(jsonUserandPass),
 		Path:     "/",
 		MaxAge:   0,
 		HttpOnly: true,
