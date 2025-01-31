@@ -4,8 +4,9 @@ package main
 import (
 	"database/sql"
 	"log"
-	"net"
 	"net/http"
+	"net/http/httputil"
+	"net/url"
 	"os"
 
 	handler "github.com/PatheticApathy/CoMMS/pkg/api/user"
@@ -20,20 +21,20 @@ func main() {
 	}
 
 	// goes to osm if not set in .env
-	nhost, nport, err := net.SplitHostPort(os.Getenv("NOMINATIM_HOST"))
-	if err != nil {
+	nom_url := os.Getenv("NOMINATIM_HOST")
+	nominatim_host, err := url.Parse(nom_url)
+	if err != nil || nom_url == "" {
 		log.Println("WARNING: Nominatim api host not set or invalid syntax, defaulting to osm website")
-		nhost = "https://nominatim.openstreetmap.org"
-		nport = ""
+		nominatim_host, _ = url.Parse("https://nominatim.openstreetmap.org")
 	}
-	nominatim := nhost + nport
+	nom_proxy := httputil.NewSingleHostReverseProxy(nominatim_host)
 
 	// prints warning if not set
-	mhost, mport, err := net.SplitHostPort(os.Getenv("MATERIAL_HOST"))
+	mat_host, err := url.Parse(os.Getenv("MATERIAL_HOST"))
 	if err != nil {
 		log.Printf("Warning: material api host not set: %e", err)
 	}
-	material := mhost + mport
+	mat_proxy := httputil.NewSingleHostReverseProxy(mat_host)
 
 	secret := os.Getenv("SECRETKEY")
 	if secret == "" {
@@ -43,7 +44,7 @@ func main() {
 		log.Fatal("Error: Invalid secret length(must be 16 charcaters)")
 	}
 
-	_, port, err := net.SplitHostPort(os.Getenv("USER_HOST"))
+	url, err := url.Parse(os.Getenv("USER_HOST"))
 	if err != nil {
 		log.Fatal("No port for server set in environment variable or invalid syntax")
 	}
@@ -59,9 +60,11 @@ func main() {
 	}
 	defer db.Close()
 
-	env := handler.NewEnv(db, secret, material, nominatim)
+	env := handler.NewEnv(db, secret)
 	http.Handle("/", env.Handler())
+	http.Handle("/material/", http.StripPrefix("/material", mat_proxy))
+	http.Handle("/geo/", http.StripPrefix("/geo", nom_proxy))
 
-	log.Printf("Server is running on port %s", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Printf("Server is running on on %s:%s", url.Hostname(), url.Port())
+	log.Fatal(http.ListenAndServe(":"+url.Port(), nil))
 }

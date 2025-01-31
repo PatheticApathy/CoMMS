@@ -27,7 +27,7 @@ import (
 //	@BasePath	/
 
 // @externalDocs.description	OpenAPI
-// @externalDocs.url			https://swagger.io/resources/open-api/
+// @externalDocs.url			https://app.swaggerhub.com/apis/CJW041/material-tracker_api/1.0
 func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Fatalf("No .env file found LOL: %e", err)
