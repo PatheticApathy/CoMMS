@@ -1,8 +1,8 @@
 -- name: GetAllUsers :many
-SELECT id, username, firstname, lastname, company, site, role, email, phone FROM Users;
+SELECT id, username, password, firstname, lastname, company, site, role, email, phone FROM Users;
 
 -- name: GetUser :one
-SELECT id, username, firstname, lastname, company, site, role, email, phone FROM Users WHERE id = ?;
+SELECT id, username, password, firstname, lastname, company, site, role, email, phone FROM Users WHERE id = ?;
 
 -- name: AddUser :one
 INSERT INTO Users(username, password, firstname, lastname, company, site, role, email, phone) VALUES (?,?,?,?,?,?,?,?,?) RETURNING *;
