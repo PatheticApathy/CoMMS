@@ -61,15 +61,30 @@ func main() {
 		}
 
 		user := user_db.AddUserParams{
-			Username:  row[0],
-			Password:  row[1],
-			Firstname: row[2],
-			Lastname:  row[3],
-			Company:   row[4],
-			Site:      row[5],
-			Role:      row[6],
-			Email:     row[7],
-			Phone:     row[8],
+			Username: row[0],
+			Password: row[1],
+			Firstname: sql.NullString{
+				String: row[2],
+				Valid:  true,
+			},
+			Lastname: sql.NullString{
+				String: row[3],
+				Valid:  true,
+			},
+			Company: sql.NullString{
+				String: row[4],
+				Valid:  true,
+			},
+			Site: sql.NullString{
+				String: row[5],
+				Valid:  true,
+			},
+			Role: sql.NullString{
+				String: row[6],
+				Valid:  true,
+			},
+			Email: row[7],
+			Phone: row[8],
 		}
 
 		user_row, err := queries.AddUser(ctxt, user)

@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/PatheticApathy/CoMMS/pkg/auth"
 )
 
 type middleware func(http.Handler) http.Handler
@@ -24,6 +26,18 @@ func Logger(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 		log.Println(r.Method, r.URL.Path, time.Since(start))
 	})
+}
+
+// Auth middlware locks sub routes unless user is authenticated
+func Auth(next http.Handler, cookie_name string, secret []byte) middleware {
+	return func(next http.Handler) http.Handler {
+		 return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+      login, auth.ReadEncrypted(r, cookie_name, secret)
+			next.ServeHTTP(w, r)
+
+		})
+	}
 }
 
 func Middlewares(middl ...middleware) middleware {

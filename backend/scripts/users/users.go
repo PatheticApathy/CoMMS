@@ -24,15 +24,30 @@ func main() {
 
 	// Create a new user
 	AddUserParams := user_db.AddUserParams{
-		Username:  "johndoe",
-		Password:  "password",
-		Firstname: "John",
-		Lastname:  "Doe",
-		Company:   "Acme Inc",
-		Site:      "acme.com",
-		Role:      "admin",
-		Email:     "test@gmail.com",
-		Phone:     "1234567890",
+		Username: "johndoe",
+		Password: "password",
+		Firstname: sql.NullString{
+			String: "John",
+			Valid:  true,
+		},
+		Lastname: sql.NullString{
+			String: "Doe",
+			Valid:  true,
+		},
+		Company: sql.NullString{
+			String: "Acme Inc",
+			Valid:  true,
+		},
+		Site: sql.NullString{
+			String: "acme.com",
+			Valid:  true,
+		},
+		Role: sql.NullString{
+			String: "admin",
+			Valid:  true,
+		},
+		Email: "test@gmail.com",
+		Phone: "1234567890",
 	}
 	user, err := queries.AddUser(context.Background(), AddUserParams)
 	if err != nil {
@@ -57,16 +72,31 @@ func main() {
 
 	// Update a user
 	updateParams := user_db.UpdateUserParams{
-		ID:        userID,
-		Username:  "john_doe_updated",
-		Password:  "new_password",
-		Firstname: "John_updated",
-		Lastname:  "Doe_updated",
-		Company:   "Acme Inc",
-		Site:      "acme.com",
-		Role:      "admin",
-		Email:     "test@gmail.com",
-		Phone:     "1234567890",
+		ID:       userID,
+		Username: "john_doe_updated",
+		Password: "new_password",
+		Firstname: sql.NullString{
+			String: "John_updated",
+			Valid:  true,
+		},
+		Lastname: sql.NullString{
+			String: "Doe_updated",
+			Valid:  true,
+		},
+		Company: sql.NullString{
+			String: "Acme Inc",
+			Valid:  true,
+		},
+		Site: sql.NullString{
+			String: "acme.com",
+			Valid:  true,
+		},
+		Role: sql.NullString{
+			String: "admin",
+			Valid:  true,
+		},
+		Email: "test@gmail.com",
+		Phone: "1234567890",
 	}
 	updatedUser, err := queries.UpdateUser(context.Background(), updateParams)
 	if err != nil {
