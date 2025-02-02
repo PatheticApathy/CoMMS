@@ -1,0 +1,261 @@
+basePath: /
+definitions:
+  sql.NullString:
+    properties:
+      string:
+        type: string
+      valid:
+        description: Valid is true if String is not NULL
+        type: boolean
+    type: object
+  userdb.AddUserParams:
+    properties:
+      company:
+        $ref: '#/definitions/sql.NullString'
+      email:
+        type: string
+      firstname:
+        $ref: '#/definitions/sql.NullString'
+      lastname:
+        $ref: '#/definitions/sql.NullString'
+      password:
+        type: string
+      phone:
+        type: string
+      role:
+        $ref: '#/definitions/sql.NullString'
+      site:
+        $ref: '#/definitions/sql.NullString'
+      username:
+        type: string
+    type: object
+  userdb.SignUpParams:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      username:
+        type: string
+    type: object
+  userdb.UpdateUserParams:
+    properties:
+      company:
+        $ref: '#/definitions/sql.NullString'
+      email:
+        type: string
+      firstname:
+        $ref: '#/definitions/sql.NullString'
+      id:
+        type: integer
+      lastname:
+        $ref: '#/definitions/sql.NullString'
+      password:
+        type: string
+      phone:
+        type: string
+      role:
+        $ref: '#/definitions/sql.NullString'
+      site:
+        $ref: '#/definitions/sql.NullString'
+      username:
+        type: string
+    type: object
+  userdb.User:
+    properties:
+      company:
+        $ref: '#/definitions/sql.NullString'
+      email:
+        type: string
+      firstname:
+        $ref: '#/definitions/sql.NullString'
+      id:
+        type: integer
+      lastname:
+        $ref: '#/definitions/sql.NullString'
+      password:
+        type: string
+      phone:
+        type: string
+      role:
+        $ref: '#/definitions/sql.NullString'
+      site:
+        $ref: '#/definitions/sql.NullString'
+      username:
+        type: string
+    type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+host: localhost:8080
+info:
+  contact:
+    name: Comms group
+    url: http://github.com/PatheticApathy/CoMMS
+  description: This is the api for dealing with users
+  termsOfService: http://swagger.io/terms/
+  title: User API
+  version: "1.0"
+paths:
+  /user/all:
+    get:
+      description: Gets users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: users
+          schema:
+            $ref: '#/definitions/userdb.User'
+        "500":
+          description: Faliled to get users
+          schema:
+            type: string
+      summary: fetches all users
+      tags:
+      - users
+  /user/create:
+    post:
+      consumes:
+      - application/json
+      description: Adds user to the database using valid json structure
+      parameters:
+      - description: Format of add user request
+        in: body
+        name: users
+        required: true
+        schema:
+          $ref: '#/definitions/userdb.AddUserParams'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: users
+          schema:
+            $ref: '#/definitions/userdb.User'
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "500":
+          description: Failed to create user
+          schema:
+            type: string
+      summary: post user to database
+      tags:
+      - users
+  /user/delete:
+    delete:
+      description: Deletes user using id(may add more parameters later)
+      parameters:
+      - description: user's identification number
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: users
+          schema:
+            $ref: '#/definitions/userdb.User'
+        "400":
+          description: Invalid user ID
+          schema:
+            type: string
+        "500":
+          description: Failed to delete user
+          schema:
+            type: string
+      summary: removes user based on given paremeters
+      tags:
+      - users
+  /user/search:
+    get:
+      description: Gets user using id(may add more parameters later)
+      parameters:
+      - description: user's identification number
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: users
+          schema:
+            $ref: '#/definitions/userdb.User'
+        "400":
+          description: Invalid id
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: fetches user based on given paremeters
+      tags:
+      - users
+  /user/signup:
+    post:
+      consumes:
+      - application/json
+      description: Adds user to the database using valid json structure
+      parameters:
+      - description: Format of signup user request
+        in: body
+        name: users
+        required: true
+        schema:
+          $ref: '#/definitions/userdb.SignUpParams'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: users
+          schema:
+            $ref: '#/definitions/userdb.User'
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "500":
+          description: Failed to signup user
+          schema:
+            type: string
+      summary: post user to database
+      tags:
+      - users
+  /user/update:
+    put:
+      description: Updates user using id(may add more parameters later)
+      parameters:
+      - description: Format of update user request
+        in: body
+        name: users
+        required: true
+        schema:
+          $ref: '#/definitions/userdb.UpdateUserParams'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: users
+          schema:
+            $ref: '#/definitions/userdb.User'
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "500":
+          description: Failed to update user
+          schema:
+            type: string
+      summary: updates user based on given paremeters
+      tags:
+      - users
+swagger: "2.0"
