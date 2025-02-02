@@ -11,10 +11,24 @@ import (
 
 	handler "github.com/PatheticApathy/CoMMS/pkg/api/user"
 	"github.com/joho/godotenv"
+	httpSwagger "github.com/swaggo/http-swagger"
 
 	_ "modernc.org/sqlite"
 )
 
+//	@title			User API
+//	@version		1.0
+//	@description	This is the api for dealing with users
+//	@termsOfService	http://swagger.io/terms/
+
+//	@contact.name	Comms group
+//	@contact.url	http://github.com/PatheticApathy/CoMMS
+
+//	@host		localhost:8080
+//	@BasePath	/
+
+// @externalDocs.description	OpenAPI
+// @externalDocs.url			https://swagger.io/resources/open-api/
 func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Fatalf("No .env file found LOL: %e", err)
@@ -64,6 +78,10 @@ func main() {
 	http.Handle("/", env.Handler())
 	http.Handle("/material/", http.StripPrefix("/material", mat_proxy))
 	http.Handle("/geo/", http.StripPrefix("/geo", nom_proxy))
+	http.Handle("/swagger/", httpSwagger.Handler())
+	http.HandleFunc("/{$}", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/swagger", http.StatusPermanentRedirect)
+	})
 
 	log.Printf("Server is running on on %s:%s", url.Hostname(), url.Port())
 	log.Fatal(http.ListenAndServe(":"+url.Port(), nil))
