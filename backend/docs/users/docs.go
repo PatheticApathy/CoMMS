@@ -33,7 +33,7 @@ const docTemplate = `{
                     "200": {
                         "description": "users",
                         "schema": {
-                            "$ref": "#/definitions/user_db.User"
+                            "$ref": "#/definitions/userdb.User"
                         }
                     },
                     "500": {
@@ -65,7 +65,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/user_db.AddUserParams"
+                            "$ref": "#/definitions/userdb.AddUserParams"
                         }
                     }
                 ],
@@ -73,7 +73,7 @@ const docTemplate = `{
                     "200": {
                         "description": "users",
                         "schema": {
-                            "$ref": "#/definitions/user_db.User"
+                            "$ref": "#/definitions/userdb.User"
                         }
                     },
                     "400": {
@@ -114,7 +114,7 @@ const docTemplate = `{
                     "200": {
                         "description": "users",
                         "schema": {
-                            "$ref": "#/definitions/user_db.User"
+                            "$ref": "#/definitions/userdb.User"
                         }
                     },
                     "400": {
@@ -155,7 +155,7 @@ const docTemplate = `{
                     "200": {
                         "description": "users",
                         "schema": {
-                            "$ref": "#/definitions/user_db.User"
+                            "$ref": "#/definitions/userdb.User"
                         }
                     },
                     "400": {
@@ -166,6 +166,52 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/signup": {
+            "post": {
+                "description": "Adds user to the database using valid json structure",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "post user to database",
+                "parameters": [
+                    {
+                        "description": "Format of signup user request",
+                        "name": "users",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/userdb.SignUpParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "users",
+                        "schema": {
+                            "$ref": "#/definitions/userdb.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to signup user",
                         "schema": {
                             "type": "string"
                         }
@@ -190,7 +236,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/user_db.UpdateUserParams"
+                            "$ref": "#/definitions/userdb.UpdateUserParams"
                         }
                     }
                 ],
@@ -198,7 +244,7 @@ const docTemplate = `{
                     "200": {
                         "description": "users",
                         "schema": {
-                            "$ref": "#/definitions/user_db.User"
+                            "$ref": "#/definitions/userdb.User"
                         }
                     },
                     "400": {
@@ -218,20 +264,32 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "user_db.AddUserParams": {
+        "sql.NullString": {
+            "type": "object",
+            "properties": {
+                "string": {
+                    "type": "string"
+                },
+                "valid": {
+                    "description": "Valid is true if String is not NULL",
+                    "type": "boolean"
+                }
+            }
+        },
+        "userdb.AddUserParams": {
             "type": "object",
             "properties": {
                 "company": {
-                    "type": "string"
+                    "$ref": "#/definitions/sql.NullString"
                 },
                 "email": {
                     "type": "string"
                 },
                 "firstname": {
-                    "type": "string"
+                    "$ref": "#/definitions/sql.NullString"
                 },
                 "lastname": {
-                    "type": "string"
+                    "$ref": "#/definitions/sql.NullString"
                 },
                 "password": {
                     "type": "string"
@@ -240,9 +298,26 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "role": {
-                    "type": "string"
+                    "$ref": "#/definitions/sql.NullString"
                 },
                 "site": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "userdb.SignUpParams": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "phone": {
                     "type": "string"
                 },
                 "username": {
@@ -250,23 +325,23 @@ const docTemplate = `{
                 }
             }
         },
-        "user_db.UpdateUserParams": {
+        "userdb.UpdateUserParams": {
             "type": "object",
             "properties": {
                 "company": {
-                    "type": "string"
+                    "$ref": "#/definitions/sql.NullString"
                 },
                 "email": {
                     "type": "string"
                 },
                 "firstname": {
-                    "type": "string"
+                    "$ref": "#/definitions/sql.NullString"
                 },
                 "id": {
                     "type": "integer"
                 },
                 "lastname": {
-                    "type": "string"
+                    "$ref": "#/definitions/sql.NullString"
                 },
                 "password": {
                     "type": "string"
@@ -275,33 +350,33 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "role": {
-                    "type": "string"
+                    "$ref": "#/definitions/sql.NullString"
                 },
                 "site": {
-                    "type": "string"
+                    "$ref": "#/definitions/sql.NullString"
                 },
                 "username": {
                     "type": "string"
                 }
             }
         },
-        "user_db.User": {
+        "userdb.User": {
             "type": "object",
             "properties": {
                 "company": {
-                    "type": "string"
+                    "$ref": "#/definitions/sql.NullString"
                 },
                 "email": {
                     "type": "string"
                 },
                 "firstname": {
-                    "type": "string"
+                    "$ref": "#/definitions/sql.NullString"
                 },
                 "id": {
                     "type": "integer"
                 },
                 "lastname": {
-                    "type": "string"
+                    "$ref": "#/definitions/sql.NullString"
                 },
                 "password": {
                     "type": "string"
@@ -310,10 +385,10 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "role": {
-                    "type": "string"
+                    "$ref": "#/definitions/sql.NullString"
                 },
                 "site": {
-                    "type": "string"
+                    "$ref": "#/definitions/sql.NullString"
                 },
                 "username": {
                     "type": "string"
