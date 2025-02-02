@@ -148,12 +148,14 @@ func TestAdminSignupToAddMaterial(t *testing.T) {
 		t.Fatalf("Could not marshall json: %e", err)
 		return
 	}
+
 	resp, err = client.Post(userver.URL+"/material/material/add", "application/json", bytes.NewReader(jdata))
 	if err != nil {
 		t.Fatal(client.Jar)
 		t.Fatal(err)
 		return
 	}
+
 	if resp.Status != "200 OK" {
 		t.Fatalf("Error got status code %s from /material/material/add", resp.Status)
 		return
@@ -161,6 +163,7 @@ func TestAdminSignupToAddMaterial(t *testing.T) {
 	defer resp.Body.Close()
 }
 
+// TODO: Finish this test
 // subordinates should be able to adjust the quantity of itmes and be able to
 func TestWorkerAdjustQuantity(t *testing.T) {
 	// make request for test
