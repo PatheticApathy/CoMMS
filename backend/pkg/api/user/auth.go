@@ -35,7 +35,7 @@ func (e *Env) authenticate(w http.ResponseWriter, r *http.Request) {
 		Path:     "/",
 		MaxAge:   0,
 		HttpOnly: true,
-		Secure:   true,
+		Secure:   false,
 		SameSite: http.SameSiteLaxMode,
 	}
 
@@ -53,7 +53,7 @@ func (e *Env) loggout(w http.ResponseWriter, _ *http.Request) {
 		Path:     "/",
 		MaxAge:   -1,
 		HttpOnly: true,
-		Secure:   true,
+		Secure:   false,
 		SameSite: http.SameSiteLaxMode,
 	}
 

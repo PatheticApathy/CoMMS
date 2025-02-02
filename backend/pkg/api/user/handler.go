@@ -83,7 +83,14 @@ func (e *Env) getUsers(w http.ResponseWriter, r *http.Request) {
 //	@Router			/user/create [post]
 func (e *Env) SignUp(w http.ResponseWriter, r *http.Request) {
 	var params user_db.SignUpParams
-	auth.Hash(params.Password)
+
+	hash_pass := auth.Hash(params.Password)
+	userandpass := auth.UserAndPass{
+		Username: params.Username,
+		Password: params.Password,
+	}
+	params.Password = hash_pass
+
 	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
 		log.Println(err)
 		http.Error(w, "Invalid input", http.StatusBadRequest)
@@ -96,6 +103,28 @@ func (e *Env) SignUp(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to signup user", http.StatusInternalServerError)
 		return
 	}
+
+	jsonUserandPass, err := json.Marshal(userandpass)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "Server Error", http.StatusInternalServerError)
+	}
+	cookie := http.Cookie{
+		Name:     "LoginCookie",
+		Value:    string(jsonUserandPass),
+		Path:     "/",
+		MaxAge:   0,
+		HttpOnly: true,
+		Secure:   false,
+		SameSite: http.SameSiteLaxMode,
+	}
+
+	err = auth.WriteEncrypted(w, cookie, []byte(e.Secret))
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "server error", http.StatusInternalServerError)
+	}
+
 	json.NewEncoder(w).Encode(&user)
 }
 

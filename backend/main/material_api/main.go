@@ -3,8 +3,8 @@ package main
 import (
 	"database/sql"
 	"log"
-	"net"
 	"net/http"
+	"net/url"
 	"os"
 
 	_ "github.com/PatheticApathy/CoMMS/docs/material"
@@ -33,9 +33,9 @@ func main() {
 		log.Fatalf("No .env file found LOL: %e", err)
 	}
 
-	_, port, err := net.SplitHostPort(os.Getenv("MATERIAL_HOST"))
+	url, err := url.Parse(os.Getenv("MATERIAL_HOST"))
 	if err != nil {
-		log.Fatal("No port set in environment variable for material api host")
+		log.Fatalf("Error in material host .env declaration: %e", err)
 	}
 
 	db_path := os.Getenv("MATERIALDB")
@@ -57,12 +57,12 @@ func main() {
 	})
 
 	serv := http.Server{
-		Addr:    ":" + port,
+		Addr:    ":" + url.Port(),
 		Handler: middleware.Middlewares(middleware.Json, middleware.Logger)(router),
 	}
 
 	defer serv.Close()
 
-	log.Printf("Running on port %s", port)
+	log.Printf("Running on port %s", serv.Addr)
 	log.Fatal(serv.ListenAndServe())
 }

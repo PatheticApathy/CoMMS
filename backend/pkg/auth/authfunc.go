@@ -47,11 +47,7 @@ func CheckUserAndPass(queries *user_db.Queries, ctxt context.Context, userandpas
 		return false, err
 	}
 	hashedpass := Hash(userandpass.Password)
-	if hashedpass == realhash {
-		return true, nil
-	} else {
-		return false, nil
-	}
+	return hashedpass == realhash, nil
 }
 
 // Experimental below

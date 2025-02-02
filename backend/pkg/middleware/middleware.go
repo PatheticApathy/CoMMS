@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	handler "github.com/PatheticApathy/CoMMS/pkg/api/user"
 	"github.com/PatheticApathy/CoMMS/pkg/auth"
 )
 
@@ -29,15 +30,27 @@ func Logger(next http.Handler) http.Handler {
 }
 
 // Auth middlware locks sub routes unless user is authenticated
-func Auth(next http.Handler, cookie_name string, secret []byte) middleware {
-	return func(next http.Handler) http.Handler {
-		 return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
-      login, auth.ReadEncrypted(r, cookie_name, secret)
-			next.ServeHTTP(w, r)
-
-		})
-	}
+func Auth(next http.Handler, e *handler.Env) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		login, err := auth.ReadEncrypted(r, "LoginCookie", []byte(e.Secret))
+		if err != nil {
+			log.Printf("Error for authorization request: %e", err)
+			http.Error(w, "Invalid request", http.StatusBadRequest)
+			return
+		}
+		ok, err := auth.CheckUserAndPass(e.Queries, r.Context(), login)
+		if err != nil {
+			log.Printf("Error: %e", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		if !ok {
+			log.Printf("Unable to verify username %s with password %s", login.Username, login.Password)
+			http.Error(w, "Invalid permissions", http.StatusBadRequest)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
 }
 
 func Middlewares(middl ...middleware) middleware {
