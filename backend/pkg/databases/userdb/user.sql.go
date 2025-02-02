@@ -15,15 +15,15 @@ INSERT INTO Users(username, password, firstname, lastname, company, site, role, 
 `
 
 type AddUserParams struct {
-	Username  string
-	Password  string
-	Firstname sql.NullString
-	Lastname  sql.NullString
-	Company   sql.NullString
-	Site      sql.NullString
-	Role      sql.NullString
-	Email     string
-	Phone     string
+	Username  string         `json:"username"`
+	Password  string         `json:"password"`
+	Firstname sql.NullString `json:"firstname"`
+	Lastname  sql.NullString `json:"lastname"`
+	Company   sql.NullString `json:"company"`
+	Site      sql.NullString `json:"site"`
+	Role      sql.NullString `json:"role"`
+	Email     string         `json:"email"`
+	Phone     string         `json:"phone"`
 }
 
 func (q *Queries) AddUser(ctx context.Context, arg AddUserParams) (User, error) {
@@ -128,10 +128,10 @@ INSERT INTO Users(username, password, email, phone) VALUES (?,?,?,?) RETURNING i
 `
 
 type SignUpParams struct {
-	Username string
-	Password string
-	Email    string
-	Phone    string
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Email    string `json:"email"`
+	Phone    string `json:"phone"`
 }
 
 func (q *Queries) SignUp(ctx context.Context, arg SignUpParams) (User, error) {
@@ -162,16 +162,16 @@ UPDATE Users SET username = ?, password = ?, firstname = ?, lastname = ?, compan
 `
 
 type UpdateUserParams struct {
-	Username  string
-	Password  string
-	Firstname sql.NullString
-	Lastname  sql.NullString
-	Company   sql.NullString
-	Site      sql.NullString
-	Role      sql.NullString
-	Email     string
-	Phone     string
-	ID        int64
+	Username  string         `json:"username"`
+	Password  string         `json:"password"`
+	Firstname sql.NullString `json:"firstname"`
+	Lastname  sql.NullString `json:"lastname"`
+	Company   sql.NullString `json:"company"`
+	Site      sql.NullString `json:"site"`
+	Role      sql.NullString `json:"role"`
+	Email     string         `json:"email"`
+	Phone     string         `json:"phone"`
+	ID        int64          `json:"id"`
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
