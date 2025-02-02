@@ -11,11 +11,22 @@ import {
 } from "@/components/ui/table"
 import { Material } from "@/material-api-types"
 import { ReactNode } from "react";
-import GetMaterials from "@/server_side/get_material";
+
 
 export default async function MTable() {
-  let materials = await GetMaterials()
-  let rows: ReactNode = materials.map((material) => (
+  const api_host = process.env.API
+  const resp = await fetch(`http://localhost:8080/material/all`, {
+    headers: { "Content-Type": "application/json" },
+    method: "GET",
+
+  })
+  if (!resp.ok) {
+    console.error("Error, got status code %s", resp.status);
+  }
+
+  const data = await resp.json() as Material[];
+
+  let rows: ReactNode = data.map((material) => (
     <TableRow>
       <TableCell className="font-medium">{material.id}</TableCell>
       <TableCell>{material.name.valid ? material.name.string : "N/A"}</TableCell>
