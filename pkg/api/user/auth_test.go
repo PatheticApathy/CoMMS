@@ -25,15 +25,30 @@ func TestAuth(t *testing.T) {
 
 	passwrd := auth.Hash("bassword")
 	adduser := user_db.AddUserParams{
-		Username:  "bob",
-		Password:  passwrd,
-		Firstname: "Bob",
-		Lastname:  "Bobbert",
-		Company:   "BobbyBuilds",
-		Site:      "Bobbytown",
-		Role:      "user",
-		Email:     "bobbert@gmail.com",
-		Phone:     "1",
+		Username: "bob",
+		Password: passwrd,
+		Firstname: sql.NullString{
+			String: "Bob",
+			Valid:  true,
+		},
+		Lastname: sql.NullString{
+			String: "Bobbert",
+			Valid:  true,
+		},
+		Company: sql.NullString{
+			String: "BobCo",
+			Valid:  true,
+		},
+		Site: sql.NullString{
+			String: "BobbyTown",
+			Valid:  true,
+		},
+		Role: sql.NullString{
+			String: "user",
+			Valid:  true,
+		},
+		Email: "bobbert@gmail.com",
+		Phone: "1",
 	}
 	user, err := env.Queries.AddUser(context.Background(), adduser)
 	if err != nil {

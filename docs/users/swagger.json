@@ -1,0 +1,397 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is the api for dealing with users",
+        "title": "User API",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "Comms group",
+            "url": "http://github.com/PatheticApathy/CoMMS"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/user/all": {
+            "get": {
+                "description": "Gets users",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "fetches all users",
+                "responses": {
+                    "200": {
+                        "description": "users",
+                        "schema": {
+                            "$ref": "#/definitions/userdb.User"
+                        }
+                    },
+                    "500": {
+                        "description": "Faliled to get users",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/create": {
+            "post": {
+                "description": "Adds user to the database using valid json structure",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "post user to database",
+                "parameters": [
+                    {
+                        "description": "Format of add user request",
+                        "name": "users",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/userdb.AddUserParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "users",
+                        "schema": {
+                            "$ref": "#/definitions/userdb.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to create user",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/delete": {
+            "delete": {
+                "description": "Deletes user using id(may add more parameters later)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "removes user based on given paremeters",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "user's identification number",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "users",
+                        "schema": {
+                            "$ref": "#/definitions/userdb.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid user ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to delete user",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/search": {
+            "get": {
+                "description": "Gets user using id(may add more parameters later)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "fetches user based on given paremeters",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "user's identification number",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "users",
+                        "schema": {
+                            "$ref": "#/definitions/userdb.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid id",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/signup": {
+            "post": {
+                "description": "Adds user to the database using valid json structure",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "post user to database",
+                "parameters": [
+                    {
+                        "description": "Format of signup user request",
+                        "name": "users",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/userdb.SignUpParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "users",
+                        "schema": {
+                            "$ref": "#/definitions/userdb.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to signup user",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/update": {
+            "put": {
+                "description": "Updates user using id(may add more parameters later)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "updates user based on given paremeters",
+                "parameters": [
+                    {
+                        "description": "Format of update user request",
+                        "name": "users",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/userdb.UpdateUserParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "users",
+                        "schema": {
+                            "$ref": "#/definitions/userdb.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to update user",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "sql.NullString": {
+            "type": "object",
+            "properties": {
+                "string": {
+                    "type": "string"
+                },
+                "valid": {
+                    "description": "Valid is true if String is not NULL",
+                    "type": "boolean"
+                }
+            }
+        },
+        "userdb.AddUserParams": {
+            "type": "object",
+            "properties": {
+                "company": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "firstname": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "lastname": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "role": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "site": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "userdb.SignUpParams": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "userdb.UpdateUserParams": {
+            "type": "object",
+            "properties": {
+                "company": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "firstname": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "lastname": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "role": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "site": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "userdb.User": {
+            "type": "object",
+            "properties": {
+                "company": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "firstname": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "lastname": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "role": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "site": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "externalDocs": {
+        "description": "OpenAPI",
+        "url": "https://swagger.io/resources/open-api/"
+    }
+}
