@@ -40,7 +40,12 @@ export default function SignupForm() {
   //validate form data(data is safe at this point)
   async function onSubmit(values: z.infer<typeof formSchema>) {
     console.log("Making server request")
-    const message = await Signup(values)
+    const message = await Signup({
+      email: values.email,
+      passwod: values.password,
+      username: values.username,
+      phone: values.phone_number,
+    })
     console.log("Request finished")
     alert(message.message)
   }

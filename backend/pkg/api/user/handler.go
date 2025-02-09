@@ -83,17 +83,15 @@ func (e *Env) getUsers(w http.ResponseWriter, r *http.Request) {
 //	@Router			/user/signup [post]
 func (e *Env) SignUp(w http.ResponseWriter, r *http.Request) {
 	var params user_db.SignUpParams
-	hash_pass := auth.Hash(params.Password)
-	userandpass := auth.UserAndPass{
-		Username: params.Username,
-		Password: params.Password,
-	}
-	params.Password = hash_pass
-
 	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
 		log.Println(err)
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 		return
+	}
+
+	userandpass := auth.UserAndPass{
+		Username: params.Username,
+		Password: params.Password,
 	}
 
 	params.Password = auth.Hash(params.Password)
