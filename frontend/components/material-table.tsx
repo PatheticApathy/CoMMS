@@ -34,7 +34,7 @@ export default async function MTable() {
       <TableCell>{material.quantity}</TableCell>
       <TableCell>{material.status}</TableCell>
       <TableCell>{material.type.valid ? material.type.string : "N/A"}</TableCell>
-      <TableCell className="text-right">{material.job_site ? material.job_site.valid : "N/A"}</TableCell>
+      <TableCell className="text-right">{material.job_site.valid ? material.job_site.int64 : "N/A"}</TableCell>
     </TableRow>
   ));
   return (

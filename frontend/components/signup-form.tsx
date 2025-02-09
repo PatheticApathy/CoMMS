@@ -14,15 +14,40 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import Signup from "@/server_side/signup"
+import { SignupParams } from '@/user-api-types'
+import { redirect } from 'next/navigation'
 
 const formSchema = z.object({
-  username: z.string(),
-  password: z.string(),
-  confirm_password: z.string(),
-  email: z.string(),
-  phone_number: z.string(),
+  username: z.string().nonempty(),
+  password: z.string().nonempty(),
+  confirm_password: z.string().nonempty(),
+  email: z.string().nonempty(),
+  phone_number: z.string().nonempty(),
 })
+
+async function Signup(values: SignupParams) {
+  const api_host = process.env.API
+  if (!api_host) {
+    return { message: "api host not set in .env file" }
+  }
+  try {
+    const resp = await fetch(`http://${api_host}/user/signup`, {
+      headers: { "Content-Type": "application/json" },
+      method: "POST",
+      body: JSON.stringify(values),
+    })
+
+    if (!resp.ok) {
+      const msg: string = await (await resp.blob()).text()
+      return { message: msg }
+    }
+  } catch (err) {
+    console.error(err)
+    return { message: err }
+  }
+
+  redirect('/dashboard')
+}
 
 export default function SignupForm() {
 
@@ -46,6 +71,7 @@ export default function SignupForm() {
       username: values.username,
       phone: values.phone_number,
     })
+
     console.log("Request finished")
     alert(message.message)
   }
