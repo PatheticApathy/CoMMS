@@ -13,6 +13,7 @@ import { Material } from "@/material-api-types"
 import { ReactNode } from "react";
 
 
+//TODO:// check token beofre accessing
 export default async function MTable() {
   const api_host = process.env.API
   const resp = await fetch(`http://localhost:8080/material/all`, {
