@@ -24,7 +24,7 @@ const formSchema = z.object({
   phone_number: z.string(),
 })
 
-export default function SignupForm() {
+export default function LoginForm() {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -72,47 +72,11 @@ export default function SignupForm() {
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="confirm_password"
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <Input placeholder="Confirm Password" type="password" required {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <Input placeholder="Email" type="email" required {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="phone_number"
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <Input placeholder="Phone Number" type="number" required {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
         <div className="flex justify-center">
-          <Button className="flex justify-center" type="submit">Signup</Button>
+          <Button className="flex justify-center" type="submit">Login</Button>
         </div>
-        <div className="flex justify-center">Already Have an Account?</div>
-        <Link href="/login" className="flex justify-center hover:text-blue-500 hover:underline">Login!</Link>
+        <div className="flex justify-center">Don't Have an Account?</div>
+        <Link href="/signup" className="flex justify-center hover:text-blue-500 hover:underline">Sign up!</Link>
       </form>
     </Form>
   )
