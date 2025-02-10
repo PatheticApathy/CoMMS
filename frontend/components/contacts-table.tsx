@@ -24,13 +24,14 @@ export default async function ContactsTable() {
   }
 
   const data = await resp.json() as User[];
+  console.log(data);
 
   let rows: ReactNode = data.map((user) => (
     <TableRow>
       <TableCell className="font-medium">{user.id}</TableCell>
       <TableCell>{user.username }</TableCell>
-      <TableCell>{user.firstname.valid ? user.firstname.string : "N/A"}</TableCell>
-      <TableCell>{user.lastname.valid ? user.lastname.string : "N/A"}</TableCell>
+      <TableCell>{user.firstname.Valid ? user.firstname.String : "N/A"}</TableCell>
+      <TableCell>{user.lastname.Valid ? user.lastname.String : "N/A"}</TableCell>
       <TableCell>{user.email}</TableCell>
       <TableCell className="text-right">{user.phone}</TableCell>
     </TableRow>

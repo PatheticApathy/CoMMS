@@ -14,28 +14,28 @@ export interface User {
   }
   
   export interface Company {
-    string: string
-    valid: boolean
+    String: string
+    Valid: boolean
   }
   
   export interface Firstname {
-    string: string
-    valid: boolean
+    String: string
+    Valid: boolean
   }
   
   export interface Lastname {
-    string: string
-    valid: boolean
+    String: string
+    Valid: boolean
   }
   
   export interface Role {
-    string: string
-    valid: boolean
+    String: string
+    Valid: boolean
   }
   
   export interface Site {
-    string: string
-    valid: boolean
+    String: string
+    Valid: boolean
   }
 
   export interface SignUpUser {
