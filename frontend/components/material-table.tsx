@@ -13,6 +13,7 @@ import { Material } from "@/material-api-types"
 import { ReactNode } from "react";
 
 
+//TODO:// check token beofre accessing
 export default async function MTable() {
   const api_host = process.env.API
   const resp = await fetch(`http://localhost:8080/material/all`, {
@@ -34,7 +35,7 @@ export default async function MTable() {
       <TableCell>{material.quantity}</TableCell>
       <TableCell>{material.status}</TableCell>
       <TableCell>{material.type.valid ? material.type.string : "N/A"}</TableCell>
-      <TableCell className="text-right">{material.job_site ? material.job_site.valid : "N/A"}</TableCell>
+      <TableCell className="text-right">{material.job_site.valid ? material.job_site.int64 : "N/A"}</TableCell>
     </TableRow>
   ));
   return (

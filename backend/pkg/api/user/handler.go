@@ -25,7 +25,6 @@ import (
 //	@Failure		500	{string}	string			"Internal Server Error"
 //	@Router			/user/search [get]
 func (e *Env) getUser(w http.ResponseWriter, r *http.Request) {
-
 	log.Println("Handling getUser request")
 	query := r.URL.Query()
 	if query.Has("id") {
@@ -110,12 +109,13 @@ func (e *Env) SignUp(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Received signup request for username: %s", params.Username)
 
 	log.Println("Hashing user password")
-	hash_pass := auth.Hash(params.Password)
+
 	userandpass := auth.UserAndPass{
 		Username: params.Username,
 		Password: params.Password,
 	}
-	params.Password = hash_pass
+
+	params.Password = auth.Hash(params.Password)
 
 	log.Println("Attempting to create user in database")
 	user, err := e.Queries.SignUp(context.Background(), params)

@@ -1,5 +1,4 @@
 import MTable from "@/components/material-table";
-import { GetMaterials } from "@/server_side/get_material";
 export default async function DashboardPage() {
 
   return (
