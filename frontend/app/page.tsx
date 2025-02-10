@@ -1,6 +1,8 @@
 import styles from "./page.module.css";
 import Link from "next/link";
 
+import { Button } from "@/components/ui/button"
+
 export default function Welcome() {
   return (
     <main className={styles.main}>
@@ -14,7 +16,7 @@ export default function Welcome() {
         </div>
         <div className={styles.WelcomeButtonDiv}>
           <Link href="/login">
-            <button className={styles.buttonWelcome}>Go To Login</button>
+            <Button className={styles.buttonWelcome}>Go To Login</Button>
           </Link>
         </div>
       </div>
