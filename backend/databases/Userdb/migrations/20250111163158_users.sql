@@ -10,7 +10,8 @@ CREATE TABLE Users (
   site TEXT,
   role TEXT CHECK(role IN ('admin', 'user')),
   email TEXT NOT NULL UNIQUE,
-  phone TEXT NOT NULL UNIQUE
+  phone TEXT NOT NULL UNIQUE,
+  profilepicture TEXT
 );
 -- +goose StatementEnd
 
