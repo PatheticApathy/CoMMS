@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -10,7 +11,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
@@ -84,9 +84,8 @@ export default function SignupForm() {
           name="username"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
               <FormControl>
-                <Input placeholder="" {...field} />
+                <Input placeholder="Username" required {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -97,9 +96,8 @@ export default function SignupForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input placeholder="" {...field} />
+                <Input placeholder="Password" type="password" required {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -110,9 +108,8 @@ export default function SignupForm() {
           name="confirm_password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Confirm password</FormLabel>
               <FormControl>
-                <Input placeholder="" {...field} />
+                <Input placeholder="Confirm Password" type="password" required {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -123,9 +120,8 @@ export default function SignupForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="" {...field} />
+                <Input placeholder="Email" type="email" required {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -136,15 +132,18 @@ export default function SignupForm() {
           name="phone_number"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Phone Number</FormLabel>
               <FormControl>
-                <Input placeholder="" {...field} />
+                <Input placeholder="Phone Number" type="number" required {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button className="flex justify-center" type="submit">Signup</Button>
+        <div className="flex justify-center">
+          <Button className="flex justify-center" type="submit">Signup</Button>
+        </div>
+        <div className="flex justify-center">Already Have an Account?</div>
+        <Link href="/login" className="flex justify-center hover:text-blue-500 hover:underline">Login!</Link>
       </form>
     </Form>
   )

@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"os"
 
+	_ "github.com/PatheticApathy/CoMMS/docs/users"
 	handler "github.com/PatheticApathy/CoMMS/pkg/api/user"
 	"github.com/joho/godotenv"
 	httpSwagger "github.com/swaggo/http-swagger"
@@ -25,7 +26,7 @@ import (
 //	@contact.name	Comms group
 //	@contact.url	http://github.com/PatheticApathy/CoMMS
 
-//	@host		localhost:8080
+//	@host		localhost:8082
 //	@BasePath	/
 
 // @externalDocs.description	OpenAPI
