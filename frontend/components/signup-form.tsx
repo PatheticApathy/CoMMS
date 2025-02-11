@@ -26,7 +26,7 @@ const formSchema = z.object({
 })
 
 async function Signup(values: SignupParams) {
-  const api_host = process.env.API
+  const api_host = process.env.API;
   if (!api_host) {
     return { message: "api host not set in .env file" }
   }
