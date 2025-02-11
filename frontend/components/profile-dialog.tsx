@@ -73,7 +73,8 @@ export function Profile() {
                                 <img className="" src="https://static.vecteezy.com/system/resources/thumbnails/009/734/564/small/default-avatar-profile-icon-of-social-media-user-vector.jpg"></img>
                             </div>
                             <Input id="username" defaultValue="Username" required></Input>
-                            <Input id="name" defaultValue="FirstName Lastname"></Input>
+                            <Input id="firstname" defaultValue="FirstName" type="text"></Input>
+                            <Input id="lastname" defaultValue="LastName" type="text"></Input>
                             <Input id="email" defaultValue="email@place.com" type="email" required></Input>
                             <Input id="phone" defaultValue="1234567890" type="number" required></Input>
                             <DialogFooter>
