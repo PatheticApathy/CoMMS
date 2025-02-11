@@ -1,16 +1,18 @@
 'use client'
 import { ChangeEvent, useEffect, useState } from 'react'
-import MTable, { GetAllMaterials } from "@/components/material-table";
+import MTable from "@/components/material-table";
 import { Material } from '@/material-api-types';
-import MaterialFilter, { Filter, FilterFunction } from '@/components/materials-filter';
+import MaterialFilter, { Filter } from '@/components/materials-filter';
 import useSWR, { Fetcher } from 'swr'
+import Loading from '@/components/loading';
 export default function DashboardPage() {
 
   const options: Filter = {
     id: "",
     quantity: "",
     status: "",
-    type: ""
+    type: "",
+    jobsite: "",
   };
 
   const fetcher: Fetcher<Material[], string> = (...args) => fetch(...args).then(res => res.json())
@@ -18,24 +20,8 @@ export default function DashboardPage() {
   const [filter, setFilter] = useState<Filter>(options);
   const [materials, setMaterial] = useState<Material[] | undefined>(undefined);
 
-  const filterID = (e: ChangeEvent<HTMLInputElement>) => {
-    setFilter({ ...filter, id: e.target.value });
-  };
 
-  const filterQuantity = (e: ChangeEvent<HTMLInputElement>) => {
-    setFilter({ ...filter, quantity: e.target.value });
-  };
-
-  const filterStatus = (e: ChangeEvent<HTMLInputElement>) => {
-    setFilter({ ...filter, status: e.target.value });
-  };
-
-  const filterType = (e: ChangeEvent<HTMLInputElement>) => {
-    setFilter({ ...filter, type: e.target.value });
-  };
-
-
-  //whenerver data is done
+  //whenerver data is grabbed
   useEffect(() => { setMaterial(data) }, [data])
 
   // Filter materials whenever filter changes
@@ -57,13 +43,18 @@ export default function DashboardPage() {
 
       if (filter.status) {
         filteredMaterials = filteredMaterials.filter(
-          (material) => filter.status.includes(material.status)
+          (material) => material.status.includes(filter.status)
         );
       }
 
       if (filter.type) {
         filteredMaterials = filteredMaterials.filter(
-          (material) => filter.type.includes(material.type.String)
+          (material) => material.type.String.includes(filter.type)
+        );
+      }
+      if (filter.jobsite) {
+        filteredMaterials = filteredMaterials.filter(
+          (material) => material.job_site.Int64 == Number(filter.jobsite)
         );
       }
 
@@ -71,12 +62,12 @@ export default function DashboardPage() {
     }
   }, [filter, data]);
 
-  if (isLoading) { <div>...Loading</div> }
-  if (error) { <div>Error occured</div> }
+  if (isLoading) { return (<div className='flex items-center justify-center w-screen h-screen'>Loading <Loading /></div>) }
+  if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
   return (
-    <div>
-      <MaterialFilter filter={filter} filter1Action={filterID} filter2Action={filterQuantity} filter3Action={filterStatus} filter4Action={filterType} />
-      <div className="flex flex-col justify-items-center items-center">
+    <div className="flex">
+      <MaterialFilter filter={filter} setFilterAction={setFilter} />
+      <div className='flex justify-end h-screen w-screen'>
         <MTable data={materials} />
       </div>
     </div>
