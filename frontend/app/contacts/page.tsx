@@ -1,12 +1,19 @@
-import ContactsTable from "@/components/contacts-table"
+"use client";
+
+import { useState } from "react";
+import ContactsTable from "@/components/contacts-table";
+import InputWithButton from "@/components/search-button";
 
 export default function Contacts() {
+  const [searchQuery, setSearchQuery] = useState("");
+
   return (
     <div className="dark:bg-gray-800 flex flex-col justify-center items-center h-screen">
-      <h1 className="font-bold font-sans text-5xl basis-1/4">Contacts</h1>
+      <h1 className="font-bold text-5xl mb-4">Contacts</h1>
       <div className="flex flex-col justify-self-end items-center">
-          <ContactsTable />
-        </div>
+        <InputWithButton onSearch={setSearchQuery} />
+        <ContactsTable searchQuery={searchQuery} />
+      </div>
     </div>
-  )
+  );
 }
