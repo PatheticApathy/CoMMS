@@ -4,8 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import Link from "next/link"
-import { useState, useEffect } from  'react'
-import useSWR, { Fetcher } from 'swr'
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -15,7 +13,6 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { SignupParams, User } from '@/user-api-types'
 import { redirect } from 'next/navigation'
 import useSWRMutation from 'swr/mutation'
 import Loading from '@/components/loading'
