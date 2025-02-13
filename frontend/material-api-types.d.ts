@@ -49,19 +49,19 @@ export enum Status {
 }
 
 export interface JobSite {
-  int64: number
-  valid: boolean
+  Int64: number
+  Valid: boolean
 }
 
 
 export interface Name {
-  string: string
-  valid: boolean
+  String: string
+  Valid: boolean
 }
 
 export interface Type {
-  string: string
-  valid: boolean
+  String: string
+  Valid: boolean
 }
 
 
@@ -89,8 +89,8 @@ export interface AddNoteToMaterialLog {
 }
 
 export interface Note {
-  string: string
-  valid: boolean
+  String: string
+  Valid: boolean
 }
 
 //**************************** Jobsite related types ***************************
@@ -103,18 +103,18 @@ export interface Jobsite {
 }
 
 export interface Addr {
-  string: string
-  valid: boolean
+  String: string
+  Valid: boolean
 }
 
 //**************************misc******************
 
 export interface LocationLat {
-  float64: number
-  valid: boolean
+  Float64: number
+  Valid: boolean
 }
 
 export interface LocationLng {
-  float64: number
-  valid: boolean
+  Float64: number
+  Valid: boolean
 }

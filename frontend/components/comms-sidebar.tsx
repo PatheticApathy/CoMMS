@@ -17,7 +17,7 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenuButton asChild>
-            <a href="#">
+            <a href="/dashboard/material">
               <span>Materials</span>
             </a>
           </SidebarMenuButton>

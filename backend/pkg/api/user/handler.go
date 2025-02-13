@@ -118,6 +118,7 @@ func (e *Env) SignUp(w http.ResponseWriter, r *http.Request) {
 	params.Password = auth.Hash(params.Password)
 
 	log.Println("Attempting to create user in database")
+
 	user, err := e.Queries.SignUp(context.Background(), params)
 	if err != nil {
 		log.Printf("Failed to signup user, reason: %v", err)
