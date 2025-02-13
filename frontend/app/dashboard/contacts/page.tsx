@@ -8,7 +8,7 @@ export default function Contacts() {
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
-    <div className="dark:bg-gray-800 flex flex-col justify-center items-center h-screen">
+    <div className="dark:bg-gray-800 flex flex-col justify-center items-center h-screen w-screen">
       <h1 className="font-bold text-5xl mb-4">Contacts</h1>
       <div className="flex flex-col justify-self-end items-center">
         <InputWithButton onSearch={setSearchQuery} />

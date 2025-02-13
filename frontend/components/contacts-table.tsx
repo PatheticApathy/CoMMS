@@ -21,7 +21,7 @@ const fetcher = async (url: string): Promise<User[]> => {
 };
 
 export default function ContactsTable({ searchQuery }: { searchQuery: string }) {
-  const { data, error } = useSWR<User[]>("api/user/all", fetcher);
+  const { data, error } = useSWR<User[]>("/api/user/all", fetcher);
 
   if (error) return <p>Error loading contacts.</p>;
   if (!data) return <p>Loading...</p>;
