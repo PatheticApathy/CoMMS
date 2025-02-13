@@ -37,10 +37,10 @@ export default function MTable({ data }: { data: Material[] | undefined }) {
               return (
                 data.map((material) => (
                   <TableRow>
-                    <TableCell className="font-medium hover:text-cyan-200"><MaterialSheet id={material.id}>{material.id}</MaterialSheet></TableCell>
-                    <TableCell className="hover:text-cyan-200"><MaterialSheet id={material.id}>{material.name.Valid ? material.name.String : "N/A"}</MaterialSheet></TableCell>
+                    <TableCell className="font-medium hover:text-cyan-200"><MaterialSheet material={material}>{material.id}</MaterialSheet></TableCell>
+                    <TableCell className="hover:text-cyan-200"><MaterialSheet material={material}>{material.name.Valid ? material.name.String : "N/A"}</MaterialSheet></TableCell>
                     <TableCell className="hover:text-cyan-200">{material.last_checked_out}</TableCell>
-                    <TableCell className="hover:text-cyan-200">{material.quantity}</TableCell>
+                    <TableCell className="hover:text-cyan-200">{`${material.quantity}  ${material.unit}`}</TableCell>
                     <TableCell className="hover:text-cyan-200">{material.status}</TableCell>
                     <TableCell className="hover:text-cyan-200">{material.type.Valid ? material.type.String : "N/A"}</TableCell>
                     <TableCell className="text-right hover:text-cyan-200">{material.job_site.Valid ? material.job_site.Int64 : "N/A"}</TableCell>
