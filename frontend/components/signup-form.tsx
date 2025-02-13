@@ -4,7 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import Link from "next/link"
-
+import { useState, useEffect } from  'react'
+import useSWR, { Fetcher } from 'swr'
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -14,66 +15,57 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { SignupParams } from '@/user-api-types'
+import { SignupParams, User } from '@/user-api-types'
 import { redirect } from 'next/navigation'
+import useSWRMutation from 'swr/mutation'
+import Loading from '@/components/loading'
 
 const formSchema = z.object({
   username: z.string().nonempty(),
   password: z.string().nonempty(),
   confirm_password: z.string().nonempty(),
   email: z.string().nonempty(),
-  phone_number: z.string().nonempty(),
+  phone: z.string().nonempty(),
 })
-
-async function Signup(values: SignupParams) {
-  const api_host = process.env.API;
-  if (!api_host) {
-    return { message: "api host not set in .env file" }
-  }
-  try {
-    const resp = await fetch(`http://${api_host}/user/signup`, {
-      headers: { "Content-Type": "application/json" },
-      method: "POST",
-      body: JSON.stringify(values),
-    })
-
-    if (!resp.ok) {
-      const msg: string = await (await resp.blob()).text()
-      return { message: msg }
+  .refine(
+    (values) => {
+      return values.password === values.confirm_password
+    },
+    {
+      message: "The passwords do not match.",
+      path: ["confirm_password"]
     }
-  } catch (err) {
-    console.error(err)
-    return { message: err }
-  }
+  )
 
-  redirect('/dashboard')
+async function signUp(url, { arg }) {
+  return fetch(url, {
+    method: 'POST',
+    body: JSON.stringify(arg)
+  })
 }
 
 export default function SignupForm() {
+
+  const { trigger, error, isMutating } = useSWRMutation('http://localhost:8082/user/signup', signUp)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       username: "",
       password: "",
-      confirm_password: "",
       email: "",
-      phone_number: "",
+      phone: "",
     },
   })
 
   //validate form data(data is safe at this point)
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log("Making server request")
-    const message = await Signup({
-      email: values.email,
-      passwod: values.password,
-      username: values.username,
-      phone: values.phone_number,
-    })
+    if (isMutating) { return (<div className='flex items-center justify-center w-screen h-screen'>Loading <Loading /></div>) }
+    if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
 
-    console.log("Request finished")
-    alert(message.message)
+    trigger(values)
+
+    redirect('/dashboard')
   }
 
   return (
@@ -97,7 +89,7 @@ export default function SignupForm() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="Password" type="password" required {...field} />
+                <Input placeholder="Password" id="password" type="password" required {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -129,7 +121,7 @@ export default function SignupForm() {
         />
         <FormField
           control={form.control}
-          name="phone_number"
+          name="phone"
           render={({ field }) => (
             <FormItem>
               <FormControl>
