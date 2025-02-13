@@ -162,14 +162,3 @@ func TestAdminSignupToAddMaterial(t *testing.T) {
 	}
 	defer resp.Body.Close()
 }
-
-// TODO: Finish this test
-// subordinates should be able to adjust the quantity of itmes and be able to
-func TestWorkerAdjustQuantity(t *testing.T) {
-	// make request for test
-	// signup
-
-	// change quantity of material from previous test
-
-	// delete material from previous test
-}
