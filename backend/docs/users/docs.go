@@ -297,6 +297,9 @@ const docTemplate = `{
                 "phone": {
                     "type": "string"
                 },
+                "profilepicture": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
                 "role": {
                     "$ref": "#/definitions/sql.NullString"
                 },
@@ -349,6 +352,9 @@ const docTemplate = `{
                 "phone": {
                     "type": "string"
                 },
+                "profilepicture": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
                 "role": {
                     "$ref": "#/definitions/sql.NullString"
                 },
@@ -383,6 +389,9 @@ const docTemplate = `{
                 },
                 "phone": {
                     "type": "string"
+                },
+                "profilepicture": {
+                    "$ref": "#/definitions/sql.NullString"
                 },
                 "role": {
                     "$ref": "#/definitions/sql.NullString"
