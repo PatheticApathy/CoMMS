@@ -85,6 +85,10 @@ func main() {
 			},
 			Email: row[7],
 			Phone: row[8],
+			Profilepicture: sql.NullString{
+				String: row[9],
+				Valid:  true,
+			},
 		}
 
 		user_row, err := queries.AddUser(ctxt, user)

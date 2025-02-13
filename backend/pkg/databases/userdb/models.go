@@ -9,14 +9,15 @@ import (
 )
 
 type User struct {
-	ID        int64          `json:"id"`
-	Username  string         `json:"username"`
-	Password  string         `json:"password"`
-	Firstname sql.NullString `json:"firstname"`
-	Lastname  sql.NullString `json:"lastname"`
-	Company   sql.NullString `json:"company"`
-	Site      sql.NullString `json:"site"`
-	Role      sql.NullString `json:"role"`
-	Email     string         `json:"email"`
-	Phone     string         `json:"phone"`
+	ID             int64          `json:"id"`
+	Username       string         `json:"username"`
+	Password       string         `json:"password"`
+	Firstname      sql.NullString `json:"firstname"`
+	Lastname       sql.NullString `json:"lastname"`
+	Company        sql.NullString `json:"company"`
+	Site           sql.NullString `json:"site"`
+	Role           sql.NullString `json:"role"`
+	Email          string         `json:"email"`
+	Phone          string         `json:"phone"`
+	Profilepicture sql.NullString `json:"profilepicture"`
 }
