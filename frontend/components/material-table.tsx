@@ -1,5 +1,4 @@
 //TODO: Need to handle possible render error
-`use server`
 import {
   Table,
   TableBody,
@@ -9,34 +8,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { SheetTrigger } from "@/components/ui/sheet";
 import { Material } from "@/material-api-types"
 import { ReactNode } from "react";
+import MaterialSheet from "./material-sheet";
 
-
-export default async function MTable() {
-  const api_host = process.env.API
-  const resp = await fetch(`http://localhost:8080/material/all`, {
-    headers: { "Content-Type": "application/json" },
-    method: "GET",
-
-  })
-  if (!resp.ok) {
-    console.error("Error, got status code %s", resp.status);
-  }
-
-  const data = await resp.json() as Material[];
-
-  let rows: ReactNode = data.map((material) => (
-    <TableRow>
-      <TableCell className="font-medium">{material.id}</TableCell>
-      <TableCell>{material.name.valid ? material.name.string : "N/A"}</TableCell>
-      <TableCell>{material.last_checked_out}</TableCell>
-      <TableCell>{material.quantity}</TableCell>
-      <TableCell>{material.status}</TableCell>
-      <TableCell>{material.type.valid ? material.type.string : "N/A"}</TableCell>
-      <TableCell className="text-right">{material.job_site ? material.job_site.valid : "N/A"}</TableCell>
-    </TableRow>
-  ));
+export default function MTable({ data }: { data: Material[] | undefined }) {
   return (
     <Table>
       <TableCaption>Materials</TableCaption>
@@ -52,7 +29,27 @@ export default async function MTable() {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {rows}
+        {
+          (() => {
+            if (!data) {
+              return (<div className="justify-self-center">No Data to display</div>)
+            } else {
+              return (
+                data.map((material) => (
+                  <TableRow>
+                    <TableCell className="font-medium hover:text-cyan-200"><MaterialSheet material={material}>{material.id}</MaterialSheet></TableCell>
+                    <TableCell className="hover:text-cyan-200"><MaterialSheet material={material}>{material.name.Valid ? material.name.String : "N/A"}</MaterialSheet></TableCell>
+                    <TableCell className="hover:text-cyan-200">{material.last_checked_out}</TableCell>
+                    <TableCell className="hover:text-cyan-200">{`${material.quantity}  ${material.unit}`}</TableCell>
+                    <TableCell className="hover:text-cyan-200">{material.status}</TableCell>
+                    <TableCell className="hover:text-cyan-200">{material.type.Valid ? material.type.String : "N/A"}</TableCell>
+                    <TableCell className="text-right hover:text-cyan-200">{material.job_site.Valid ? material.job_site.Int64 : "N/A"}</TableCell>
+                  </TableRow>
+                )))
+            }
+          }
+          )()
+        }
       </TableBody>
     </Table>
   )

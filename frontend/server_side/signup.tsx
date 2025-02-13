@@ -8,7 +8,7 @@ export default async function Signup(values: any) {
     return { message: "this not set" }
   }
   try {
-    const resp = await fetch(`http://${api_host}/signup`, {
+    const resp = await fetch(`http://${api_host}/user/signup`, {
       headers: { "Content-Type": "application/json" },
       method: "POST",
       body: JSON.stringify(values),

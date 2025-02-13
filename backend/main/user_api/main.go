@@ -14,6 +14,7 @@ import (
 	"github.com/joho/godotenv"
 	httpSwagger "github.com/swaggo/http-swagger"
 
+	_ "github.com/PatheticApathy/CoMMS/docs/users"
 	_ "modernc.org/sqlite"
 )
 

@@ -1,3 +1,9 @@
+export interface SignupParams {
+  email: string,
+  passwod: string,
+  phone: string,
+  username: string
+}
 //********************************* User related types ***********************************
 
 export interface User {
@@ -11,6 +17,7 @@ export interface User {
     role: Role
     site: Site
     username: string
+    profilepicture: Profilepicture
   }
   
   export interface Company {
@@ -38,9 +45,39 @@ export interface User {
     Valid: boolean
   }
 
-  export interface SignUpUser {
-    email: string
-    password: string
-    phone: string
-    username: string
-  }
+export interface Company {
+  string: string
+  valid: boolean
+}
+
+export interface Firstname {
+  string: string
+  valid: boolean
+}
+
+export interface Lastname {
+  string: string
+  valid: boolean
+}
+
+export interface Role {
+  string: string
+  valid: boolean
+}
+
+export interface Site {
+  string: string
+  valid: boolean
+}
+
+export interface Profilepicture {
+  String: string
+  Valid: boolean
+}
+
+export interface SignUpUser {
+  email: string
+  password: string
+  phone: string
+  username: string
+}

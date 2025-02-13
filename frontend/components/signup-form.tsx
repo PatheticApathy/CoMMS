@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -10,19 +11,43 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import Signup from "@/server_side/signup"
+import { SignupParams } from '@/user-api-types'
+import { redirect } from 'next/navigation'
 
 const formSchema = z.object({
-  username: z.string(),
-  password: z.string(),
-  confirm_password: z.string(),
-  email: z.string(),
-  phone_number: z.string(),
+  username: z.string().nonempty(),
+  password: z.string().nonempty(),
+  confirm_password: z.string().nonempty(),
+  email: z.string().nonempty(),
+  phone_number: z.string().nonempty(),
 })
+
+async function Signup(values: SignupParams) {
+  const api_host = process.env.API;
+  if (!api_host) {
+    return { message: "api host not set in .env file" }
+  }
+  try {
+    const resp = await fetch(`http://${api_host}/user/signup`, {
+      headers: { "Content-Type": "application/json" },
+      method: "POST",
+      body: JSON.stringify(values),
+    })
+
+    if (!resp.ok) {
+      const msg: string = await (await resp.blob()).text()
+      return { message: msg }
+    }
+  } catch (err) {
+    console.error(err)
+    return { message: err }
+  }
+
+  redirect('/dashboard')
+}
 
 export default function SignupForm() {
 
@@ -40,7 +65,13 @@ export default function SignupForm() {
   //validate form data(data is safe at this point)
   async function onSubmit(values: z.infer<typeof formSchema>) {
     console.log("Making server request")
-    const message = await Signup(values)
+    const message = await Signup({
+      email: values.email,
+      passwod: values.password,
+      username: values.username,
+      phone: values.phone_number,
+    })
+
     console.log("Request finished")
     alert(message.message)
   }
@@ -53,9 +84,8 @@ export default function SignupForm() {
           name="username"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
               <FormControl>
-                <Input placeholder="" {...field} />
+                <Input placeholder="Username" required {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -66,9 +96,8 @@ export default function SignupForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input placeholder="" {...field} />
+                <Input placeholder="Password" type="password" required {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -79,9 +108,8 @@ export default function SignupForm() {
           name="confirm_password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Confirm password</FormLabel>
               <FormControl>
-                <Input placeholder="" {...field} />
+                <Input placeholder="Confirm Password" type="password" required {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -92,9 +120,8 @@ export default function SignupForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="" {...field} />
+                <Input placeholder="Email" type="email" required {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -105,15 +132,18 @@ export default function SignupForm() {
           name="phone_number"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Phone Number</FormLabel>
               <FormControl>
-                <Input placeholder="" {...field} />
+                <Input placeholder="Phone Number" type="number" required {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button className="flex justify-center" type="submit">Signup</Button>
+        <div className="flex justify-center">
+          <Button className="flex justify-center" type="submit">Signup</Button>
+        </div>
+        <div className="flex justify-center">Already Have an Account?</div>
+        <Link href="/login" className="flex justify-center hover:text-blue-500 hover:underline">Login!</Link>
       </form>
     </Form>
   )
