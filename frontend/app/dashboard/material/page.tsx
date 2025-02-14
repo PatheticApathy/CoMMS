@@ -1,10 +1,12 @@
 'use client'
-import { ChangeEvent, useEffect, useState } from 'react'
+import { useState } from 'react'
 import MTable from "@/components/material-table";
 import { Material } from '@/material-api-types';
 import MaterialFilter, { Filter } from '@/components/materials-filter';
 import useSWR, { Fetcher } from 'swr'
 import Loading from '@/components/loading';
+
+const fetcher: Fetcher<Material[], string> = async (...args) => fetch(...args).then(res => res.json())
 export default function DashboardPage() {
 
   const options: Filter = {
@@ -15,60 +17,61 @@ export default function DashboardPage() {
     jobsite: "",
   };
 
-  const fetcher: Fetcher<Material[], string> = (...args) => fetch(...args).then(res => res.json())
-  const { data, error, isLoading } = useSWR('/api/material/material/all', fetcher)
+  const { data: materials, error, isLoading } = useSWR('/api/material/material/all', fetcher)
   const [filter, setFilter] = useState<Filter>(options);
-  const [materials, setMaterial] = useState<Material[] | undefined>(undefined);
 
-
-  //whenerver data is grabbed
-  useEffect(() => { setMaterial(data) }, [data])
 
   // Filter materials whenever filter changes
-  useEffect(() => {
-    if (data) {
-      let filteredMaterials = data;
-
+  const filterer = (materials: Material[] | undefined) => {
+    if (materials) {
       if (filter.id) {
-        filteredMaterials = filteredMaterials.filter(
+        return materials.filter(
           (material) => material.id === Number(filter.id)
         );
       }
 
       if (filter.quantity) {
-        filteredMaterials = filteredMaterials.filter(
+        return materials.filter(
           (material) => material.quantity === Number(filter.quantity)
         );
       }
 
       if (filter.status) {
-        filteredMaterials = filteredMaterials.filter(
-          (material) => material.status.includes(filter.status)
+        return materials.filter(
+          (material) => material.status.toLowerCase().includes(filter.status.toLowerCase())
         );
       }
 
       if (filter.type) {
-        filteredMaterials = filteredMaterials.filter(
-          (material) => material.type.String.includes(filter.type)
+        return materials.filter(
+          (material) => material.type.String.toLowerCase().includes(filter.type.toLowerCase())
         );
       }
       if (filter.jobsite) {
-        filteredMaterials = filteredMaterials.filter(
+        return materials.filter(
           (material) => material.job_site.Int64 == Number(filter.jobsite)
         );
       }
 
-      setMaterial(filteredMaterials);
+      else {
+        return materials
+      }
+
     }
-  }, [filter, data]);
+  }
+
+  const filtered = filterer(materials);
 
   if (isLoading) { return (<div className='flex items-center justify-center w-screen h-screen'>Loading <Loading /></div>) }
   if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
+  if (!filtered) {
+    return (<div className='flex items-center justify-center w-screen h-screen'>No Data to display</div>)
+  }
   return (
     <div className="flex">
       <MaterialFilter filter={filter} setFilterAction={setFilter} />
       <div className='flex justify-end h-screen w-screen'>
-        <MTable data={materials} />
+        <MTable materials={filtered} />
       </div>
     </div>
   );
