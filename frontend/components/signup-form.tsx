@@ -38,31 +38,32 @@ async function signUp(url, { arg }) {
   return fetch(url, {
     method: 'POST',
     body: JSON.stringify(arg)
-  })
+  }).then(res => res.json())
 }
+
 
 export default function SignupForm() {
 
-  const { trigger, error, isMutating } = useSWRMutation('http://localhost:8082/user/signup', signUp)
+  const { data, trigger, error, isMutating } = useSWRMutation('api/user/signup', signUp, {throwOnError: false})
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       username: "",
       password: "",
+      confirm_password: "",
       email: "",
       phone: "",
     },
   })
 
+  if (isMutating) { return (<div className='flex items-center justify-center w-screen h-screen'>Loading <Loading /></div>) }
+  if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
+  if (data) {redirect('/dashboard')}
+
   //validate form data(data is safe at this point)
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (isMutating) { return (<div className='flex items-center justify-center w-screen h-screen'>Loading <Loading /></div>) }
-    if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
-
+  async function onSubmit(values: z.infer<typeof formSchema>) {   
     trigger(values)
-
-    redirect('/dashboard')
   }
 
   return (
