@@ -3,15 +3,11 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
-  SidebarGroupLabel,
-  SidebarGroupAction,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarGroupContent,
-
 } from "@/components/ui/sidebar"
-
 
 import { Profile } from "./profile-dialog"
 
