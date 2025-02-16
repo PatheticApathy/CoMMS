@@ -158,3 +158,41 @@ func (q *Queries) GetMaterialLogsByMaterial(ctx context.Context, materialID int6
 	}
 	return items, nil
 }
+
+const getRecentMaterialLogsForMaterial = `-- name: GetRecentMaterialLogsForMaterial :many
+SELECT id, material_id, note, status, quantity_change, timestamp 
+FROM  MaterialLogs
+WHERE material_id = ?
+ORDER BY timestamp
+LIMIT 10
+`
+
+func (q *Queries) GetRecentMaterialLogsForMaterial(ctx context.Context, materialID int64) ([]MaterialLog, error) {
+	rows, err := q.db.QueryContext(ctx, getRecentMaterialLogsForMaterial, materialID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []MaterialLog
+	for rows.Next() {
+		var i MaterialLog
+		if err := rows.Scan(
+			&i.ID,
+			&i.MaterialID,
+			&i.Note,
+			&i.Status,
+			&i.QuantityChange,
+			&i.Timestamp,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

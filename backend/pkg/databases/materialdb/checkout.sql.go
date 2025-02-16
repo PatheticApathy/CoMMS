@@ -33,22 +33,75 @@ func (q *Queries) AddCheckoutLog(ctx context.Context, arg AddCheckoutLogParams) 
 	return i, err
 }
 
-const getAllCheckoutLogs = `-- name: GetAllCheckoutLogs :one
+const getAllCheckoutLogs = `-- name: GetAllCheckoutLogs :many
 SELECT id, item_id, user_id, checkin_time, checkout_time 
 FROM  CheckoutLogs
 `
 
-func (q *Queries) GetAllCheckoutLogs(ctx context.Context) (CheckoutLog, error) {
-	row := q.db.QueryRowContext(ctx, getAllCheckoutLogs)
-	var i CheckoutLog
-	err := row.Scan(
-		&i.ID,
-		&i.ItemID,
-		&i.UserID,
-		&i.CheckinTime,
-		&i.CheckoutTime,
-	)
-	return i, err
+func (q *Queries) GetAllCheckoutLogs(ctx context.Context) ([]CheckoutLog, error) {
+	rows, err := q.db.QueryContext(ctx, getAllCheckoutLogs)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []CheckoutLog
+	for rows.Next() {
+		var i CheckoutLog
+		if err := rows.Scan(
+			&i.ID,
+			&i.ItemID,
+			&i.UserID,
+			&i.CheckinTime,
+			&i.CheckoutTime,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getRecentCheckoutLogsForMaterial = `-- name: GetRecentCheckoutLogsForMaterial :many
+SELECT id, item_id, user_id, checkin_time, checkout_time 
+FROM  CheckoutLogs
+WHERE item_id = ?
+ORDER BY checkout_time
+LIMIT 10
+`
+
+func (q *Queries) GetRecentCheckoutLogsForMaterial(ctx context.Context, itemID int64) ([]CheckoutLog, error) {
+	rows, err := q.db.QueryContext(ctx, getRecentCheckoutLogsForMaterial, itemID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []CheckoutLog
+	for rows.Next() {
+		var i CheckoutLog
+		if err := rows.Scan(
+			&i.ID,
+			&i.ItemID,
+			&i.UserID,
+			&i.CheckinTime,
+			&i.CheckoutTime,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const updateCheckinlog = `-- name: UpdateCheckinlog :one
