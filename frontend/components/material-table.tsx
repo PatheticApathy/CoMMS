@@ -1,4 +1,3 @@
-//TODO: Need to handle possible render error
 import {
   Table,
   TableBody,
@@ -8,9 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { SheetTrigger } from "@/components/ui/sheet";
 import { Material } from "@/material-api-types"
-import { ReactNode } from "react";
 import MaterialSheet from "./material-sheet";
 
 export default function MTable({ materials }: { materials: Material[] }) {
@@ -25,7 +22,7 @@ export default function MTable({ materials }: { materials: Material[] }) {
           <TableHead>Quantity</TableHead>
           <TableHead>Status</TableHead>
           <TableHead>Type</TableHead>
-          <TableHead className="text-right">Job Site</TableHead>
+          <TableHead className="">Job Site</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -38,7 +35,7 @@ export default function MTable({ materials }: { materials: Material[] }) {
               <TableCell className="hover:text-cyan-200">{`${material.quantity}  ${material.unit}`}</TableCell>
               <TableCell className="hover:text-cyan-200">{material.status}</TableCell>
               <TableCell className="hover:text-cyan-200">{material.type.Valid ? material.type.String : "N/A"}</TableCell>
-              <TableCell className="text-right hover:text-cyan-200">{material.job_site.Valid ? material.job_site.Int64 : "N/A"}</TableCell>
+              <TableCell className=" hover:text-cyan-200">{material.job_site.Valid ? material.job_site.Int64 : "N/A"}</TableCell>
             </TableRow>
           ))
         }
