@@ -34,7 +34,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "material-api-types.d.ts",
-    "nominatim-types.d.ts"
+    "nominatim-types.d.ts",
+    "user-api-types.d.ts"
   ],
   "exclude": [
     "node_modules"

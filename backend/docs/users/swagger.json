@@ -10,7 +10,7 @@
         },
         "version": "1.0"
     },
-    "host": "localhost:8080",
+    "host": "localhost:8082",
     "basePath": "/",
     "paths": {
         "/user/all": {
@@ -368,6 +368,9 @@
                 "phone": {
                     "type": "string"
                 },
+                "profilepicture": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
                 "role": {
                     "$ref": "#/definitions/sql.NullString"
                 },
@@ -420,6 +423,9 @@
                 "phone": {
                     "type": "string"
                 },
+                "profilepicture": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
                 "role": {
                     "$ref": "#/definitions/sql.NullString"
                 },
@@ -454,6 +460,9 @@
                 },
                 "phone": {
                     "type": "string"
+                },
+                "profilepicture": {
+                    "$ref": "#/definitions/sql.NullString"
                 },
                 "role": {
                     "$ref": "#/definitions/sql.NullString"

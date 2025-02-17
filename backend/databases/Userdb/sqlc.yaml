@@ -8,4 +8,3 @@ sql:
         package: userdb
         out: ../../pkg/databases/userdb
         emit_json_tags: true
-

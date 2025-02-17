@@ -1,16 +1,15 @@
 // Server Action
 'use server'
-import { redirect } from 'next/navigation'
 
-export default async function Signup(values: any) {
+export default async function GetContacts(values: any) {
   const api_host = process.env.API
   if (!api_host) {
     return { message: "this not set" }
   }
   try {
-    const resp = await fetch(`http://${api_host}/user/signup`, {
+    const resp = await fetch(`http://${api_host}/users/all`, {
       headers: { "Content-Type": "application/json" },
-      method: "POST",
+      method: "GET",
       body: JSON.stringify(values),
     })
 
@@ -21,7 +20,4 @@ export default async function Signup(values: any) {
     console.error(err)
     return { message: err }
   }
-
-  redirect('/dashboard')
 }
-

@@ -3,28 +3,48 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import Signup from "@/server_side/signup"
+import { redirect } from 'next/navigation'
+import useSWRMutation from 'swr/mutation'
+import Loading from '@/components/loading'
 
 const formSchema = z.object({
-  username: z.string(),
-  password: z.string(),
-  confirm_password: z.string(),
-  email: z.string(),
-  phone_number: z.string(),
+  username: z.string().nonempty(),
+  password: z.string().nonempty(),
+  confirm_password: z.string().nonempty(),
+  email: z.string().nonempty(),
+  phone: z.string().nonempty(),
 })
+  .refine(
+    (values) => {
+      return values.password === values.confirm_password
+    },
+    {
+      message: "The passwords do not match.",
+      path: ["confirm_password"]
+    }
+  )
+
+async function signUp(url, { arg }) {
+  return fetch(url, {
+    method: 'POST',
+    body: JSON.stringify(arg)
+  }).then(res => res.json())
+}
+
 
 export default function SignupForm() {
+
+  const { data, trigger, error, isMutating } = useSWRMutation('api/user/signup', signUp, {throwOnError: false})
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -33,16 +53,17 @@ export default function SignupForm() {
       password: "",
       confirm_password: "",
       email: "",
-      phone_number: "",
+      phone: "",
     },
   })
 
+  if (isMutating) { return (<div className='flex items-center justify-center w-screen h-screen'>Loading <Loading /></div>) }
+  if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
+  if (data) {redirect('/dashboard')}
+
   //validate form data(data is safe at this point)
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log("Making server request")
-    const message = await Signup(values)
-    console.log("Request finished")
-    alert(message.message)
+  async function onSubmit(values: z.infer<typeof formSchema>) {   
+    trigger(values)
   }
 
   return (
@@ -53,9 +74,8 @@ export default function SignupForm() {
           name="username"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
               <FormControl>
-                <Input placeholder="" {...field} />
+                <Input placeholder="Username" required {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -66,9 +86,8 @@ export default function SignupForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input placeholder="" {...field} />
+                <Input placeholder="Password" id="password" type="password" required {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -79,9 +98,8 @@ export default function SignupForm() {
           name="confirm_password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Confirm password</FormLabel>
               <FormControl>
-                <Input placeholder="" {...field} />
+                <Input placeholder="Confirm Password" type="password" required {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -92,9 +110,8 @@ export default function SignupForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="" {...field} />
+                <Input placeholder="Email" type="email" required {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -102,18 +119,21 @@ export default function SignupForm() {
         />
         <FormField
           control={form.control}
-          name="phone_number"
+          name="phone"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Phone Number</FormLabel>
               <FormControl>
-                <Input placeholder="" {...field} />
+                <Input placeholder="Phone Number" type="number" required {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button className="flex justify-center" type="submit">Signup</Button>
+        <div className="flex justify-center">
+          <Button className="flex justify-center" type="submit">Signup</Button>
+        </div>
+        <div className="flex justify-center">Already Have an Account?</div>
+        <Link href="/login" className="flex justify-center hover:text-blue-500 hover:underline">Login!</Link>
       </form>
     </Form>
   )

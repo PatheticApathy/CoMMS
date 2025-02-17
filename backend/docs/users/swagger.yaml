@@ -29,6 +29,8 @@ definitions:
         type: string
       phone:
         type: string
+      profilepicture:
+        $ref: '#/definitions/sql.NullString'
       role:
         $ref: '#/definitions/sql.NullString'
       site:
@@ -63,6 +65,8 @@ definitions:
         type: string
       phone:
         type: string
+      profilepicture:
+        $ref: '#/definitions/sql.NullString'
       role:
         $ref: '#/definitions/sql.NullString'
       site:
@@ -86,6 +90,8 @@ definitions:
         type: string
       phone:
         type: string
+      profilepicture:
+        $ref: '#/definitions/sql.NullString'
       role:
         $ref: '#/definitions/sql.NullString'
       site:
@@ -96,7 +102,7 @@ definitions:
 externalDocs:
   description: OpenAPI
   url: https://swagger.io/resources/open-api/
-host: localhost:8080
+host: localhost:8082
 info:
   contact:
     name: Comms group
