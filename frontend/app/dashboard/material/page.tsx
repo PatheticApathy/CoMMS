@@ -65,10 +65,13 @@ export default function DashboardPage() {
   if (isLoading) { return (<div className='flex items-center justify-center w-screen h-screen'>Loading <Loading /></div>) }
   if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
   return (
-    <div className="flex">
-      <MaterialFilter filter={filter} setFilterAction={setFilter} />
-      <div className='flex justify-end h-screen w-screen'>
-        <MTable data={materials} />
+    <div className="flex flex-col justify-center items-center w-screen">
+      <h1 className="font-bold text-5xl mb-4">Materials</h1>
+      <div className='flex'>
+        <MaterialFilter filter={filter} setFilterAction={setFilter} />
+        <div className='flex justify-end h-screen w-screen'>
+          <MTable data={materials} />
+        </div>
       </div>
     </div>
   );
