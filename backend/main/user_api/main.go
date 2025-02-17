@@ -89,6 +89,7 @@ func main() {
 	router.Handle("/", env.Handler())
 	router.Handle("/material/", http.StripPrefix("/material", mat_proxy))
 	router.Handle("/geo/", http.StripPrefix("/geo", nom_proxy))
+	router.Handle("/map/", http.StripPrefix("/map", osm_proxy))
 	router.Handle("/swagger/", httpSwagger.Handler())
 	router.HandleFunc("/{$}", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/swagger", http.StatusPermanentRedirect)
