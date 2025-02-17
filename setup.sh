@@ -55,6 +55,7 @@ cd $OG
 
 #setup material db
 cd ./backend/databases/Materialdb/
+$GOOSE down
 $GOOSE up
 $SQLC generate
 cd ./../../
@@ -63,6 +64,7 @@ cd $OG
 
 #setup userdb
 cd ./backend/databases/Userdb/
+$GOOSE down
 $GOOSE up
 $SQLC generate
 cd ./../../

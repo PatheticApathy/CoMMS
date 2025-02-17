@@ -11,10 +11,10 @@ import (
 
 	_ "github.com/PatheticApathy/CoMMS/docs/users"
 	handler "github.com/PatheticApathy/CoMMS/pkg/api/user"
+	"github.com/PatheticApathy/CoMMS/pkg/middleware"
 	"github.com/joho/godotenv"
 	httpSwagger "github.com/swaggo/http-swagger"
 
-	_ "github.com/PatheticApathy/CoMMS/docs/users"
 	_ "modernc.org/sqlite"
 )
 
@@ -77,14 +77,20 @@ func main() {
 	defer db.Close()
 
 	env := handler.NewEnv(db, secret)
-	http.Handle("/", env.Handler())
-	http.Handle("/material/", http.StripPrefix("/material", mat_proxy))
-	http.Handle("/geo/", http.StripPrefix("/geo", nom_proxy))
-	http.Handle("/swagger/", httpSwagger.Handler())
-	http.HandleFunc("/{$}", func(w http.ResponseWriter, r *http.Request) {
+	router := http.NewServeMux()
+	router.Handle("/", env.Handler())
+	router.Handle("/material/", http.StripPrefix("/material", mat_proxy))
+	router.Handle("/geo/", http.StripPrefix("/geo", nom_proxy))
+	router.Handle("/swagger/", httpSwagger.Handler())
+	router.HandleFunc("/{$}", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/swagger", http.StatusPermanentRedirect)
 	})
 
-	log.Printf("Server is running on on %s:%s", url.Hostname(), url.Port())
-	log.Fatal(http.ListenAndServe(":"+url.Port(), nil))
+	serv := http.Server{
+		Addr:    ":" + url.Port(),
+		Handler: middleware.Middlewares(middleware.Json, middleware.Logger)(router),
+	}
+
+	log.Printf("Server is running on on %s:%s", url.Hostname(), serv.Addr)
+	log.Fatal(serv.ListenAndServe())
 }
