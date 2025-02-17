@@ -24,24 +24,27 @@ import (
 //		@Router			/user/login [post]
 func (e *Env) authenticate(w http.ResponseWriter, r *http.Request) {
 	var userandpass auth.UserAndPass
+	log.Println("Got User and Pass")
 	if err := json.NewDecoder(r.Body).Decode(&userandpass); err != nil {
 		log.Println(err)
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 		return
 	}
+	log.Printf("Checking user %s", userandpass.Username)
 	response, err := auth.CheckUserAndPass(e.Queries, r.Context(), userandpass)
 	if err != nil || !response {
 		log.Println(err)
 		http.Error(w, "Invalid User or Password", http.StatusBadRequest)
 		return
 	}
-
+	log.Println("Repackaging userandpass to json")
 	jsonUserandPass, err := json.Marshal(userandpass)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "Server Error", http.StatusInternalServerError)
 		return
 	}
+	log.Println("Generating cookie")
 	cookie := http.Cookie{
 		Name:     "LoginCookie",
 		Value:    string(jsonUserandPass),
@@ -51,14 +54,14 @@ func (e *Env) authenticate(w http.ResponseWriter, r *http.Request) {
 		Secure:   false,
 		SameSite: http.SameSiteLaxMode,
 	}
-
+	log.Println("Encrypting Cookie")
 	err = auth.WriteEncrypted(w, cookie, []byte(e.Secret))
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "Server Error", http.StatusInternalServerError)
 		return
 	}
-
+	log.Println("Encoding json")
 	if err := json.NewEncoder(w).Encode("Success"); err != nil {
 		log.Printf("Could not encode json user, reason: %e", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
