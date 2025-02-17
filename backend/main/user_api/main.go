@@ -28,7 +28,7 @@ import (
 
 //	@host		localhost:8082
 //	@BasePath	/
-
+//
 // @externalDocs.description	OpenAPI
 // @externalDocs.url			https://swagger.io/resources/open-api/
 func main() {
@@ -44,6 +44,14 @@ func main() {
 		nominatim_host, _ = url.Parse("https://nominatim.openstreetmap.org")
 	}
 	nom_proxy := httputil.NewSingleHostReverseProxy(nominatim_host)
+
+	// goes to osm if not set in .env
+	osm_url := os.Getenv("MAP_HOST")
+	osm_host, err := url.Parse(osm_url)
+	if err != nil || nom_url == "" {
+		log.Println("WARNING: OSM api host not set or invalid syntax, defaulting to osm website")
+	}
+	osm_proxy := httputil.NewSingleHostReverseProxy(osm_host)
 
 	// prints warning if not set
 	mat_host, err := url.Parse(os.Getenv("MATERIAL_HOST"))

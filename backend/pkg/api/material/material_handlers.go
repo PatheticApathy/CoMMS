@@ -81,6 +81,7 @@ func (e *Env) getMaterialHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "invalid quantity or unit", http.StatusInternalServerError)
 			return
 		}
+		return
 	}
 
 	// has param site
@@ -110,6 +111,7 @@ func (e *Env) getMaterialHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Error creating json", http.StatusInternalServerError)
 			return
 		}
+		return
 	}
 
 	// has param type
@@ -134,6 +136,7 @@ func (e *Env) getMaterialHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Error creating json", http.StatusInternalServerError)
 			return
 		}
+		return
 	}
 
 	// has no valid params
