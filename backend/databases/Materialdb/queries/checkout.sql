@@ -9,6 +9,13 @@ SET checkin_time = date()
 WHERE id = ?
 RETURNING *;
 
--- name: GetAllCheckoutLogs :one
+-- name: GetAllCheckoutLogs :many
 SELECT * 
 FROM  CheckoutLogs;
+
+-- name: GetRecentCheckoutLogsForMaterial :many
+SELECT * 
+FROM  CheckoutLogs
+WHERE item_id = ?
+ORDER BY checkout_time
+LIMIT 10;

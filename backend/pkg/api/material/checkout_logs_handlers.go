@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/PatheticApathy/CoMMS/pkg/databases/materialdb"
 )
@@ -45,8 +46,8 @@ func (e *Env) postCheckout(w http.ResponseWriter, r *http.Request) {
 
 // postMaterialLogsHandler adds material logs godoc
 //
-//	@Summary		post material log to database
-//	@Description	Adds material log  to the database using valid json structure
+//	@Summary		Adds checkin time to existing checkout log
+//	@Description	 Adds checkin time to existing checkout log
 //	@Tags			checkout logs
 //	@Accept			json
 //	@Produce		json
@@ -101,4 +102,47 @@ func (e *Env) getAllCheckoutLogs(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
+}
+
+// getRecentCheckoutLogsForMaterialHandler gets recent checkout logs based on given id godoc
+//
+//	@Summary		fetches recent checkout logs for a given material id
+//	@Description	Safer and faster way to get newest checkout logs for given material
+//	@Tags			checkout logs
+//	@Produce		json
+//	@Param			id			query		int						true	"id of material"
+//	@Success		200			{array}	materialdb.CheckoutLog	"checkout logs"
+//	@Failure		400			{string} string	"bad request"
+//	@Failure		500			{string} string	"Internal Server Error"
+//	@Router			/checkout/recent [get]
+func (e *Env) getRecentCheckoutLogsForMaterialHandler(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+
+	if query.Has("id") {
+
+		id, err := strconv.Atoi(query.Get("id"))
+		if err != nil {
+			log.Printf("Invalid material log id, reason %e", err)
+			http.Error(w, "bad request", http.StatusBadRequest)
+			return
+		}
+
+		material_log, err := e.Queries.GetRecentCheckoutLogsForMaterial(r.Context(), int64(id))
+		if err != nil {
+			log.Printf("Invalid material log id, reason %e", err)
+			http.Error(w, "bad request", http.StatusBadRequest)
+			return
+		}
+
+		log.Printf("Found checkout log %d", id)
+
+		if err := json.NewEncoder(w).Encode(&material_log); err != nil {
+			log.Printf("could not encode to json, reason %e", err)
+			http.Error(w, "internal server error", http.StatusInternalServerError)
+			return
+		}
+		return
+	}
+	log.Printf("No valid paramerters given")
+	http.Error(w, "bad request", http.StatusBadRequest)
 }

@@ -1,7 +1,7 @@
 //********************************* Checkout related types ***********************************
 
 export interface CheckoutLog {
-  checkin_time: string
+  checkin_time: CheckinTime
   checkout_time: string
   id: number
   item_id: number
@@ -116,5 +116,10 @@ export interface LocationLat {
 
 export interface LocationLng {
   Float64: number
+  Valid: boolean
+}
+
+export interface CheckinTime {
+  time: string
   Valid: boolean
 }

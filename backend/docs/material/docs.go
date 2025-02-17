@@ -19,6 +19,50 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/checkout/recent": {
+            "get": {
+                "description": "Safer and faster way to get newest checkout logs for given material",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "checkout logs"
+                ],
+                "summary": "fetches recent checkout logs for a given material id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "id of material",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "checkout logs",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/materialdb.CheckoutLog"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/checkouts/all": {
             "get": {
                 "description": "gets all checkout logs if they exist",
@@ -50,7 +94,7 @@ const docTemplate = `{
         },
         "/checkouts/in": {
             "put": {
-                "description": "Adds material log  to the database using valid json structure",
+                "description": "Adds checkin time to existing checkout log",
                 "consumes": [
                     "application/json"
                 ],
@@ -60,7 +104,7 @@ const docTemplate = `{
                 "tags": [
                     "checkout logs"
                 ],
-                "summary": "post material log to database",
+                "summary": "Adds checkin time to existing checkout log",
                 "parameters": [
                     {
                         "description": "id of checkoutlog",
@@ -429,6 +473,50 @@ const docTemplate = `{
                         "description": "material log",
                         "schema": {
                             "$ref": "#/definitions/materialdb.MaterialLog"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/mlogs/recent": {
+            "get": {
+                "description": "Safer and faster way to get newest material logs for given material",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "material logs"
+                ],
+                "summary": "fetches recent materials logs for a given material id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "id of material",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "material log",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/materialdb.MaterialLog"
+                            }
                         }
                     },
                     "400": {
@@ -1049,7 +1137,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "checkin_time": {
-                    "type": "string"
+                    "$ref": "#/definitions/sql.NullTime"
                 },
                 "checkout_time": {
                     "type": "string"
@@ -1184,6 +1272,18 @@ const docTemplate = `{
                 },
                 "valid": {
                     "description": "Valid is true if String is not NULL",
+                    "type": "boolean"
+                }
+            }
+        },
+        "sql.NullTime": {
+            "type": "object",
+            "properties": {
+                "time": {
+                    "type": "string"
+                },
+                "valid": {
+                    "description": "Valid is true if Time is not NULL",
                     "type": "boolean"
                 }
             }
