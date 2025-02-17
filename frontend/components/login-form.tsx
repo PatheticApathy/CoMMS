@@ -4,7 +4,9 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import Link from "next/link"
-
+import { redirect } from 'next/navigation'
+import useSWRMutation from 'swr/mutation'
+import Loading from '@/components/loading'
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -14,35 +16,40 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import Signup from "@/server_side/signup"
 
 const formSchema = z.object({
   username: z.string(),
   password: z.string(),
-  confirm_password: z.string(),
-  email: z.string(),
-  phone_number: z.string(),
 })
 
+async function logIn(url, { arg }) {
+  return fetch(url, {
+    method: 'POST',
+    body: JSON.stringify(arg)
+  }).then(res => res.json())
+}
+
 export default function LoginForm() {
+
+  const { data, trigger, error, isMutating } = useSWRMutation('api/user/login', logIn, {throwOnError: false})
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       username: "",
       password: "",
-      confirm_password: "",
-      email: "",
-      phone_number: "",
     },
   })
 
+  console.log("Error: ", error)
+  console.log("Data: ", data)
+  if (isMutating) { return (<div className='flex items-center justify-center w-screen h-screen'>Loading <Loading /></div>) }
+  if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
+  if (data) {redirect('/dashboard')}
+
   //validate form data(data is safe at this point)
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log("Making server request")
-    const message = await Signup(values)
-    console.log("Request finished")
-    alert(message.message)
+  async function onSubmit(values: z.infer<typeof formSchema>) {    
+    trigger(values)
   }
 
   return (
@@ -73,7 +80,7 @@ export default function LoginForm() {
           )}
         />
         <div className="flex justify-center">
-          <Button className="flex justify-center" type="submit">Login</Button>
+          <Button disabled={isMutating} className="flex justify-center" type="submit">Login</Button>
         </div>
         <div className="flex justify-center">Don't Have an Account?</div>
         <Link href="/signup" className="flex justify-center hover:text-blue-500 hover:underline">Sign up!</Link>
