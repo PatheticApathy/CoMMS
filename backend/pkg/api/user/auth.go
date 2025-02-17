@@ -12,18 +12,16 @@ import (
 
 // authenticate handler that verifies user credentials and generates a cookie godoc
 //
-//	@Summary		Authenticate user information
-//	@Description	Pulls user login information and authenticates the user
-//	@Tags			users
-//  @Accept			json
-//  @Produce		string
-//	@Param			users	body		user_db.UserAndPass		true	"Format of login user request"
-//	@Success		200		{string}	string					"Success"
-//	@Failure		400		{string}	string					"Invalid input"
-//	@Failure		500		{string}	string					"Invalid User or Password"
-//  @Failure		500		{string}	string					"Server Error"
-//	@Router			/user/login [post]
-
+//		@Summary		Authenticate user information
+//		@Description	Pulls user login information and authenticates the user
+//		@Tags			users
+//	  @Accept			json
+//		@Param			users	body		auth.UserAndPass		true	"Format of login user request"
+//		@Success		200		{string}	string					"Success"
+//		@Failure		400		{string}	string					"Invalid input"
+//		@Failure		500		{string}	string					"Invalid User or Password"
+//	  @Failure		500		{string}	string					"Server Error"
+//		@Router			/user/login [post]
 func (e *Env) authenticate(w http.ResponseWriter, r *http.Request) {
 	var userandpass auth.UserAndPass
 	if err := json.NewDecoder(r.Body).Decode(&userandpass); err != nil {
@@ -69,15 +67,14 @@ func (e *Env) authenticate(w http.ResponseWriter, r *http.Request) {
 	log.Printf("User successfully logged in")
 }
 
-//  loggout handler that removes an authentication cookie godoc
+//	 loggout handler that removes an authentication cookie godoc
 //
-//	@Summary		Removes authenticated user information
-//	@Description	Replaces login cookie with an empty one that deletes itself instantly
-//	@Tags			users
-//	@Success		200		{string}	string					"Success"
-//	@Failure		400		{string}	string					"Invalid input"
-//	@Router			/user/loggout [post]
-
+//		@Summary		Removes authenticated user information
+//		@Description	Replaces login cookie with an empty one that deletes itself instantly
+//		@Tags			users
+//		@Success		200		{string}	string					"Success"
+//		@Failure		400		{string}	string					"Invalid input"
+//		@Router			/user/loggout [post]
 func (e *Env) loggout(w http.ResponseWriter, _ *http.Request) {
 	cookie := &http.Cookie{
 		Name:     "LoginCookie",
