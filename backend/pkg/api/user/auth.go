@@ -31,8 +31,8 @@ func (e *Env) authenticate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Printf("Checking user %s", userandpass.Username)
-	response, err := auth.CheckUserAndPass(e.Queries, r.Context(), userandpass)
-	if err != nil || !response {
+	err := auth.CheckUserAndPass(e.Queries, r.Context(), userandpass)
+	if err != nil {
 		log.Println(err)
 		http.Error(w, "Invalid User or Password", http.StatusBadRequest)
 		return
