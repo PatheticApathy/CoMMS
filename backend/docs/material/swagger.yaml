@@ -72,7 +72,7 @@ definitions:
   materialdb.CheckoutLog:
     properties:
       checkin_time:
-        type: string
+        $ref: '#/definitions/sql.NullTime'
       checkout_time:
         type: string
       id:
@@ -161,6 +161,14 @@ definitions:
         type: string
       valid:
         description: Valid is true if String is not NULL
+        type: boolean
+    type: object
+  sql.NullTime:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
         type: boolean
     type: object
   userdb.AddUserParams:
@@ -261,6 +269,35 @@ info:
   title: Material Tracker API
   version: "1.0"
 paths:
+  /checkout/recent:
+    get:
+      description: Safer and faster way to get newest checkout logs for given material
+      parameters:
+      - description: id of material
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: checkout logs
+          schema:
+            items:
+              $ref: '#/definitions/materialdb.CheckoutLog'
+            type: array
+        "400":
+          description: bad request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: fetches recent checkout logs for a given material id
+      tags:
+      - checkout logs
   /checkouts/all:
     get:
       description: gets all checkout logs if they exist
@@ -284,7 +321,7 @@ paths:
     put:
       consumes:
       - application/json
-      description: Adds material log  to the database using valid json structure
+      description: Adds checkin time to existing checkout log
       parameters:
       - description: id of checkoutlog
         in: body
@@ -307,7 +344,7 @@ paths:
           description: Internal Server Error
           schema:
             type: string
-      summary: post material log to database
+      summary: Adds checkin time to existing checkout log
       tags:
       - checkout logs
   /checkouts/out:
@@ -539,6 +576,35 @@ paths:
           schema:
             type: string
       summary: post changes not on a existing material log
+      tags:
+      - material logs
+  /mlogs/recent:
+    get:
+      description: Safer and faster way to get newest material logs for given material
+      parameters:
+      - description: id of material
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: material log
+          schema:
+            items:
+              $ref: '#/definitions/materialdb.MaterialLog'
+            type: array
+        "400":
+          description: bad request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: fetches recent materials logs for a given material id
       tags:
       - material logs
   /mlogs/search:

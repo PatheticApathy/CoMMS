@@ -11,6 +11,7 @@ export interface Filter {
   jobsite: string
 }
 
+
 export default function MaterialFilter({ filter, setFilterAction }: { filter: Filter, setFilterAction: Dispatch<Filter> }) {
 
   const filterID = (e: ChangeEvent<HTMLInputElement>) => {

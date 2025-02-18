@@ -170,3 +170,46 @@ func (e *Env) changeMaterialLogNoteHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 }
+
+// getRecentMaterialLogsForMaterialHandler gets recent material log based on given id godoc
+//
+//	@Summary		fetches recent materials logs for a given material id
+//	@Description	Safer and faster way to get newest material logs for given material
+//	@Tags			material logs
+//	@Produce		json
+//	@Param			id			query		int						true	"id of material"
+//	@Success		200			{array}	materialdb.MaterialLog	"material log"
+//	@Failure		400			{string} string	"bad request"
+//	@Failure		500			{string} string	"Internal Server Error"
+//	@Router			/mlogs/recent [get]
+func (e *Env) getRecentMaterialLogsForMaterialHandler(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+
+	if query.Has("id") {
+
+		id, err := strconv.Atoi(query.Get("id"))
+		if err != nil {
+			log.Printf("Invalid material log id, reason %e", err)
+			http.Error(w, "bad request", http.StatusBadRequest)
+			return
+		}
+
+		material_log, err := e.Queries.GetRecentMaterialLogsForMaterial(r.Context(), int64(id))
+		if err != nil {
+			log.Printf("Invalid material log id, reason %e", err)
+			http.Error(w, "bad request", http.StatusBadRequest)
+			return
+		}
+
+		log.Printf("Found material log %d", id)
+
+		if err := json.NewEncoder(w).Encode(&material_log); err != nil {
+			log.Printf("could not encode to json, reason %e", err)
+			http.Error(w, "internal server error", http.StatusInternalServerError)
+			return
+		}
+		return
+	}
+	log.Printf("No valid paramerters given")
+	http.Error(w, "bad request", http.StatusBadRequest)
+}

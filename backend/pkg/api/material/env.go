@@ -43,6 +43,7 @@ func (e *Env) materialLogHandlers() http.Handler {
 	mux.HandleFunc("GET /all", e.getAllMaterialLogsHandler)
 	mux.HandleFunc("POST /add", e.postMaterialHandler)
 	mux.HandleFunc("PUT /note", e.changeMaterialLogNoteHandler)
+	mux.HandleFunc("GET /recent", e.getRecentMaterialLogsForMaterialHandler)
 	return mux
 }
 
@@ -59,6 +60,7 @@ func (e *Env) checkoutHandlers() http.Handler {
 	mux.HandleFunc("Get /all", e.getAllCheckoutLogs)
 	mux.HandleFunc("POST /out", e.postCheckout)
 	mux.HandleFunc("PUT /in", e.putCheckin)
+	mux.HandleFunc("GET /recent", e.getRecentCheckoutLogsForMaterialHandler)
 	return mux
 }
 

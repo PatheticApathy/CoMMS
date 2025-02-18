@@ -5,9 +5,10 @@ import { Filter } from '@/components/materials-filter';
 import useSWR, { Fetcher } from 'swr'
 import Loading from '@/components/loading';
 import FilterAndTable from '@/components/material-filter+table';
+import { useParams } from 'next/navigation';
 
 const fetcher: Fetcher<Material[], string> = async (...args) => fetch(...args).then(res => res.json())
-export default function AllMaterialPage() {
+export default function JobSiteMaterialPage() {
 
   const options: Filter = {
     id: "",
@@ -17,7 +18,8 @@ export default function AllMaterialPage() {
     jobsite: "",
   };
 
-  const { data: materials, error, isLoading } = useSWR('/api/material/material/all', fetcher)
+  const { id } = useParams()
+  const { data: materials, error, isLoading } = useSWR(`/api/material/material/search?site=${id}`, fetcher)
   const [filter, setFilter] = useState<Filter>(options);
 
 
