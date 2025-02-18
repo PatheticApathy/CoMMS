@@ -63,7 +63,7 @@ func main() {
 
 		user := user_db.AddUserParams{
 			Username: row[0],
-			Password: row[1],
+			Password: auth.Hash(row[1]),
 			Firstname: sql.NullString{
 				String: row[2],
 				Valid:  true,
@@ -91,8 +91,6 @@ func main() {
 				Valid:  true,
 			},
 		}
-
-		user.Password = auth.Hash(user.Password)
 
 		user_row, err := queries.AddUser(ctxt, user)
 		if err != nil {
