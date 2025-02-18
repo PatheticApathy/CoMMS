@@ -21,27 +21,36 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
   } from "@/components/ui/dropdown-menu"
-
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { redirect } from 'next/navigation'
 import useSWRMutation from 'swr/mutation'
 import Loading from '@/components/loading'
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { EditProfile } from "./edit-profile-dailog"
+import { EditProfile } from "./edit-profile-dialog"
+import useSWR from "swr";
+import { User } from "@/user-api-types";
 
-async function logOut(url, { arg }) {
+async function logOut(url: string, { arg }) {
     return fetch(url, {
         method: 'POST',
         body: JSON.stringify(arg)
     }).then(res => res.json())
 }
 
+const fetcher = async  (url: string) => {
+    const res = await fetch(url)
+    if (!res.ok) {
+      throw new Error("Failed to fetch data");
+    }
+    return res.json();
+};
+
 export function Profile() {
 
     const { data, trigger, error, isMutating } = useSWRMutation('api/user/logout', logOut, {throwOnError: false})
+
+    const { data: user, error: error2 } = useSWR<User, string>( 'api/user/search?id=1', fetcher);
+
+    if (error2) return <p>Error loading Profile.</p>;
+    if (!user) return <p>Loading...</p>;        
 
     if (isMutating) { return (<div className='flex items-center justify-center w-screen h-screen'>Loading <Loading /></div>) }
     if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
@@ -81,10 +90,10 @@ export function Profile() {
                 <div className="rounded-full overflow-hidden h-28 w-28">
                     <img className="" src="https://static.vecteezy.com/system/resources/thumbnails/009/734/564/small/default-avatar-profile-icon-of-social-media-user-vector.jpg"></img>
                 </div>
-                <div>Username: Username</div>
-                <div>Name: FirstName LastName</div>
-                <div>Email: email@place.com</div>
-                <div>Phone: 1234567890</div>
+                <div>Username: {user.username}</div>
+                <div>Name: {user.firstname.Valid? user.firstname.String : "N/A"} {user.lastname.Valid? user.lastname.String : "N/A"}</div>
+                <div>Email: {user.email}</div>
+                <div>Phone: {user.phone}</div>
                 <DialogFooter>
                     <EditProfile />
                 </DialogFooter>

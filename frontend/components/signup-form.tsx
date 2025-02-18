@@ -34,7 +34,7 @@ const formSchema = z.object({
     }
   )
 
-async function signUp(url, { arg }) {
+async function signUp(url: string, { arg }) {
   return fetch(url, {
     method: 'POST',
     body: JSON.stringify(arg)

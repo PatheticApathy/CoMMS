@@ -22,7 +22,7 @@ const formSchema = z.object({
   password: z.string(),
 })
 
-async function logIn(url, { arg }) {
+async function logIn(url: string, { arg }) {
   return fetch(url, {
     method: 'POST',
     body: JSON.stringify(arg)
