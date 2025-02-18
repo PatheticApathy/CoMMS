@@ -1,5 +1,12 @@
 basePath: /
 definitions:
+  auth.UserAndPass:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
   materialdb.AddCheckoutLogParams:
     properties:
       item_id:
@@ -202,31 +209,6 @@ definitions:
         type: string
       phone:
         type: string
-      username:
-        type: string
-    type: object
-  userdb.UpdateUserParams:
-    properties:
-      company:
-        $ref: '#/definitions/sql.NullString'
-      email:
-        type: string
-      firstname:
-        $ref: '#/definitions/sql.NullString'
-      id:
-        type: integer
-      lastname:
-        $ref: '#/definitions/sql.NullString'
-      password:
-        type: string
-      phone:
-        type: string
-      profilepicture:
-        $ref: '#/definitions/sql.NullString'
-      role:
-        $ref: '#/definitions/sql.NullString'
-      site:
-        $ref: '#/definitions/sql.NullString'
       username:
         type: string
     type: object
@@ -843,6 +825,49 @@ paths:
       summary: removes user based on given paremeters
       tags:
       - users
+  /user/loggout:
+    post:
+      description: Replaces login cookie with an empty one that deletes itself instantly
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+      summary: Removes authenticated user information
+      tags:
+      - users
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: Pulls user login information and authenticates the user
+      parameters:
+      - description: Format of login user request
+        in: body
+        name: users
+        required: true
+        schema:
+          $ref: '#/definitions/auth.UserAndPass'
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "500":
+          description: Server Error
+          schema:
+            type: string
+      summary: Authenticate user information
+      tags:
+      - users
   /user/search:
     get:
       description: Gets user using id(may add more parameters later)
@@ -909,7 +934,8 @@ paths:
         name: users
         required: true
         schema:
-          $ref: '#/definitions/userdb.UpdateUserParams'
+          additionalProperties: true
+          type: object
       produces:
       - application/json
       responses:
@@ -925,7 +951,7 @@ paths:
           description: Failed to update user
           schema:
             type: string
-      summary: updates user based on given paremeters
+      summary: updates user based on given parameters
       tags:
       - users
 swagger: "2.0"

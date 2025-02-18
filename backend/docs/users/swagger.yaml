@@ -49,31 +49,6 @@ definitions:
       username:
         type: string
     type: object
-  userdb.UpdateUserParams:
-    properties:
-      company:
-        $ref: '#/definitions/sql.NullString'
-      email:
-        type: string
-      firstname:
-        $ref: '#/definitions/sql.NullString'
-      id:
-        type: integer
-      lastname:
-        $ref: '#/definitions/sql.NullString'
-      password:
-        type: string
-      phone:
-        type: string
-      profilepicture:
-        $ref: '#/definitions/sql.NullString'
-      role:
-        $ref: '#/definitions/sql.NullString'
-      site:
-        $ref: '#/definitions/sql.NullString'
-      username:
-        type: string
-    type: object
   userdb.User:
     properties:
       company:
@@ -295,7 +270,8 @@ paths:
         name: users
         required: true
         schema:
-          $ref: '#/definitions/userdb.UpdateUserParams'
+          additionalProperties: true
+          type: object
       produces:
       - application/json
       responses:
@@ -311,7 +287,7 @@ paths:
           description: Failed to update user
           schema:
             type: string
-      summary: updates user based on given paremeters
+      summary: updates user based on given parameters
       tags:
       - users
 swagger: "2.0"

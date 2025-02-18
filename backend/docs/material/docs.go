@@ -855,6 +855,72 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/loggout": {
+            "post": {
+                "description": "Replaces login cookie with an empty one that deletes itself instantly",
+                "tags": [
+                    "users"
+                ],
+                "summary": "Removes authenticated user information",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/login": {
+            "post": {
+                "description": "Pulls user login information and authenticates the user",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Authenticate user information",
+                "parameters": [
+                    {
+                        "description": "Format of login user request",
+                        "name": "users",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.UserAndPass"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/user/search": {
             "get": {
                 "description": "Gets user using id(may add more parameters later)",
@@ -951,7 +1017,7 @@ const docTemplate = `{
                 "tags": [
                     "users"
                 ],
-                "summary": "updates user based on given paremeters",
+                "summary": "updates user based on given parameters",
                 "parameters": [
                     {
                         "description": "Format of update user request",
@@ -959,7 +1025,8 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/userdb.UpdateUserParams"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 ],
@@ -1026,6 +1093,17 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "auth.UserAndPass": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "materialdb.AddCheckoutLogParams": {
             "type": "object",
             "properties": {
@@ -1334,44 +1412,6 @@ const docTemplate = `{
                 },
                 "phone": {
                     "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "userdb.UpdateUserParams": {
-            "type": "object",
-            "properties": {
-                "company": {
-                    "$ref": "#/definitions/sql.NullString"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "firstname": {
-                    "$ref": "#/definitions/sql.NullString"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "lastname": {
-                    "$ref": "#/definitions/sql.NullString"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "phone": {
-                    "type": "string"
-                },
-                "profilepicture": {
-                    "$ref": "#/definitions/sql.NullString"
-                },
-                "role": {
-                    "$ref": "#/definitions/sql.NullString"
-                },
-                "site": {
-                    "$ref": "#/definitions/sql.NullString"
                 },
                 "username": {
                     "type": "string"

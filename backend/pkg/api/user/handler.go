@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -201,43 +202,108 @@ func (e *Env) createUser(w http.ResponseWriter, r *http.Request) {
 	log.Println("User response successfully sent")
 }
 
-// updateUser hanlder returns an updated user based on given parameters godoc
+// updateUser handler returns an updated user based on given parameters godoc
 //
-//	@Summary		updates user based on given paremeters
+//	@Summary		updates user based on given parameters
 //	@Description	Updates user using id(may add more parameters later)
 //	@Tags			users
 //	@Produce		json
-//	@Param			users	body		user_db.UpdateUserParams	true	"Format of update user request"
+//	@Param			users	body		map[string]interface{}	true	"Format of update user request"
 //	@Success		200		{object}	user_db.User				"users"
 //	@Failure		400		{string}	string						"Invalid input"
 //	@Failure		500		{string}	string						"Failed to update user"
 //	@Router			/user/update [put]
 func (e *Env) updateUser(w http.ResponseWriter, r *http.Request) {
 	log.Println("Handling updateUser request")
-	var params user_db.UpdateUserParams
+	var params map[string]interface{}
 	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
 		log.Printf("Failed to decode request body, reason: %v", err)
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 		return
 	}
 
+	id, ok := params["id"].(float64)
+	if !ok {
+		log.Println("Missing or invalid 'id' parameter")
+		http.Error(w, "Invalid input", http.StatusBadRequest)
+		return
+	}
+
 	log.Printf("Received user update request: %+v", params)
 
-	log.Println("Attempting to update user in database")
-	user, err := e.Queries.UpdateUser(context.Background(), params)
-	if err != nil {
-		log.Printf("Failed to update user, reason: %v", err)
-		http.Error(w, "Failed to update user", http.StatusInternalServerError)
-		return
-	}
-	log.Printf("User successfully updated: %+v", user)
-	if err := json.NewEncoder(w).Encode(&user); err != nil {
-		log.Printf("Failed to encode user response, reason: %v", err)
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
+	for field, value := range params {
+		if field == "id" {
+			continue
+		}
+
+		var err error
+		switch field {
+		case "username":
+			_, err = e.Queries.UpdateUserUsername(context.Background(), user_db.UpdateUserUsernameParams{
+				Username: value.(string),
+				ID:       int64(id),
+			})
+		case "password":
+			_, err = e.Queries.UpdateUserPassword(context.Background(), user_db.UpdateUserPasswordParams{
+				Password: auth.Hash(value.(string)),
+				ID:       int64(id),
+			})
+		case "firstname":
+			_, err = e.Queries.UpdateUserFirstname(context.Background(), user_db.UpdateUserFirstnameParams{
+				Firstname: sql.NullString{String: value.(map[string]interface{})["string"].(string), Valid: value.(map[string]interface{})["valid"].(bool)},
+				ID:        int64(id),
+			})
+		case "lastname":
+			_, err = e.Queries.UpdateUserLastname(context.Background(), user_db.UpdateUserLastnameParams{
+				Lastname: sql.NullString{String: value.(map[string]interface{})["string"].(string), Valid: value.(map[string]interface{})["valid"].(bool)},
+				ID:       int64(id),
+			})
+		case "company":
+			_, err = e.Queries.UpdateUserCompany(context.Background(), user_db.UpdateUserCompanyParams{
+				Company: sql.NullString{String: value.(map[string]interface{})["string"].(string), Valid: value.(map[string]interface{})["valid"].(bool)},
+				ID:      int64(id),
+			})
+		case "site":
+			_, err = e.Queries.UpdateUserSite(context.Background(), user_db.UpdateUserSiteParams{
+				Site: sql.NullString{String: value.(map[string]interface{})["string"].(string), Valid: value.(map[string]interface{})["valid"].(bool)},
+				ID:   int64(id),
+			})
+		case "role":
+			_, err = e.Queries.UpdateUserRole(context.Background(), user_db.UpdateUserRoleParams{
+				Role: sql.NullString{String: value.(map[string]interface{})["string"].(string), Valid: value.(map[string]interface{})["valid"].(bool)},
+				ID:   int64(id),
+			})
+		case "email":
+			_, err = e.Queries.UpdateUserEmail(context.Background(), user_db.UpdateUserEmailParams{
+				Email: value.(string),
+				ID:    int64(id),
+			})
+		case "phone":
+			_, err = e.Queries.UpdateUserPhone(context.Background(), user_db.UpdateUserPhoneParams{
+				Phone: value.(string),
+				ID:    int64(id),
+			})
+		case "profilepicture":
+			_, err = e.Queries.UpdateUserProfilePicture(context.Background(), user_db.UpdateUserProfilePictureParams{
+				Profilepicture: sql.NullString{String: value.(map[string]interface{})["string"].(string), Valid: value.(map[string]interface{})["valid"].(bool)},
+				ID:             int64(id),
+			})
+		default:
+			log.Printf("Unknown field: %s", field)
+			http.Error(w, "Invalid input", http.StatusBadRequest)
+			return
+		}
+
+		if err != nil {
+			log.Printf("Failed to update user field %s, reason: %v", field, err)
+			http.Error(w, "Failed to update user", http.StatusInternalServerError)
+			return
+		}
 	}
 
-	log.Println("User response successfully sent")
+	log.Println("User successfully updated")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("User updated successfully"))
 }
 
 // deleteUser hanlder removes a user based on given parameters godoc
