@@ -38,15 +38,10 @@ func Auth(next http.Handler, e *handler.Env) http.Handler {
 			http.Error(w, "Invalid request", http.StatusBadRequest)
 			return
 		}
-		ok, err := auth.CheckUserAndPass(e.Queries, r.Context(), login)
+		err = auth.CheckUserAndPass(e.Queries, r.Context(), login)
 		if err != nil {
 			log.Printf("Error: %e", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-		if !ok {
-			log.Printf("Unable to verify username %s with password %s", login.Username, login.Password)
-			http.Error(w, "Invalid permissions", http.StatusBadRequest)
 			return
 		}
 		next.ServeHTTP(w, r)
