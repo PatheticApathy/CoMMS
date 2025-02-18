@@ -10,6 +10,7 @@ import (
 	"log"
 	"os"
 
+	auth "github.com/PatheticApathy/CoMMS/pkg/auth"
 	user_db "github.com/PatheticApathy/CoMMS/pkg/databases/userdb"
 	_ "modernc.org/sqlite"
 )
@@ -90,6 +91,8 @@ func main() {
 				Valid:  true,
 			},
 		}
+
+		user.Password = auth.Hash(user.Password)
 
 		user_row, err := queries.AddUser(ctxt, user)
 		if err != nil {
