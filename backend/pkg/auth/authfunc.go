@@ -40,14 +40,17 @@ func Hash(input string) string {
 }
 
 // takes a username and pass and checks the password against the database to verify the account.
-func CheckUserAndPass(queries *user_db.Queries, ctxt context.Context, userandpass UserAndPass) (bool, error) {
+func CheckUserAndPass(queries *user_db.Queries, ctxt context.Context, userandpass UserAndPass) error {
 	realhash, err := queries.GetUserAndPass(ctxt, userandpass.Username)
 	if err != nil {
 		log.Println(err)
-		return false, err
+		return err
 	}
 	hashedpass := Hash(userandpass.Password)
-	return hashedpass == realhash, errors.New("Invalid Pass")
+	if hashedpass != realhash {
+		return errors.New("Invalid Pass")
+	}
+	return nil
 }
 
 // Experimental below
