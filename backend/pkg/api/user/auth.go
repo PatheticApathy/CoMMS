@@ -16,14 +16,14 @@ import (
 //		@Description	Pulls user login information and authenticates the user
 //		@Tags			users
 //	  @Accept			json
-//		@Param			users	body		auth.UserAndPass		true	"Format of login user request"
-//		@Success		200		{string}	string					"Success"
+//		@Param			users	body		auth.UnEncrypted		true	"Format of login user request"
+//		@Success		200		{object}	auth.Token					"User login token"
 //		@Failure		400		{string}	string					"Invalid input"
 //		@Failure		500		{string}	string					"Invalid User or Password"
 //	  @Failure		500		{string}	string					"Server Error"
 //		@Router			/user/login [post]
 func (e *Env) authenticate(w http.ResponseWriter, r *http.Request) {
-	var userandpass auth.UserAndPass
+	var userandpass auth.UnEncrypted
 	log.Println("Got User and Pass")
 	if err := json.NewDecoder(r.Body).Decode(&userandpass); err != nil {
 		log.Println(err)
@@ -31,7 +31,7 @@ func (e *Env) authenticate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Printf("Checking user %s", userandpass.Username)
-	err := auth.CheckUserAndPass(e.Queries, r.Context(), userandpass)
+	err := auth.CheckUserAndPass(e.Queries, r.Context(), &userandpass)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "Invalid User or Password", http.StatusBadRequest)
@@ -55,14 +55,17 @@ func (e *Env) authenticate(w http.ResponseWriter, r *http.Request) {
 		SameSite: http.SameSiteLaxMode,
 	}
 	log.Println("Encrypting Cookie")
-	err = auth.WriteEncrypted(w, cookie, []byte(e.Secret))
+	encrypted, err := auth.WriteEncrypted(w, cookie, []byte(e.Secret))
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "Server Error", http.StatusInternalServerError)
 		return
 	}
 	log.Println("Encoding json")
-	if err := json.NewEncoder(w).Encode("Success"); err != nil {
+	token := auth.Token{
+		Token: encrypted,
+	}
+	if err := json.NewEncoder(w).Encode(&token); err != nil {
 		log.Printf("Could not encode json user, reason: %e", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return

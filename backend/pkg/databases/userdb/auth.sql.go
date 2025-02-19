@@ -10,12 +10,17 @@ import (
 )
 
 const getUserAndPass = `-- name: GetUserAndPass :one
-SELECT password FROM Users WHERE username = ?
+SELECT password, id FROM Users WHERE username = ?
 `
 
-func (q *Queries) GetUserAndPass(ctx context.Context, username string) (string, error) {
+type GetUserAndPassRow struct {
+	Password string `json:"password"`
+	ID       int64  `json:"id"`
+}
+
+func (q *Queries) GetUserAndPass(ctx context.Context, username string) (GetUserAndPassRow, error) {
 	row := q.db.QueryRowContext(ctx, getUserAndPass, username)
-	var password string
-	err := row.Scan(&password)
-	return password, err
+	var i GetUserAndPassRow
+	err := row.Scan(&i.Password, &i.ID)
+	return i, err
 }

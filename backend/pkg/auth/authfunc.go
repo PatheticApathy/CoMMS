@@ -26,10 +26,16 @@ import (
 	user_db "github.com/PatheticApathy/CoMMS/pkg/databases/userdb"
 )
 
-// json function
-type UserAndPass struct {
+// json decrypt function
+type UnEncrypted struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
+	Id       int64  `json:"id"`
+}
+
+// json encrypt function
+type Token struct {
+	Token string `json:"token"`
 }
 
 // Hashing function
@@ -40,16 +46,18 @@ func Hash(input string) string {
 }
 
 // takes a username and pass and checks the password against the database to verify the account.
-func CheckUserAndPass(queries *user_db.Queries, ctxt context.Context, userandpass UserAndPass) error {
-	realhash, err := queries.GetUserAndPass(ctxt, userandpass.Username)
+func CheckUserAndPass(queries *user_db.Queries, ctxt context.Context, userandpass *UnEncrypted) error {
+	user_n_id, err := queries.GetUserAndPass(ctxt, userandpass.Username)
 	if err != nil {
 		log.Println(err)
 		return err
 	}
+
 	hashedpass := Hash(userandpass.Password)
-	if hashedpass != realhash {
+	if hashedpass != user_n_id.Password {
 		return errors.New("Invalid Pass")
 	}
+	userandpass.Id = user_n_id.ID
 	return nil
 }
 
@@ -95,24 +103,24 @@ func Read(r *http.Request, name string) (string, error) {
 	return string(value), nil
 }
 
-func WriteEncrypted(w http.ResponseWriter, cookie http.Cookie, secretKey []byte) error {
+func WriteEncrypted(w http.ResponseWriter, cookie http.Cookie, secretKey []byte) (string, error) {
 	// Create a new AES cipher block from the secret key.
 	block, err := aes.NewCipher(secretKey)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	// Wrap the cipher block in Galois Counter Mode.
 	aesGCM, err := cipher.NewGCM(block)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	// Create a unique nonce containing 12 random bytes.
 	nonce := make([]byte, aesGCM.NonceSize())
 	_, err = io.ReadFull(rand.Reader, nonce)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	// Prepare the plaintext input for encryption. Because we want to
@@ -129,14 +137,11 @@ func WriteEncrypted(w http.ResponseWriter, cookie http.Cookie, secretKey []byte)
 	encryptedValue := aesGCM.Seal(nonce, nonce, []byte(plaintext), nil)
 
 	// Set the cookie value to the encryptedValue.
-	cookie.Value = string(encryptedValue)
-
-	// Write the cookie as normal.
-	return Write(w, cookie)
+	return string(encryptedValue), nil
 }
 
-func ReadEncrypted(r *http.Request, name string, secretKey []byte) (UserAndPass, error) {
-	var userandpass UserAndPass
+func ReadEncrypted(r *http.Request, name string, secretKey []byte) (UnEncrypted, error) {
+	var userandpass UnEncrypted
 	// Read the encrypted value from the cookie as normal.
 	encryptedValue, err := Read(r, name)
 	if err != nil {
