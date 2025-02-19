@@ -94,3 +94,36 @@ func (e *Env) loggout(w http.ResponseWriter, _ *http.Request) {
 
 	http.SetCookie(w, cookie)
 }
+
+// DecryptHandler decrypts token godoc
+//
+//		@Summary		 Decrypts token
+//		@Description	 Decrypt user login token
+//		@Tags			users
+//	  @Accept			json
+//		@Param			users	body		auth.Token		true	"Format of login user request"
+//		@Success		200		{object}	auth.UnEncrypted					"User login data token"
+//		@Failure		400		{string}	string					"Invalid request"
+//	  @Failure		500		{string}	string					"Server Error"
+//		@Router			/user/decrypt [post]
+func (e *Env) DecryptHanlder(w http.ResponseWriter, r *http.Request) {
+	var token auth.Token
+	if err := json.NewEncoder(w).Encode(&token); err != nil {
+		log.Printf("Could not encode json token, reason: %e", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	decrypt_token, err := auth.ReadEncrypted(r, "LoginCookie", []byte(e.Secret))
+	if err != nil {
+		log.Printf("Error for authorization request: %e", err)
+		http.Error(w, "Invalid request", http.StatusBadRequest)
+		return
+	}
+
+	if err := json.NewEncoder(w).Encode(&decrypt_token); err != nil {
+		log.Printf("Could not encode json user, reason: %e", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+}

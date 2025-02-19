@@ -201,3 +201,62 @@ func ReadEncrypted(r *http.Request, name string, secretKey []byte) (UnEncrypted,
 	// Return the cookie value struct.
 	return userandpass, nil
 }
+
+func ReadToken(token Token, secretKey []byte) (UnEncrypted, error) {
+	var userandpass UnEncrypted
+	// Read the encrypted value from the cookie as normal.
+	encryptedValue := token.Token
+
+	// Create a new AES cipher block from the secret key.
+	block, err := aes.NewCipher(secretKey)
+	if err != nil {
+		return userandpass, err
+	}
+
+	// Wrap the cipher block in Galois Counter Mode.
+	aesGCM, err := cipher.NewGCM(block)
+	if err != nil {
+		return userandpass, err
+	}
+
+	// Get the nonce size.
+	nonceSize := aesGCM.NonceSize()
+
+	// To avoid a potential 'index out of range' panic in the next step, we
+	// check that the length of the encrypted value is at least the nonce
+	// size.
+	if len(encryptedValue) < nonceSize {
+		return userandpass, ErrInvalidValue
+	}
+
+	// Split apart the nonce from the actual encrypted data.
+	nonce := encryptedValue[:nonceSize]
+	ciphertext := encryptedValue[nonceSize:]
+
+	// Use aesGCM.Open() to decrypt and authenticate the data. If this fails,
+	// return a ErrInvalidValue error.
+	plaintext, err := aesGCM.Open(nil, []byte(nonce), []byte(ciphertext), nil)
+	if err != nil {
+		return userandpass, ErrInvalidValue
+	}
+
+	// The plaintext value is in the format "{cookie name}:{cookie value}". We
+	// use strings.Cut() to split it on the first ":" character.
+	expectedName, value, ok := strings.Cut(string(plaintext), ":")
+	if !ok {
+		return userandpass, ErrInvalidValue
+	}
+
+	// Check that the cookie name is the expected one and hasn't been changed.
+	if expectedName != token.Token {
+		return userandpass, ErrInvalidValue
+	}
+
+	// Convert the plaintext value back into the struct.
+	err = json.Unmarshal([]byte(value), &userandpass)
+	if err != nil {
+		return userandpass, err
+	}
+	// Return the cookie value struct.
+	return userandpass, nil
+}
