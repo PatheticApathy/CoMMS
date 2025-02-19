@@ -27,6 +27,7 @@ import Loading from '@/components/loading'
 import { EditProfile } from "./edit-profile-dialog"
 import useSWR from "swr";
 import { User } from "@/user-api-types";
+import { getCookie } from "./cookie-functions"
 
 async function logOut(url: string, { arg }) {
     return fetch(url, {
@@ -45,19 +46,27 @@ const fetcher = async  (url: string) => {
 
 export function Profile() {
 
-    const { data, trigger, error, isMutating } = useSWRMutation('api/user/logout', logOut, {throwOnError: false})
+    let id = getCookie("id")
 
-    const { data: user, error: error2 } = useSWR<User, string>( 'api/user/search?id=1', fetcher);
+    const { data, trigger, error, isMutating } = useSWRMutation('api/user/loggout', logOut, {throwOnError: false})
+
+    const { data: user, error: error2 } = useSWR<User, string>( `api/user/search?id=${id}`, fetcher);
 
     if (error2) return <p>Error loading Profile.</p>;
     if (!user) return <p>Loading...</p>;        
 
     if (isMutating) { return (<div className='flex items-center justify-center w-screen h-screen'>Loading <Loading /></div>) }
+    console.log("Error: ", error)
+    console.log("Data: ", data)
     if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
-    if (data) {redirect('/')}
+    if (data) {redirect('/')}   
 
     async function logoutSubmit() {
         trigger()
+        document.cookie = `username=`
+        document.cookie = `id=`
+        document.cookie = `expires=Thu, 01 Jan 1970 00:00:00 UTC`
+        document.cookie = `path=/`
     }
 
     return (

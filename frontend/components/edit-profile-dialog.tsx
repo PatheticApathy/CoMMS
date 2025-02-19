@@ -25,6 +25,7 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import useSWR from "swr"
 import { User, Firstname, Lastname } from "@/user-api-types"
+import { getCookie } from "./cookie-functions"
 
 const formSchema = z.object({
     username: z.string(),
@@ -51,9 +52,11 @@ const fetcher = async  (url: string) => {
 
 export function EditProfile() {
 
+    let id = getCookie("id")
+
     const { data, trigger, error, isMutating } = useSWRMutation('api/user/update', changeProfile, {throwOnError: false})
 
-    const { data: user, error: error2 } = useSWR<User, string>('api/user/search?id=1', fetcher)
+    const { data: user, error: error2 } = useSWR<User, string>(`api/user/search?id=${id}`, fetcher)
 
     if (error2) return <p>Error loading Profile.</p>;
     if (!user) return <p>Loading...</p>;  
@@ -84,13 +87,14 @@ export function EditProfile() {
         }
         const email = values.email
         const phone = values.phone
+        const intID = Number(id)
         const values2 = {
             username,
             firstname,
             lastname,
             email,
             phone,
-            ID: 1,
+            ID: intID,
         }
         trigger(values2)
     }

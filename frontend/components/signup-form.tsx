@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input"
 import { redirect } from 'next/navigation'
 import useSWRMutation from 'swr/mutation'
 import Loading from '@/components/loading'
+import { getCookie, setCookie, checkCookie } from "./cookie-functions"
 
 const formSchema = z.object({
   username: z.string().nonempty(),
@@ -57,9 +58,20 @@ export default function SignupForm() {
     },
   })
 
+  console.log("Data: ", data)
+  console.log("Error: ", error)
+  let cookieID = document.cookie
+  console.log("Cookie: ", cookieID)
   if (isMutating) { return (<div className='flex items-center justify-center w-screen h-screen'>Loading <Loading /></div>) }
   if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
-  if (data) {redirect('/dashboard')}
+  if (data) {
+    const cookieLife = setCookie(7)
+    document.cookie = `username=${data.username}`
+    document.cookie = `id=${data.id}`
+    document.cookie = `expires=${cookieLife}`
+    document.cookie = `path=/`
+    redirect('/dashboard')
+  }
 
   //validate form data(data is safe at this point)
   async function onSubmit(values: z.infer<typeof formSchema>) {   
