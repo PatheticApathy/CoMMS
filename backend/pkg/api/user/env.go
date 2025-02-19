@@ -29,5 +29,6 @@ func (e *Env) Handler() http.Handler {
 	mux.HandleFunc("GET /user/search", e.getUser)
 	mux.HandleFunc("POST /user/login", e.authenticate)
 	mux.HandleFunc("POST /user/logout", e.loggout)
+	mux.HandleFunc("POST /user/decrypt", e.DecryptHanlder)
 	return mux
 }
