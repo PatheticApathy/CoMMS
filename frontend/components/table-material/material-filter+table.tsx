@@ -1,8 +1,8 @@
 'use client'
 import { Dispatch } from 'react'
-import MTable from "@/components/material-table";
+import MTable from "./material-table";
 import { Material } from '@/material-api-types';
-import MaterialFilter, { Filter } from '@/components/materials-filter';
+import MaterialFilter, { Filter } from '@/components/table-material/materials-filter';
 
 //component uses whole screen. Considered a page component
 export default function FilterAndTable({ filter, setFilterAction, materials }: { filter: Filter, setFilterAction: Dispatch<Filter>, materials: Material[] | undefined }) {

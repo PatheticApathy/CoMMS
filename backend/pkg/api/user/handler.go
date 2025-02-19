@@ -91,7 +91,7 @@ func (e *Env) getUsers(w http.ResponseWriter, r *http.Request) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			users	body		user_db.SignUpParams	true	"Format of signup user request"
-//	@Success		200		{object}	user_db.User			"users"
+//	@Success		200		{object}	auth.Token			"User login token"
 //	@Failure		400		{string}	string					"Invalid input"
 //	@Failure		500		{string}	string					"Failed to signup user"
 //	@Router			/user/signup [post]
@@ -110,7 +110,7 @@ func (e *Env) SignUp(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("Hashing user password")
 
-	userandpass := auth.UserAndPass{
+	userandpass := auth.UnEncrypted{
 		Username: params.Username,
 		Password: params.Password,
 	}
@@ -145,14 +145,18 @@ func (e *Env) SignUp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Println("Writing encrypted cookie")
-	err = auth.WriteEncrypted(w, cookie, []byte(e.Secret))
+	encrypted, err := auth.WriteEncrypted(w, cookie, []byte(e.Secret))
 	if err != nil {
 		log.Printf("Failed to write encrypted cookie, reason: %v", err)
 		http.Error(w, "server error", http.StatusInternalServerError)
 	}
 
+	token := auth.Token{
+		Token: encrypted,
+	}
+
 	log.Println("Sending user response")
-	if err := json.NewEncoder(w).Encode(&user); err != nil {
+	if err := json.NewEncoder(w).Encode(&token); err != nil {
 		log.Printf("Failed to encode user response, reason: %v", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
