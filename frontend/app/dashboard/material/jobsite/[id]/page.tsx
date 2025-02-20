@@ -1,10 +1,10 @@
 'use client'
 import { useState } from 'react'
 import { Material } from '@/material-api-types';
-import { Filter } from '@/components/materials-filter';
+import { Filter } from '@/components/table-material/materials-filter';
 import useSWR, { Fetcher } from 'swr'
 import Loading from '@/components/loading';
-import FilterAndTable from '@/components/material-filter+table';
+import FilterAndTable from '@/components/table-material/material-filter+table';
 import { useParams } from 'next/navigation';
 
 const fetcher: Fetcher<Material[], string> = async (...args) => fetch(...args).then(res => res.json())

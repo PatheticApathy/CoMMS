@@ -64,7 +64,7 @@ func TestMain(m *testing.M) {
 
 // Admins should be able to add materials to jobs sites wihtin their company
 func TestAdminSignupToAddMaterial(t *testing.T) {
-	login := auth.UserAndPass{
+	login := auth.UnEncrypted{
 		Username: "username",
 		Password: "password",
 	}
@@ -97,6 +97,7 @@ func TestAdminSignupToAddMaterial(t *testing.T) {
 	}
 	defer resp.Body.Close()
 
+	// TODO: rewrite test
 	t.Logf("Cookies in signup response %s", resp.Cookies())
 	url, err := url.Parse(userver.URL)
 	if err != nil {

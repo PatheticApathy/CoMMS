@@ -8,7 +8,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Material } from "@/material-api-types"
-import MaterialSheet from "./material-sheet";
+import MaterialSheet from "@/components/table-material/material-sheet";
 
 export default function MTable({ materials }: { materials: Material[] }) {
   return (
