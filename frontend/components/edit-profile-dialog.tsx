@@ -35,6 +35,13 @@ const formSchema = z.object({
     phone: z.string(),
   })
 
+/*async function getProfileArgs(url: string, arg: {token: string}) {
+    return fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(arg)
+    }).then(res => res.json())
+}*/
+
 async function changeProfile(url: string, { arg }) {
     return fetch(url, {
         method: 'PUT',
@@ -52,13 +59,21 @@ const fetcher = async  (url: string) => {
 
 export function EditProfile() {
 
-    let id = getCookie("id")
+    //let token = getCookie('token')
 
     const { data, trigger, error, isMutating } = useSWRMutation('api/user/update', changeProfile, {throwOnError: false})
 
-    const { data: user, error: error2 } = useSWR<User, string>(`api/user/search?id=${id}`, fetcher)
+    //const  { data: tokenData, mutate, error: error2 } = useSWR('api/user/decrypt', getProfileArgs)
 
-    if (error2) return <p>Error loading Profile.</p>;
+    //mutate(token)
+
+    //console.log(tokenData.id)
+
+    //let id = tokenData.id
+
+    const { data: user, error: error3 } = useSWR<User, string>(`api/user/search?id=1`, fetcher)
+
+    if (error3) return <p>Error loading Profile.</p>;
     if (!user) return <p>Loading...</p>;  
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -94,7 +109,7 @@ export function EditProfile() {
             lastname,
             email,
             phone,
-            ID: intID,
+            ID: 1,
         }
         trigger(values2)
     }

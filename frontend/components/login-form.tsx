@@ -42,18 +42,15 @@ export default function LoginForm() {
     },
   })
 
-  console.log("Error: ", error)
-  console.log("Data: ", data)
   if (isMutating) { return (<div className='flex items-center justify-center w-screen h-screen'>Loading <Loading /></div>) }
   if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
   if (data) {
-    const cookieLife = setCookie(7)
-    document.cookie = `username=${data.username}`
-    document.cookie = `id=${data.id}`
-    document.cookie = `expires=${cookieLife}`
-    document.cookie = `path=/`
+    let expireTime = setCookie(7)
+    document.cookie = `token=${JSON.stringify(data.token)}; expires=${expireTime}; path=/`
     redirect('/dashboard')
   }
+
+  console.log(document.cookie)
 
   //validate form data(data is safe at this point)
   async function onSubmit(values: z.infer<typeof formSchema>) {    
