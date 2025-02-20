@@ -85,6 +85,49 @@
                 }
             }
         },
+        "/user/decrypt": {
+            "post": {
+                "description": "Decrypt user login token",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Decrypts token",
+                "parameters": [
+                    {
+                        "description": "Format of login user request",
+                        "name": "users",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.Token"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User login data token",
+                        "schema": {
+                            "$ref": "#/definitions/auth.UnEncrypted"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/user/delete": {
             "delete": {
                 "description": "Deletes user using id(may add more parameters later)",

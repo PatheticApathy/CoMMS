@@ -140,6 +140,35 @@ func WriteEncrypted(w http.ResponseWriter, cookie http.Cookie, secretKey []byte)
 	return string(encryptedValue), nil
 }
 
+func WriteEncryptedToken(token []byte, secretKey []byte) (string, error) {
+	// Create a new AES cipher block from the secret key.
+	block, err := aes.NewCipher(secretKey)
+	if err != nil {
+		return "", err
+	}
+
+	// Wrap the cipher block in Galois Counter Mode.
+	aesGCM, err := cipher.NewGCM(block)
+	if err != nil {
+		return "", err
+	}
+
+	// Create a unique nonce containing 12 random bytes.
+	nonce := make([]byte, aesGCM.NonceSize())
+	_, err = io.ReadFull(rand.Reader, nonce)
+	if err != nil {
+		return "", err
+	}
+
+	// Encrypt the data using aesGCM.Seal(). By passing the nonce as the first
+	// parameter, the encrypted data will be appended to the nonce — meaning
+	// that the returned encryptedValue variable will be in the format
+	// "{nonce}{encrypted plaintext data}".
+	encryptedValue := aesGCM.Seal(nonce, nonce, token, nil)
+
+	// Set the cookie value to the encryptedValue.
+	return string(encryptedValue), nil
+}
 func ReadEncrypted(r *http.Request, name string, secretKey []byte) (UnEncrypted, error) {
 	var userandpass UnEncrypted
 	// Read the encrypted value from the cookie as normal.
@@ -226,7 +255,7 @@ func ReadToken(token Token, secretKey []byte) (UnEncrypted, error) {
 	// check that the length of the encrypted value is at least the nonce
 	// size.
 	if len(encryptedValue) < nonceSize {
-		return userandpass, ErrInvalidValue
+		return userandpass, errors.New("Encrypted value smaller than nonce")
 	}
 
 	// Split apart the nonce from the actual encrypted data.
@@ -234,29 +263,22 @@ func ReadToken(token Token, secretKey []byte) (UnEncrypted, error) {
 	ciphertext := encryptedValue[nonceSize:]
 
 	// Use aesGCM.Open() to decrypt and authenticate the data. If this fails,
-	// return a ErrInvalidValue error.
 	plaintext, err := aesGCM.Open(nil, []byte(nonce), []byte(ciphertext), nil)
 	if err != nil {
-		return userandpass, ErrInvalidValue
-	}
-
-	// The plaintext value is in the format "{cookie name}:{cookie value}". We
-	// use strings.Cut() to split it on the first ":" character.
-	expectedName, value, ok := strings.Cut(string(plaintext), ":")
-	if !ok {
-		return userandpass, ErrInvalidValue
+		return userandpass, err
 	}
 
 	// Check that the cookie name is the expected one and hasn't been changed.
-	if expectedName != token.Token {
+	if string(plaintext) != token.Token {
 		return userandpass, ErrInvalidValue
 	}
 
 	// Convert the plaintext value back into the struct.
-	err = json.Unmarshal([]byte(value), &userandpass)
+	err = json.Unmarshal([]byte(plaintext), &userandpass)
 	if err != nil {
 		return userandpass, err
 	}
+
 	// Return the cookie value struct.
 	return userandpass, nil
 }

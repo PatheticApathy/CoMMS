@@ -30,6 +30,7 @@ func (e *Env) authenticate(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 		return
 	}
+
 	log.Printf("Checking user %s", userandpass.Username)
 	err := auth.CheckUserAndPass(e.Queries, r.Context(), &userandpass)
 	if err != nil {
@@ -37,25 +38,16 @@ func (e *Env) authenticate(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid User or Password", http.StatusBadRequest)
 		return
 	}
-	log.Println("Repackaging userandpass to json")
+	log.Printf("Hashing token for user with id %d", userandpass.Id)
 	jsonUserandPass, err := json.Marshal(userandpass)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "Server Error", http.StatusInternalServerError)
 		return
 	}
-	log.Println("Generating cookie")
-	cookie := http.Cookie{
-		Name:     "LoginCookie",
-		Value:    string(jsonUserandPass),
-		Path:     "/",
-		MaxAge:   0,
-		HttpOnly: true,
-		Secure:   false,
-		SameSite: http.SameSiteLaxMode,
-	}
-	log.Println("Encrypting Cookie")
-	encrypted, err := auth.WriteEncrypted(w, cookie, []byte(e.Secret))
+
+	log.Println("Encrypting Token")
+	encrypted, err := auth.WriteEncryptedToken(jsonUserandPass, []byte(e.Secret))
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "Server Error", http.StatusInternalServerError)
@@ -108,13 +100,13 @@ func (e *Env) loggout(w http.ResponseWriter, _ *http.Request) {
 //		@Router			/user/decrypt [post]
 func (e *Env) DecryptHanlder(w http.ResponseWriter, r *http.Request) {
 	var token auth.Token
-	if err := json.NewEncoder(w).Encode(&token); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&token); err != nil {
 		log.Printf("Could not encode json token, reason: %e", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 
-	decrypt_token, err := auth.ReadEncrypted(r, "LoginCookie", []byte(e.Secret))
+	decrypt_token, err := auth.ReadToken(token, []byte(e.Secret))
 	if err != nil {
 		log.Printf("Error for authorization request: %e", err)
 		http.Error(w, "Invalid request", http.StatusBadRequest)

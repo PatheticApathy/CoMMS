@@ -166,6 +166,34 @@ paths:
       summary: post user to database
       tags:
       - users
+  /user/decrypt:
+    post:
+      consumes:
+      - application/json
+      description: Decrypt user login token
+      parameters:
+      - description: Format of login user request
+        in: body
+        name: users
+        required: true
+        schema:
+          $ref: '#/definitions/auth.Token'
+      responses:
+        "200":
+          description: User login data token
+          schema:
+            $ref: '#/definitions/auth.UnEncrypted'
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Server Error
+          schema:
+            type: string
+      summary: Decrypts token
+      tags:
+      - users
   /user/delete:
     delete:
       description: Deletes user using id(may add more parameters later)
