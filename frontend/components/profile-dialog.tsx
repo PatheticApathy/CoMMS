@@ -36,12 +36,6 @@ import { getCookie } from "./cookie-functions"
     }).then(res => res.json())
 }*/
 
-async function logOut(url: string) {
-    return fetch(url, {
-        method: 'POST'
-    }).then(res => res.json())
-}
-
 const fetcher = async  (url: string) => {
     const res = await fetch(url)
     if (!res.ok) {
