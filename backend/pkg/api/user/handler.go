@@ -250,27 +250,27 @@ func (e *Env) updateUser(w http.ResponseWriter, r *http.Request) {
 			})
 		case "firstname":
 			_, err = e.Queries.UpdateUserFirstname(context.Background(), user_db.UpdateUserFirstnameParams{
-				Firstname: sql.NullString{String: value.(map[string]interface{})["string"].(string), Valid: value.(map[string]interface{})["valid"].(bool)},
+				Firstname: parseNullString(value),
 				ID:        int64(id),
 			})
 		case "lastname":
 			_, err = e.Queries.UpdateUserLastname(context.Background(), user_db.UpdateUserLastnameParams{
-				Lastname: sql.NullString{String: value.(map[string]interface{})["string"].(string), Valid: value.(map[string]interface{})["valid"].(bool)},
+				Lastname: parseNullString(value),
 				ID:       int64(id),
 			})
 		case "company":
 			_, err = e.Queries.UpdateUserCompany(context.Background(), user_db.UpdateUserCompanyParams{
-				Company: sql.NullString{String: value.(map[string]interface{})["string"].(string), Valid: value.(map[string]interface{})["valid"].(bool)},
+				Company: parseNullString(value),
 				ID:      int64(id),
 			})
 		case "site":
 			_, err = e.Queries.UpdateUserSite(context.Background(), user_db.UpdateUserSiteParams{
-				Site: sql.NullString{String: value.(map[string]interface{})["string"].(string), Valid: value.(map[string]interface{})["valid"].(bool)},
+				Site: parseNullString(value),
 				ID:   int64(id),
 			})
 		case "role":
 			_, err = e.Queries.UpdateUserRole(context.Background(), user_db.UpdateUserRoleParams{
-				Role: sql.NullString{String: value.(map[string]interface{})["string"].(string), Valid: value.(map[string]interface{})["valid"].(bool)},
+				Role: parseNullString(value),
 				ID:   int64(id),
 			})
 		case "email":
@@ -285,7 +285,7 @@ func (e *Env) updateUser(w http.ResponseWriter, r *http.Request) {
 			})
 		case "profilepicture":
 			_, err = e.Queries.UpdateUserProfilePicture(context.Background(), user_db.UpdateUserProfilePictureParams{
-				Profilepicture: sql.NullString{String: value.(map[string]interface{})["string"].(string), Valid: value.(map[string]interface{})["valid"].(bool)},
+				Profilepicture: parseNullString(value),
 				ID:             int64(id),
 			})
 		default:
@@ -304,6 +304,13 @@ func (e *Env) updateUser(w http.ResponseWriter, r *http.Request) {
 	log.Println("User successfully updated")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("User updated successfully"))
+}
+
+func parseNullString(value interface{}) sql.NullString {
+	if v, ok := value.(string); ok {
+		return sql.NullString{String: v, Valid: v != ""}
+	}
+	return sql.NullString{String: "", Valid: false}
 }
 
 // deleteUser hanlder removes a user based on given parameters godoc

@@ -230,7 +230,7 @@ export const columns: ColumnDef<User>[] = [
             >
               Delete
             </DropdownMenuItem>
-            <DropdownMenuItem onPointerDown={(e) => e.preventDefault()}>
+            <DropdownMenuItem onClick={(e) => e.preventDefault()}>
               <Input
                 placeholder="New Company"
                 value={newCompany}
@@ -252,7 +252,7 @@ export const columns: ColumnDef<User>[] = [
                 Change site
               </Button>
             </DropdownMenuItem>
-            <DropdownMenuItem onPointerDown={(e) => e.preventDefault()}>
+            <DropdownMenuItem onClick={(e) => e.preventDefault()}>
               <Input
                 placeholder="New Role"
                 value={newRole}
