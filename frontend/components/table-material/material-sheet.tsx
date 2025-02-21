@@ -9,9 +9,7 @@ import {
 import { CheckoutLog, Material, MaterialLog } from "@/material-api-types";
 import Image from "next/image";
 import useSWR, { Fetcher } from "swr"
-import Loading from "./loading";
-import { Heading, Heading2 } from "lucide-react";
-import { User } from "@/user-api-types";
+import Loading from "@/components/loading";
 
 const MaterialLogFetcher: Fetcher<MaterialLog[], string> = async (...args) => fetch(...args).then(res => res.json())
 const CheckoutLogFetcher: Fetcher<CheckoutLog[], string> = async (...args) => fetch(...args).then(res => res.json())

@@ -1,7 +1,7 @@
 'use client'
 
 import { ChangeEvent, Dispatch } from "react";
-import { Input } from "./ui/input";
+import { Input } from "@/components/ui/input";
 
 export interface Filter {
   id: string,
