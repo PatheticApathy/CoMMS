@@ -247,3 +247,38 @@ func (e *Env) changeMaterialQuantity(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+// deleteMaterialHandler handler to delete material from database
+//
+//	@Summary	deletes material
+//	@Description	 deltes material from database
+//	@Tags			material
+//	@Produce		json
+//	@Accepts		json
+//	@Param			id	body		int	true	"Id of material to delete"
+//	@Success		200			{object}	materialdb.Material				"delted material"
+//	@Failure		400			{string} string	"bad request"
+//	@Failure		500			{string}	string "Internal Server Error"
+//	@Router			/material/delete [delete]
+func (e *Env) deleteMaterialHandler(w http.ResponseWriter, r *http.Request) {
+	var id int64
+	if err := json.NewDecoder(r.Body).Decode(&id); err != nil {
+		log.Printf("Could not parse json obj: %e", err)
+		http.Error(w, "Error parsing json", http.StatusBadRequest)
+		return
+	}
+
+	log.Printf("Deleting material with id: %d", id)
+	material, err := e.Queries.DeleteMaterial(r.Context(), id)
+	if err != nil {
+		log.Printf(`Invalid Material change, reason %e`, err)
+		http.Error(w, `Could not delete material`, http.StatusBadRequest)
+		return
+	}
+
+	if err := json.NewEncoder(w).Encode(&material); err != nil {
+		log.Printf("Could not create json obj: %e", err)
+		http.Error(w, "Error creating json", http.StatusInternalServerError)
+		return
+	}
+}

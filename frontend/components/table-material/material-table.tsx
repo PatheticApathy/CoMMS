@@ -1,45 +1,75 @@
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
 import { Material } from "@/material-api-types"
-import MaterialSheet from "@/components/table-material/material-sheet";
+import { DataTable } from "../table-maker/data-table";
+import { MaterialRow } from "./material-columns";
+import { MaterialTableColumns } from "./material-columns";
+import { toast } from "sonner";
+import { TriggerWithArgs } from "swr/mutation";
+import useSWRMutation from "swr/mutation";
+import { number } from "zod";
+
+
+//fetcher
+const DeleteMaterial = async (url: string, { arg }: { arg: number }) => await fetch(url, { method: 'DELETE', body: String(arg) })
+const CheckOut = async (url: string, { arg }: { arg: { user: number, item: number } }) => await fetch(url, { method: 'POST', body: String(arg) })
 
 export default function MTable({ materials }: { materials: Material[] }) {
+
+  const { trigger, isMutating } = useSWRMutation('/api/material/material/delete', DeleteMaterial, {
+    onError(err) {
+      console.log(err)
+      toast.error(err.message || "Error has occured");
+
+    },
+    onSuccess(data) {
+      data.json().then((resp: Material) => {
+        console.log("Successfully deleted")
+        toast.success(`Material ${resp.name.String} Deleted!`);
+      })
+    },
+
+  })
+  const { trigger: t2, isMutating: m2 } = useSWRMutation('/api/material/checkout/out', CheckOut, {
+    onError(err) {
+      console.log(err)
+      toast.error(err.message || "Error has occured");
+
+    },
+    onSuccess(data) {
+      data.json().then((resp: Material) => {
+        console.log("Checked Out")
+        toast.success(`Checked Out!`);
+      })
+    },
+
+  })
+
+
+  const rows = materials.map((material): MaterialRow => {
+    return {
+      id: material.id,
+      job_site: material.job_site.Valid ? material.job_site.Int64 : undefined,
+      last_checked_out: material.last_checked_out,
+      location_lat: material.location_lat.Valid ? material.location_lat.Float64 : undefined,
+      location_lng: material.location_lng.Valid ? material.location_lng.Float64 : undefined,
+      name: material.name.Valid ? material.name.String : undefined,
+      quantity: material.quantity,
+      status: material.status,
+      type: material.type.Valid ? material.type.String : undefined,
+      unit: material.unit
+    }
+  })
+
+  const DeleteMat = (id: number) => {
+    trigger(id)
+  }
+
+  //TODO: make it switch to a check in for  function 
+  const CheckOutMaterial = (user: number, item: number) => {
+    t2({ user, item })
+  }
   return (
-    <Table>
-      <TableCaption>Materials</TableCaption>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="">ID</TableHead>
-          <TableHead>Name</TableHead>
-          <TableHead>Last Checked Out</TableHead>
-          <TableHead>Quantity</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Type</TableHead>
-          <TableHead className="">Job Site</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {
-          materials.map((material) => (
-            <TableRow>
-              <TableCell className="font-medium hover:text-cyan-200"><MaterialSheet material={material}>{material.id}</MaterialSheet></TableCell>
-              <TableCell className="hover:text-cyan-200"><MaterialSheet material={material}>{material.name.Valid ? material.name.String : "N/A"}</MaterialSheet></TableCell>
-              <TableCell className="hover:text-cyan-200">{material.last_checked_out}</TableCell>
-              <TableCell className="hover:text-cyan-200">{`${material.quantity}  ${material.unit}`}</TableCell>
-              <TableCell className="hover:text-cyan-200">{material.status}</TableCell>
-              <TableCell className="hover:text-cyan-200">{material.type.Valid ? material.type.String : "N/A"}</TableCell>
-              <TableCell className=" hover:text-cyan-200">{material.job_site.Valid ? material.job_site.Int64 : "N/A"}</TableCell>
-            </TableRow>
-          ))
-        }
-      </TableBody>
-    </Table>
+    <div className="mx-auto py-10">
+      <DataTable columns={MaterialTableColumns(DeleteMat, CheckOutMaterial)} data={rows} />
+    </div>
   )
 }
