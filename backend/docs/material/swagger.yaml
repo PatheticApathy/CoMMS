@@ -251,36 +251,7 @@ info:
   title: Material Tracker API
   version: "1.0"
 paths:
-  /checkout/recent:
-    get:
-      description: Safer and faster way to get newest checkout logs for given material
-      parameters:
-      - description: id of material
-        in: query
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: checkout logs
-          schema:
-            items:
-              $ref: '#/definitions/materialdb.CheckoutLog'
-            type: array
-        "400":
-          description: bad request
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            type: string
-      summary: fetches recent checkout logs for a given material id
-      tags:
-      - checkout logs
-  /checkouts/all:
+  /checkout/all:
     get:
       description: gets all checkout logs if they exist
       produces:
@@ -299,7 +270,7 @@ paths:
       summary: fetches all checkout logs
       tags:
       - checkout logs
-  /checkouts/in:
+  /checkout/in:
     put:
       consumes:
       - application/json
@@ -329,7 +300,7 @@ paths:
       summary: Adds checkin time to existing checkout log
       tags:
       - checkout logs
-  /checkouts/out:
+  /checkout/out:
     post:
       consumes:
       - application/json
@@ -357,6 +328,35 @@ paths:
           schema:
             type: string
       summary: post checkout of material
+      tags:
+      - checkout logs
+  /checkout/recent:
+    get:
+      description: Safer and faster way to get newest checkout logs for given material
+      parameters:
+      - description: id of material
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: checkout logs
+          schema:
+            items:
+              $ref: '#/definitions/materialdb.CheckoutLog'
+            type: array
+        "400":
+          description: bad request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: fetches recent checkout logs for a given material id
       tags:
       - checkout logs
   /material/add:
@@ -432,6 +432,34 @@ paths:
           schema:
             type: string
       summary: adjust quantity based on the requested amount
+      tags:
+      - material
+  /material/delete:
+    delete:
+      description: deltes material from database
+      parameters:
+      - description: Id of material to delete
+        in: body
+        name: id
+        required: true
+        schema:
+          type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: delted material
+          schema:
+            $ref: '#/definitions/materialdb.Material'
+        "400":
+          description: bad request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: deletes material
       tags:
       - material
   /material/search:

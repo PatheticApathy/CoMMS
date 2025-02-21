@@ -2,19 +2,15 @@
 import { Button } from "@/components//ui/button"
 import {
   Form,
-  FormField,
-  FormItem,
-  FormControl,
-  FormDescription,
-  FormMessage
 } from "@/components/ui/form"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import useSWRMutation from "swr/mutation"
 import { Input } from "@/components/ui/input"
-import { ComboboxFormField } from "@/components/form-combobox"
+import { ComboboxFormField } from "@/components/form-maker/form-combobox"
 import { Material, AddMaterial } from "@/material-api-types"
+import FormInput from "../form-maker/form-input"
 import { toast } from "sonner"
 
 //Schema for form
@@ -101,65 +97,16 @@ export default function MaterialForm() {
     trigger(payload)
   }
 
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(SendAddMaterialRequest)}>
         <ComboboxFormField form_attr={{ name: "job_site", description: "All known jobsites for this location", form: form }} default_label="Choose a jobsite" options={jobsites} />
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormDescription>Name of item</FormDescription>
-              <FormControl>
-                <Input placeholder="Name" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="quantity"
-          render={({ field }) => (
-            <FormItem>
-              <FormDescription>Quantity of item</FormDescription>
-              <FormControl>
-                <Input placeholder="Quantity" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <FormInput name="name" placeholder="Name" description="Name of Item" form={form} />
+        <FormInput name="quantity" placeholder="Quantity" description="Quantity if item" form={form} />
         <ComboboxFormField form_attr={{ name: "status", description: "Initial status of item", form: form }} default_label={"In Stock"} options={status} />
-        <FormField
-          control={form.control}
-          name="type"
-          render={({ field }) => (
-            <FormItem>
-              <FormDescription>Type of item</FormDescription>
-              <FormControl>
-                <Input placeholder="type" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="unit"
-          render={({ field }) => (
-            <FormItem>
-              <FormDescription>Unit of measurment of item</FormDescription>
-              <FormControl>
-                <Input placeholder="unit" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit">Send Request</Button>
+        <FormInput name="type" placeholder="Type" description="Type of item" form={form} />
+        <FormInput name="unit" placeholder="Unit" description="unit of measurment of item" form={form} />
+        {isMutating ? <Button variant={'ghost'}>Sending</Button> : <Button type="submit">Send Request</Button>}
       </form>
     </Form>
   )

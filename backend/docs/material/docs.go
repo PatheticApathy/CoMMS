@@ -19,51 +19,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/checkout/recent": {
-            "get": {
-                "description": "Safer and faster way to get newest checkout logs for given material",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "checkout logs"
-                ],
-                "summary": "fetches recent checkout logs for a given material id",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "id of material",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "checkout logs",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/materialdb.CheckoutLog"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "bad request",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/checkouts/all": {
+        "/checkout/all": {
             "get": {
                 "description": "gets all checkout logs if they exist",
                 "produces": [
@@ -92,7 +48,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/checkouts/in": {
+        "/checkout/in": {
             "put": {
                 "description": "Adds checkin time to existing checkout log",
                 "consumes": [
@@ -138,7 +94,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/checkouts/out": {
+        "/checkout/out": {
             "post": {
                 "description": "Adds checkout log for a materials",
                 "consumes": [
@@ -167,6 +123,50 @@ const docTemplate = `{
                         "description": "checkout log",
                         "schema": {
                             "$ref": "#/definitions/materialdb.CheckoutLog"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/checkout/recent": {
+            "get": {
+                "description": "Safer and faster way to get newest checkout logs for given material",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "checkout logs"
+                ],
+                "summary": "fetches recent checkout logs for a given material id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "id of material",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "checkout logs",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/materialdb.CheckoutLog"
+                            }
                         }
                     },
                     "400": {
@@ -280,6 +280,49 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "material",
+                        "schema": {
+                            "$ref": "#/definitions/materialdb.Material"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/material/delete": {
+            "delete": {
+                "description": "deltes material from database",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "material"
+                ],
+                "summary": "deletes material",
+                "parameters": [
+                    {
+                        "description": "Id of material to delete",
+                        "name": "id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "delted material",
                         "schema": {
                             "$ref": "#/definitions/materialdb.Material"
                         }
