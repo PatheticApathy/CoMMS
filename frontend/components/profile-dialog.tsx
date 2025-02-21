@@ -36,13 +36,6 @@ import { getCookie } from "./cookie-functions"
     }).then(res => res.json())
 }*/
 
-async function logOut(url: string, { arg }) {
-    return fetch(url, {
-        method: 'POST',
-        body: JSON.stringify(arg)
-    }).then(res => res.json())
-}
-
 const fetcher = async  (url: string) => {
     const res = await fetch(url)
     if (!res.ok) {
@@ -54,8 +47,6 @@ const fetcher = async  (url: string) => {
 export function Profile() {
 
     //let token = getCookie('token')
-
-    const { data, trigger, error, isMutating } = useSWRMutation('api/user/loggout', logOut, {throwOnError: false})
 
     //const  { data: tokenData, mutate, error: error2 } = useSWR('api/user/decrypt', getProfileArgs)
 
@@ -70,13 +61,9 @@ export function Profile() {
     if (error3) return <p>Error loading Profile.</p>;
     if (!user) return <p>Loading...</p>;        
 
-    if (isMutating) { return (<div className='flex items-center justify-center w-screen h-screen'>Loading <Loading /></div>) }
-    if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
-    if (data) {redirect('/')}   
-
     async function logoutSubmit() {
-        trigger()
         document.cookie = `token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`
+        redirect('/')
     }
 
     return (

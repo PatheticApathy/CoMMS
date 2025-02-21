@@ -102,7 +102,7 @@ export function EditProfile() {
         }
         const email = values.email
         const phone = values.phone
-        const intID = Number(id)
+        //const intID = Number(id)
         const values2 = {
             username,
             firstname,

@@ -50,8 +50,6 @@ export default function LoginForm() {
     redirect('/dashboard')
   }
 
-  console.log(document.cookie)
-
   //validate form data(data is safe at this point)
   async function onSubmit(values: z.infer<typeof formSchema>) {    
     trigger(values)
