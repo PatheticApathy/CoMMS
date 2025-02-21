@@ -49,6 +49,17 @@ const fetcher = async (url: string): Promise<Material[]> => {
   return res.json();
 };
 
+const deleteMaterial = async (id: number) => {
+  const res = await fetch(`/api/material/material/delete?id=${id}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) {
+    throw new Error("Failed to delete user");
+  }
+  return res.json();
+};
+
+
 export const columns: ColumnDef<Material>[] = [
   {
     id: "select",
@@ -181,7 +192,11 @@ export const columns: ColumnDef<Material>[] = [
               Copy status
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Delete</DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={() => deleteMaterial(material.id)}
+            >
+              Delete
+            </DropdownMenuItem>
             <DropdownMenuItem>Change Quantity</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
