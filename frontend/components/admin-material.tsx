@@ -52,6 +52,7 @@ const fetcher = async (url: string): Promise<Material[]> => {
 const deleteMaterial = async (id: number) => {
   const res = await fetch(`/api/material/material/delete?id=${id}`, {
     method: "DELETE",
+    body: String(id),
   });
   if (!res.ok) {
     throw new Error("Failed to delete user");
