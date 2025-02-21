@@ -20,7 +20,7 @@ import (
 //	@Success		200			{object}	materialdb.CheckoutLog			"checkout log"
 //	@Failure		400			{string} string	"bad request"
 //	@Failure		500			{string}	string "Internal Server Error"
-//	@Router			/checkouts/out [post]
+//	@Router			/checkout/out [post]
 func (e *Env) postCheckout(w http.ResponseWriter, r *http.Request) {
 	var args materialdb.AddCheckoutLogParams
 	if err := json.NewDecoder(r.Body).Decode(&args); err != nil {
@@ -55,7 +55,7 @@ func (e *Env) postCheckout(w http.ResponseWriter, r *http.Request) {
 //	@Failure		400		{string}	string "bad request"
 //	@Failure		500		{string} string "Internal Server Error"
 //	@Success		200		{object}	materialdb.CheckoutLog	"checkout log"
-//	@Router			/checkouts/in [put]
+//	@Router			/checkout/in [put]
 func (e *Env) putCheckin(w http.ResponseWriter, r *http.Request) {
 	var arg int64
 	if err := json.NewDecoder(r.Body).Decode(&arg); err != nil {
@@ -87,7 +87,7 @@ func (e *Env) putCheckin(w http.ResponseWriter, r *http.Request) {
 //	@Produce		json
 //	@Success		200	{array}	materialdb.CheckoutLog	"checkout logs"
 //	@Failure		500	{string} string	"Internal Server Error"
-//	@Router			/checkouts/all [get]
+//	@Router			/checkout/all [get]
 func (e *Env) getAllCheckoutLogs(w http.ResponseWriter, r *http.Request) {
 	logs, err := e.Queries.GetAllCheckoutLogs(r.Context())
 	if err != nil {
