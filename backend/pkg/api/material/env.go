@@ -50,8 +50,10 @@ func (e *Env) materialLogHandlers() http.Handler {
 
 func (e *Env) jobSiteHandlers() http.Handler {
 	mux := http.NewServeMux()
-	// TODO: Mae serach for jobsites
+
+	// TODO: Make serach for jobsites
 	mux.HandleFunc("GET /search", e.getAllMaterialLogsHandler)
+
 	mux.HandleFunc("GET /all", e.getAllJobSitesHandler)
 	mux.HandleFunc("POST /add", e.addJobSiteHandler)
 	return mux
