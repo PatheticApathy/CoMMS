@@ -114,6 +114,30 @@ func (q *Queries) ChangeStatus(ctx context.Context, arg ChangeStatusParams) (Mat
 	return i, err
 }
 
+const deleteMaterial = `-- name: DeleteMaterial :one
+DELETE FROM Materials
+WHERE id = ?
+RETURNING id, name, type, quantity, unit, status, location_lat, location_lng, last_checked_out, job_site
+`
+
+func (q *Queries) DeleteMaterial(ctx context.Context, id int64) (Material, error) {
+	row := q.db.QueryRowContext(ctx, deleteMaterial, id)
+	var i Material
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Type,
+		&i.Quantity,
+		&i.Unit,
+		&i.Status,
+		&i.LocationLat,
+		&i.LocationLng,
+		&i.LastCheckedOut,
+		&i.JobSite,
+	)
+	return i, err
+}
+
 const getAllMaterials = `-- name: GetAllMaterials :many
 SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site, last_checked_out FROM Materials
 `
