@@ -50,7 +50,7 @@ func (e *Env) materialLogHandlers() http.Handler {
 func (e *Env) jobSiteHandlers() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /search", e.getMaterialHandler)
-	mux.HandleFunc("GET /all", e.getAllMaterialLogsHandler)
+	mux.HandleFunc("GET /all", e.getAllJobSitesHandler)
 	mux.HandleFunc("POST /add", e.addJobSiteHandler)
 	return mux
 }
