@@ -38,7 +38,7 @@ func Auth(next http.Handler, e *handler.Env) http.Handler {
 			http.Error(w, "Invalid request", http.StatusBadRequest)
 			return
 		}
-		err = auth.CheckUserAndPass(e.Queries, r.Context(), login)
+		err = auth.CheckUserAndPass(e.Queries, r.Context(), &login)
 		if err != nil {
 			log.Printf("Error: %e", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)

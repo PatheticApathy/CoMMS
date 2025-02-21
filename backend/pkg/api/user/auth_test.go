@@ -59,7 +59,7 @@ func TestAuth(t *testing.T) {
 
 	defer ts.Close()
 
-	usernpass := auth.UserAndPass{
+	usernpass := auth.UnEncrypted{
 		Username: "bob",
 		Password: "bassword",
 	}

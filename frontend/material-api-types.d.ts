@@ -42,7 +42,7 @@ export interface ChangeQuantity {
   id: number
   quantity: number
 }
-export enum Status {
+export enum MaterialStatus {
   InStock = "In Stock",
   OutOfStock = "Out of Stock",
   LowStock = "Low Stock"
