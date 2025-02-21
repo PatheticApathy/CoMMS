@@ -36,6 +36,11 @@ export function AppSidebar() {
               <span>Company</span>
             </a>
           </SidebarMenuButton>
+          <SidebarMenuButton asChild>
+            <a href="/dashboard/admin">
+              <span>Admin</span>
+            </a>
+          </SidebarMenuButton>
           <SidebarGroupContent></SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>

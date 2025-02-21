@@ -3,7 +3,7 @@ import { Button } from "../ui/button";
 export default function InitAddFormDialouge() {
   return (
     <AddMaterialFormDialouge>
-      <Button className="fixed bottom-4 right-4 rounded-sm text-2xl" variant={"outline"}>+</Button>
+      <Button className="" variant={"outline"}>Add Material</Button>
     </AddMaterialFormDialouge>
   )
 }

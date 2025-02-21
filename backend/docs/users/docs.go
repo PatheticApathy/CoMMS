@@ -294,7 +294,7 @@ const docTemplate = `{
                 "tags": [
                     "users"
                 ],
-                "summary": "updates user based on given paremeters",
+                "summary": "updates user based on given parameters",
                 "parameters": [
                     {
                         "description": "Format of update user request",
@@ -302,7 +302,8 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/userdb.UpdateUserParams"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 ],
@@ -410,44 +411,6 @@ const docTemplate = `{
                 },
                 "phone": {
                     "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "userdb.UpdateUserParams": {
-            "type": "object",
-            "properties": {
-                "company": {
-                    "$ref": "#/definitions/sql.NullString"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "firstname": {
-                    "$ref": "#/definitions/sql.NullString"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "lastname": {
-                    "$ref": "#/definitions/sql.NullString"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "phone": {
-                    "type": "string"
-                },
-                "profilepicture": {
-                    "$ref": "#/definitions/sql.NullString"
-                },
-                "role": {
-                    "$ref": "#/definitions/sql.NullString"
-                },
-                "site": {
-                    "$ref": "#/definitions/sql.NullString"
                 },
                 "username": {
                     "type": "string"
