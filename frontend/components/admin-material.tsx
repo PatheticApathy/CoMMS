@@ -37,10 +37,11 @@ import {
 } from "@/components/ui/table";
 
 import useSWR from "swr";
-import { User } from "@/user-api-types";
+import { Material } from "@/material-api-types";
 import Loading from "@/components/loading";
+import InitAddFormDialouge from "@/components/add-material-form/material-add-form-button";
 
-const fetcher = async (url: string): Promise<User[]> => {
+const fetcher = async (url: string): Promise<Material[]> => {
   const res = await fetch(url);
   if (!res.ok) {
     throw new Error("Failed to fetch data");
@@ -48,31 +49,7 @@ const fetcher = async (url: string): Promise<User[]> => {
   return res.json();
 };
 
-const deleteUser = async (id: number) => {
-  const res = await fetch(`/api/user/delete?id=${id}`, {
-    method: "DELETE",
-  });
-  if (!res.ok) {
-    throw new Error("Failed to delete user");
-  }
-  return res.json();
-};
-
-const updateUser = async (id: number, field: string, value: string) => {
-  const res = await fetch(`/api/user/update`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ id, [field]: value }),
-  });
-  if (!res.ok) {
-    throw new Error("Failed to update user");
-  }
-  return res.json();
-};
-
-export const columns: ColumnDef<User>[] = [
+export const columns: ColumnDef<Material>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -96,118 +73,97 @@ export const columns: ColumnDef<User>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "username",
-    header: "Username",
-    cell: ({ row }) => (
-      <div className="">{row.getValue("username")}</div>
-    ),
-  },
-  {
-    accessorKey: "email",
+    accessorKey: "name",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Email
-          <ArrowUpDown />
-        </Button>
-      );
-    },
-    cell: ({ row }) => <div className="">{row.getValue("email")}</div>,
-  },
-  {
-    accessorKey: "phone",
-    header: "Phone",
-    cell: ({ row }) => <div className="">{row.getValue("phone")}</div>,
-  },
-  {
-    accessorKey: "company",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Company
+          Name
           <ArrowUpDown />
         </Button>
       );
     },
     cell: ({ row }) => {
-      const company = row.getValue("company") as { String: string; Valid: boolean };
+    const name = row.getValue("name") as { String: string; Valid: boolean };
+    return (
+        <div className="capitalize">
+        {name.String}
+        </div>
+        );
+    },
+    filterFn: (row, columnId, filterValue) => {
+      const name = row.getValue(columnId) as { String: string; Valid: boolean };
+      return name.String.toLowerCase().includes(filterValue.toLowerCase());
+    },
+  },
+  {
+    accessorKey: "last_checked_out",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Last Checked Out
+          <ArrowUpDown />
+        </Button>
+      );
+    },
+    cell: ({ row }) => <div className="">{row.getValue("last_checked_out")}</div>,
+  },
+  {
+    accessorKey: "quantity",
+    header: "Quantity",
+    cell: ({ row }) => <div className="">{row.getValue("quantity")}</div>,
+    filterFn: (row, columnId, filterValue) => {
+      const quantity = row.getValue(columnId) as number;
+      return quantity.toString().includes(filterValue);
+    },
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => <div className="">{row.getValue("status")}</div>,
+  },
+  {
+    accessorKey: "type",
+    header: "Type",
+    cell: ({ row }) => {
+    const type = row.getValue("type") as { String: string; Valid: boolean };
+    return (
+        <div className="">
+        {type.String}
+        </div>
+        );
+    },
+    filterFn: (row, columnId, filterValue) => {
+      const type = row.getValue(columnId) as { String: string; Valid: boolean };
+      return type.String.toLowerCase().includes(filterValue.toLowerCase());
+    },
+  },
+  {
+    accessorKey: "job_site",
+    header: "Job Site",
+    cell: ({ row }) => {
+      const jobSite = row.getValue("job_site") as { Int64: number; Valid: boolean };
       return (
         <div className="">
-          {company.String}
+          {jobSite.Int64}
         </div>
       );
     },
     filterFn: (row, columnId, filterValue) => {
-      const site = row.getValue(columnId) as { String: string; Valid: boolean };
-      return site.String.toLowerCase().includes(filterValue.toLowerCase());
-    },
-  },
-  {
-    accessorKey: "site",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Site
-          <ArrowUpDown />
-        </Button>
-      );
-    },
-    cell: ({ row }) => {
-      const site = row.getValue("site") as { String: string; Valid: boolean };
-      return (
-        <div className="capitalize">
-          {site.String}
-        </div>
-      );
-    },
-    filterFn: (row, columnId, filterValue) => {
-      const site = row.getValue(columnId) as { String: string; Valid: boolean };
-      return site.String.toLowerCase().includes(filterValue.toLowerCase());
-    },
-  },
-  {
-    accessorKey: "role",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Role
-          <ArrowUpDown />
-        </Button>
-      );
-    },
-    cell: ({ row }) => {
-      const site = row.getValue("role") as { String: string; Valid: boolean };
-      return (
-        <div className="capitalize">
-          {site.String}
-        </div>
-      );
-    },
-    filterFn: (row, columnId, filterValue) => {
-      const role = row.getValue(columnId) as { String: string; Valid: boolean };
-      return role.String.toLowerCase().includes(filterValue.toLowerCase());
+      const jobSite = row.getValue(columnId) as { String: string; Valid: boolean };
+      return jobSite.String.toLowerCase().includes(filterValue.toLowerCase());
     },
   },
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const user = row.original;
-      const [newCompany, setNewCompany] = React.useState("");
-      const [newSite, setNewSite] = React.useState("");
-      const [newRole, setNewRole] = React.useState("");
+      const material = row.original;
 
       return (
         <DropdownMenu>
@@ -220,49 +176,13 @@ export const columns: ColumnDef<User>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(user.username)}
+              onClick={() => navigator.clipboard.writeText(material.status)}
             >
-              Copy username
+              Copy status
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem 
-              onClick={() => deleteUser(user.id)}
-            >
-              Delete
-            </DropdownMenuItem>
-            <DropdownMenuItem onPointerDown={(e) => e.preventDefault()}>
-              <Input
-                placeholder="New Company"
-                value={newCompany}
-                onChange={(e) => setNewCompany(e.target.value)}
-                className="max-w-sm"
-              />
-              <Button onClick={(e) => { e.preventDefault(); updateUser(user.id, "company", newCompany); }}>
-                Change company
-              </Button>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={(e) => e.preventDefault()}>
-              <Input
-                placeholder="New Site"
-                value={newSite}
-                onChange={(e) => setNewSite(e.target.value)}
-                className="max-w-sm"
-              />
-              <Button onClick={(e) => { e.preventDefault(); updateUser(user.id, "site", newSite); }}>
-                Change site
-              </Button>
-            </DropdownMenuItem>
-            <DropdownMenuItem onPointerDown={(e) => e.preventDefault()}>
-              <Input
-                placeholder="New Role"
-                value={newRole}
-                onChange={(e) => setNewRole(e.target.value)}
-                className="max-w-sm"
-              />
-              <Button onClick={(e) => { e.preventDefault(); updateUser(user.id, "role", newRole); }}>
-                Change role
-              </Button>
-            </DropdownMenuItem>
+            <DropdownMenuItem>Delete</DropdownMenuItem>
+            <DropdownMenuItem>Change Quantity</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
@@ -270,8 +190,8 @@ export const columns: ColumnDef<User>[] = [
   },
 ];
 
-export function UserTable() {
-  const { data, error } = useSWR<User[]>("/api/user/all", fetcher);
+export function MaterialTable() {
+  const { data, error } = useSWR<Material[]>("/api/material/material/all", fetcher);
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -312,45 +232,46 @@ export function UserTable() {
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter username..."
-          value={(table.getColumn("username")?.getFilterValue() as string) ?? ""}
+          placeholder="Filter name..."
+          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("username")?.setFilterValue(event.target.value)
+            table.getColumn("name")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
         <Input
-          placeholder="Filter email..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+          placeholder="Filter last checked out..."
+          value={(table.getColumn("last_checked_out")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
+            table.getColumn("last_checked_out")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
         <Input
-          placeholder="Filter company..."
-          value={(table.getColumn("company")?.getFilterValue() as string) ?? ""}
+          placeholder="Filter quantity..."
+          value={(table.getColumn("quantity")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("company")?.setFilterValue(event.target.value)
+            table.getColumn("quantity")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
         <Input
-          placeholder="Filter site..."
-          value={(table.getColumn("site")?.getFilterValue() as string) ?? ""}
+          placeholder="Filter status..."
+          value={(table.getColumn("status")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("site")?.setFilterValue(event.target.value)
+            table.getColumn("status")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
         <Input
-          placeholder="Filter role..."
-          value={(table.getColumn("role")?.getFilterValue() as string) ?? ""}
+          placeholder="Filter type..."
+          value={(table.getColumn("type")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("role")?.setFilterValue(event.target.value)
+            table.getColumn("type")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
+        <InitAddFormDialouge />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
