@@ -172,15 +172,15 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/auth.UserAndPass"
+                            "$ref": "#/definitions/auth.UnEncrypted"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Success",
+                        "description": "User login token",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/auth.Token"
                         }
                     },
                     "400": {
@@ -265,9 +265,9 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "users",
+                        "description": "User login token",
                         "schema": {
-                            "$ref": "#/definitions/userdb.User"
+                            "$ref": "#/definitions/auth.Token"
                         }
                     },
                     "400": {
@@ -331,9 +331,20 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "auth.UserAndPass": {
+        "auth.Token": {
             "type": "object",
             "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "auth.UnEncrypted": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
                 "password": {
                     "type": "string"
                 },
