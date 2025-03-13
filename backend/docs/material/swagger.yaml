@@ -1,5 +1,30 @@
 basePath: /
 definitions:
+  auth.Identity:
+    properties:
+      id:
+        type: integer
+      password:
+        type: string
+      role:
+        $ref: '#/definitions/sql.NullString'
+      username:
+        type: string
+    type: object
+  auth.Token:
+    properties:
+      token:
+        type: string
+    type: object
+  auth.UnEncrypted:
+    properties:
+      id:
+        type: integer
+      password:
+        type: string
+      username:
+        type: string
+    type: object
   materialdb.AddCheckoutLogParams:
     properties:
       item_id:
@@ -816,6 +841,34 @@ paths:
       summary: post user to database
       tags:
       - users
+  /user/decrypt:
+    post:
+      consumes:
+      - application/json
+      description: Decrypt user login token
+      parameters:
+      - description: Format of login user request
+        in: body
+        name: users
+        required: true
+        schema:
+          $ref: '#/definitions/auth.Token'
+      responses:
+        "200":
+          description: User login data token
+          schema:
+            $ref: '#/definitions/auth.Identity'
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Server Error
+          schema:
+            type: string
+      summary: Decrypts token
+      tags:
+      - users
   /user/delete:
     delete:
       description: Deletes user using id(may add more parameters later)
@@ -841,6 +894,49 @@ paths:
           schema:
             type: string
       summary: removes user based on given paremeters
+      tags:
+      - users
+  /user/loggout:
+    post:
+      description: Replaces login cookie with an empty one that deletes itself instantly
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+      summary: Removes authenticated user information
+      tags:
+      - users
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: Pulls user login information and authenticates the user
+      parameters:
+      - description: Format of login user request
+        in: body
+        name: users
+        required: true
+        schema:
+          $ref: '#/definitions/auth.UnEncrypted'
+      responses:
+        "200":
+          description: User login token
+          schema:
+            type: string
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "500":
+          description: Server Error
+          schema:
+            type: string
+      summary: Authenticate user information
       tags:
       - users
   /user/search:
@@ -886,9 +982,9 @@ paths:
       - application/json
       responses:
         "200":
-          description: users
+          description: User login token
           schema:
-            $ref: '#/definitions/userdb.User'
+            $ref: '#/definitions/auth.Token'
         "400":
           description: Invalid input
           schema:

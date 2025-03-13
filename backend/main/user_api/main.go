@@ -64,8 +64,8 @@ func main() {
 	if secret == "" {
 		log.Fatal("No secret set in environment variable")
 	}
-	if len([]byte(secret)) != 16 {
-		log.Fatal("Error: Invalid secret length(must be 16 charcaters)")
+	if len([]byte(secret)) != 32 {
+		log.Fatal("Error: Invalid secret length(must be 32 charcaters)")
 	}
 
 	url, err := url.Parse(os.Getenv("USER_HOST"))

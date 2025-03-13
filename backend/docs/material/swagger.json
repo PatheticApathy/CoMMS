@@ -808,6 +808,49 @@
                 }
             }
         },
+        "/user/decrypt": {
+            "post": {
+                "description": "Decrypt user login token",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Decrypts token",
+                "parameters": [
+                    {
+                        "description": "Format of login user request",
+                        "name": "users",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.Token"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User login data token",
+                        "schema": {
+                            "$ref": "#/definitions/auth.Identity"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/user/delete": {
             "delete": {
                 "description": "Deletes user using id(may add more parameters later)",
@@ -842,6 +885,72 @@
                     },
                     "500": {
                         "description": "Failed to delete user",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/loggout": {
+            "post": {
+                "description": "Replaces login cookie with an empty one that deletes itself instantly",
+                "tags": [
+                    "users"
+                ],
+                "summary": "Removes authenticated user information",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/login": {
+            "post": {
+                "description": "Pulls user login information and authenticates the user",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Authenticate user information",
+                "parameters": [
+                    {
+                        "description": "Format of login user request",
+                        "name": "users",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.UnEncrypted"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User login token",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
                         "schema": {
                             "type": "string"
                         }
@@ -916,9 +1025,9 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "users",
+                        "description": "User login token",
                         "schema": {
-                            "$ref": "#/definitions/userdb.User"
+                            "$ref": "#/definitions/auth.Token"
                         }
                     },
                     "400": {
@@ -1020,6 +1129,45 @@
         }
     },
     "definitions": {
+        "auth.Identity": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "role": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "auth.Token": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "auth.UnEncrypted": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "materialdb.AddCheckoutLogParams": {
             "type": "object",
             "properties": {

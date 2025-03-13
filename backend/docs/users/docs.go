@@ -116,7 +116,7 @@ const docTemplate = `{
                     "200": {
                         "description": "User login data token",
                         "schema": {
-                            "$ref": "#/definitions/auth.UnEncrypted"
+                            "$ref": "#/definitions/auth.Identity"
                         }
                     },
                     "400": {
@@ -223,7 +223,7 @@ const docTemplate = `{
                     "200": {
                         "description": "User login token",
                         "schema": {
-                            "$ref": "#/definitions/auth.Token"
+                            "type": "string"
                         }
                     },
                     "400": {
@@ -373,6 +373,23 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "auth.Identity": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "role": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "auth.Token": {
             "type": "object",
             "properties": {

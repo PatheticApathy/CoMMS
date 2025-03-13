@@ -1,5 +1,16 @@
 basePath: /
 definitions:
+  auth.Identity:
+    properties:
+      id:
+        type: integer
+      password:
+        type: string
+      role:
+        $ref: '#/definitions/sql.NullString'
+      username:
+        type: string
+    type: object
   auth.Token:
     properties:
       token:
@@ -182,7 +193,7 @@ paths:
         "200":
           description: User login data token
           schema:
-            $ref: '#/definitions/auth.UnEncrypted'
+            $ref: '#/definitions/auth.Identity'
         "400":
           description: Invalid request
           schema:
@@ -252,7 +263,7 @@ paths:
         "200":
           description: User login token
           schema:
-            $ref: '#/definitions/auth.Token'
+            type: string
         "400":
           description: Invalid input
           schema:

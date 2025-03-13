@@ -91,7 +91,7 @@ func (e *Env) getUsers(w http.ResponseWriter, r *http.Request) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			users	body		userdb.SignUpParams	true	"Format of signup user request"
-//	@Success		200		{object}	auth.Token			"User login token"
+//	@Success		200		{string}	string			"User login token"
 //	@Failure		400		{string}	string					"Invalid input"
 //	@Failure		500		{string}	string					"Failed to signup user"
 //	@Router			/user/signup [post]
@@ -175,7 +175,7 @@ func (e *Env) createUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to create user", http.StatusInternalServerError)
 		return
 	}
-	log.Printf("User successfully created: %+v", user)
+	log.Printf("User %s successfully created", user.Username)
 	if err := json.NewEncoder(w).Encode(&user); err != nil {
 		log.Printf("Failed to encode user response, reason: %v", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
@@ -214,7 +214,7 @@ func (e *Env) updateUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to update user", http.StatusInternalServerError)
 		return
 	}
-	log.Printf("User successfully updated: %+v", user)
+	log.Printf("User %s successfully updated", user.Username)
 	if err := json.NewEncoder(w).Encode(&user); err != nil {
 		log.Printf("Failed to encode user response, reason: %v", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)

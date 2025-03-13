@@ -53,7 +53,7 @@ func (e *Env) authenticate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("User successfully logged in")
+	log.Printf("User  %ssuccessfully logged in", userandpass.Username)
 }
 
 // WARNING: WIll probably be deprecated
