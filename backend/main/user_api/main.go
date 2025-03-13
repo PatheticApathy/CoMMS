@@ -26,13 +26,14 @@ import (
 //	@contact.name	Comms group
 //	@contact.url	http://github.com/PatheticApathy/CoMMS
 
-//> @securityDefinitions.apikey ApiKeyAuth
-//	@in header
-//	@name Authorization
-//	@tokenUrl localhost:8082/user/login
-
-//	@host		localhost:8082
-//	@BasePath	/
+// @host						localhost:8082
+// @BasePath					/
+//
+// @securityDefinitions.apikey	identity
+// @in							header
+// @name						Authorization
+// @tokenUrl					localhost:8082/user/login
+// @description				gives read and write access to api
 //
 // @externalDocs.description	OpenAPI
 // @externalDocs.url			https://swagger.io/resources/open-api/

@@ -149,6 +149,7 @@ func (e *Env) SignUp(w http.ResponseWriter, r *http.Request) {
 //
 //	@Summary		post user to database
 //	@Description	Adds user to the database using valid json structure
+//	@Security identity
 //	@Tags			users
 //	@Accept			json
 //	@Produce		json

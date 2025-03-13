@@ -14,6 +14,7 @@ import (
 //
 //		@Summary		Authenticate user information
 //		@Description	Pulls user login information and authenticates the user
+//		@Description  The id can be left blank
 //		@Tags			users
 //	  @Accept			json
 //		@Param			users	body		auth.UnEncrypted		true	"Format of login user request"

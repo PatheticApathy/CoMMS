@@ -117,9 +117,6 @@ definitions:
       username:
         type: string
     type: object
-externalDocs:
-  description: OpenAPI
-  url: https://swagger.io/resources/open-api/
 host: localhost:8082
 info:
   contact:
@@ -174,6 +171,8 @@ paths:
           description: Failed to create user
           schema:
             type: string
+      security:
+      - identity: []
       summary: post user to database
       tags:
       - users
@@ -360,4 +359,10 @@ paths:
       summary: updates user based on given paremeters
       tags:
       - users
+securityDefinitions:
+  identity:
+    description: gives read and write access to api
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

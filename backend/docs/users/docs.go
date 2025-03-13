@@ -47,6 +47,11 @@ const docTemplate = `{
         },
         "/user/create": {
             "post": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Adds user to the database using valid json structure",
                 "consumes": [
                     "application/json"
@@ -553,9 +558,13 @@ const docTemplate = `{
             }
         }
     },
-    "externalDocs": {
-        "description": "OpenAPI",
-        "url": "https://swagger.io/resources/open-api/"
+    "securityDefinitions": {
+        "identity": {
+            "description": "gives read and write access to api",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
     }
 }`
 
