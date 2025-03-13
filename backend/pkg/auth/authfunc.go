@@ -1,3 +1,5 @@
+// WARNING: LEGACY CODE
+// WARNING: WIll probably be deprecated
 package auth
 
 import (
@@ -46,19 +48,19 @@ func Hash(input string) string {
 }
 
 // takes a username and pass and checks the password against the database to verify the account.
-func CheckUserAndPass(queries *user_db.Queries, ctxt context.Context, userandpass *UnEncrypted) error {
+func CheckUserAndPass(queries *user_db.Queries, ctxt context.Context, userandpass *UnEncrypted) (user_db.GetUserAndPassRow, error) {
 	user_n_id, err := queries.GetUserAndPass(ctxt, userandpass.Username)
 	if err != nil {
 		log.Println(err)
-		return err
+		return user_db.GetUserAndPassRow{}, err
 	}
 
 	hashedpass := Hash(userandpass.Password)
 	if hashedpass != user_n_id.Password {
-		return errors.New("Invalid Pass")
+		return user_db.GetUserAndPassRow{}, errors.New("invalid Pass")
 	}
 	userandpass.Id = user_n_id.ID
-	return nil
+	return user_n_id, nil
 }
 
 // Experimental below
@@ -169,6 +171,7 @@ func WriteEncryptedToken(token []byte, secretKey []byte) (string, error) {
 	// Set the cookie value to the encryptedValue.
 	return string(encryptedValue), nil
 }
+
 func ReadEncrypted(r *http.Request, name string, secretKey []byte) (UnEncrypted, error) {
 	var userandpass UnEncrypted
 	// Read the encrypted value from the cookie as normal.

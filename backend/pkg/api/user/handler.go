@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"strconv"
 
-	auth "github.com/PatheticApathy/CoMMS/pkg/auth"
-	user_db "github.com/PatheticApathy/CoMMS/pkg/databases/userdb"
+	"github.com/PatheticApathy/CoMMS/pkg/auth"
+	"github.com/PatheticApathy/CoMMS/pkg/databases/userdb"
 
 	_ "modernc.org/sqlite"
 )
@@ -20,7 +20,7 @@ import (
 //	@Tags			users
 //	@Produce		json
 //	@Param			id	query		int				true	"user's identification number"
-//	@Success		200	{object}	user_db.User	"users"
+//	@Success		200	{object}	userdb.User	"users"
 //	@Failure		400	{string}	string			"Invalid id"
 //	@Failure		500	{string}	string			"Internal Server Error"
 //	@Router			/user/search [get]
@@ -61,7 +61,7 @@ func (e *Env) getUser(w http.ResponseWriter, r *http.Request) {
 //	@Description	Gets users
 //	@Tags			users
 //	@Produce		json
-//	@Success		200	{object}	user_db.User	"users"
+//	@Success		200	{object}	userdb.User	"users"
 //	@Failure		500	{string}	string			"Faliled to get users"
 //	@Router			/user/all [get]
 func (e *Env) getUsers(w http.ResponseWriter, r *http.Request) {
@@ -90,7 +90,7 @@ func (e *Env) getUsers(w http.ResponseWriter, r *http.Request) {
 //	@Tags			users
 //	@Accept			json
 //	@Produce		json
-//	@Param			users	body		user_db.SignUpParams	true	"Format of signup user request"
+//	@Param			users	body		userdb.SignUpParams	true	"Format of signup user request"
 //	@Success		200		{object}	auth.Token			"User login token"
 //	@Failure		400		{string}	string					"Invalid input"
 //	@Failure		500		{string}	string					"Failed to signup user"
@@ -98,7 +98,7 @@ func (e *Env) getUsers(w http.ResponseWriter, r *http.Request) {
 func (e *Env) SignUp(w http.ResponseWriter, r *http.Request) {
 	log.Println("Handling SignUp request")
 
-	var params user_db.SignUpParams
+	var params userdb.SignUpParams
 
 	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
 		log.Printf("Failed to decode request body, reason: %v", err)
@@ -109,11 +109,6 @@ func (e *Env) SignUp(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Received signup request for username: %s", params.Username)
 
 	log.Println("Hashing user password")
-
-	userandpass := auth.UnEncrypted{
-		Username: params.Username,
-		Password: params.Password,
-	}
 
 	params.Password = auth.Hash(params.Password)
 
@@ -126,43 +121,28 @@ func (e *Env) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("User successfully created: %+v", user)
+	// create token and save public key
+	identity := auth.Identity{
+		Username: user.Username,
+		Password: user.Password,
+		ID:       user.ID,
+	}
 
-	log.Println("Marshaling user credentials for cookie storage")
-	jsonUserandPass, err := json.Marshal(userandpass)
+	token, err := auth.CreateToken(identity, []byte(e.Secret))
 	if err != nil {
-		log.Printf("Failed to marshal user credentials, reason: %v", err)
-		http.Error(w, "Server Error", http.StatusInternalServerError)
-	}
-	cookie := http.Cookie{
-		Name:     "LoginCookie",
-		Value:    string(jsonUserandPass),
-		Path:     "/",
-		MaxAge:   0,
-		HttpOnly: true,
-		Secure:   false,
-		SameSite: http.SameSiteLaxMode,
-	}
-
-	log.Println("Writing encrypted cookie")
-	encrypted, err := auth.WriteEncrypted(w, cookie, []byte(e.Secret))
-	if err != nil {
-		log.Printf("Failed to write encrypted cookie, reason: %v", err)
-		http.Error(w, "server error", http.StatusInternalServerError)
-	}
-
-	token := auth.Token{
-		Token: encrypted,
-	}
-
-	log.Println("Sending user response")
-	if err := json.NewEncoder(w).Encode(&token); err != nil {
-		log.Printf("Failed to encode user response, reason: %v", err)
+		log.Printf("Could not create id token: %e", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 
-	log.Println("SignUp process completed successfully")
+	// send to client
+	if err := json.NewEncoder(w).Encode(&token); err != nil {
+		log.Printf("Could not encode json token, reason: %e", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("User successfully created: %+v", user)
 }
 
 // createUser handler that adds a user to the the db  godoc
@@ -172,14 +152,14 @@ func (e *Env) SignUp(w http.ResponseWriter, r *http.Request) {
 //	@Tags			users
 //	@Accept			json
 //	@Produce		json
-//	@Param			users	body		user_db.AddUserParams	true	"Format of add user request"
-//	@Success		200		{object}	user_db.User			"users"
+//	@Param			users	body		userdb.AddUserParams	true	"Format of add user request"
+//	@Success		200		{object}	userdb.User			"users"
 //	@Failure		400		{string}	string					"Invalid input"
 //	@Failure		500		{string}	string					"Failed to create user"
 //	@Router			/user/create [post]
 func (e *Env) createUser(w http.ResponseWriter, r *http.Request) {
 	log.Println("Handling createUser request")
-	var params user_db.AddUserParams
+	var params userdb.AddUserParams
 	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
 		log.Printf("Failed to decode request body, reason: %v", err)
 		http.Error(w, "Invalid input", http.StatusBadRequest)
@@ -211,14 +191,14 @@ func (e *Env) createUser(w http.ResponseWriter, r *http.Request) {
 //	@Description	Updates user using id(may add more parameters later)
 //	@Tags			users
 //	@Produce		json
-//	@Param			users	body		user_db.UpdateUserParams	true	"Format of update user request"
-//	@Success		200		{object}	user_db.User				"users"
+//	@Param			users	body		userdb.UpdateUserParams	true	"Format of update user request"
+//	@Success		200		{object}	userdb.User				"users"
 //	@Failure		400		{string}	string						"Invalid input"
 //	@Failure		500		{string}	string						"Failed to update user"
 //	@Router			/user/update [put]
 func (e *Env) updateUser(w http.ResponseWriter, r *http.Request) {
 	log.Println("Handling updateUser request")
-	var params user_db.UpdateUserParams
+	var params userdb.UpdateUserParams
 	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
 		log.Printf("Failed to decode request body, reason: %v", err)
 		http.Error(w, "Invalid input", http.StatusBadRequest)
@@ -251,7 +231,7 @@ func (e *Env) updateUser(w http.ResponseWriter, r *http.Request) {
 //	@Tags			users
 //	@Produce		json
 //	@Param			id	query		int				true	"user's identification number"
-//	@Success		200	{object}	user_db.User	"users"
+//	@Success		200	{object}	userdb.User	"users"
 //	@Failure		400	{string}	string			"Invalid user ID"
 //	@Failure		500	{string}	string			"Failed to delete user"
 //	@Router			/user/delete [delete]
