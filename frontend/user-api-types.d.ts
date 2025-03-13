@@ -39,31 +39,6 @@ export interface User {
     Valid: boolean
   }
 
-export interface Company {
-  String: string
-  Valid: boolean
-}
-
-export interface Firstname {
-  String: string
-  Valid: boolean
-}
-
-export interface Lastname {
-  String: string
-  Valid: boolean
-}
-
-export interface Role {
-  String: string
-  Valid: boolean
-}
-
-export interface Site {
-  String: string
-  Valid: boolean
-}
-
 export interface Profilepicture {
   String: string
   Valid: boolean

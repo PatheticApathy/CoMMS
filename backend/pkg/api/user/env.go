@@ -32,5 +32,6 @@ func (e *Env) Handler() http.Handler {
 	mux.HandleFunc("POST /user/logout", e.loggout)
 	mux.HandleFunc("POST /company/create", e.createCompany)
 	mux.HandleFunc("POST /jobsite/create", e.createJobsite)
+	mux.HandleFunc("POST /user/decrypt", e.DecryptHanlder)
 	return mux
 }

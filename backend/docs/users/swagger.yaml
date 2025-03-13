@@ -1,7 +1,14 @@
 basePath: /
 definitions:
-  auth.UserAndPass:
+  auth.Token:
     properties:
+      token:
+        type: string
+    type: object
+  auth.UnEncrypted:
+    properties:
+      id:
+        type: integer
       password:
         type: string
       username:
@@ -187,12 +194,12 @@ paths:
         name: users
         required: true
         schema:
-          $ref: '#/definitions/auth.UserAndPass'
+          $ref: '#/definitions/auth.UnEncrypted'
       responses:
         "200":
-          description: Success
+          description: User login token
           schema:
-            type: string
+            $ref: '#/definitions/auth.Token'
         "400":
           description: Invalid input
           schema:
@@ -247,9 +254,9 @@ paths:
       - application/json
       responses:
         "200":
-          description: users
+          description: User login token
           schema:
-            $ref: '#/definitions/userdb.User'
+            $ref: '#/definitions/auth.Token'
         "400":
           description: Invalid input
           schema:

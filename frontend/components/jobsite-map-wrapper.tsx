@@ -2,6 +2,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { Jobsite } from '@/material-api-types';
 
 // Dynamically import JobsiteMap with ssr disabled
 const JobsiteMap = dynamic(() => import("@/components/jobsite-map"), {
@@ -9,6 +10,6 @@ const JobsiteMap = dynamic(() => import("@/components/jobsite-map"), {
   loading: () => <p>Loading map...</p>,
 });
 
-export default function JobsiteMapWrapper() {
-  return <JobsiteMap />;
+export default function JobsiteMapWrapper({ jobsite }: { jobsite: Jobsite }) {
+  return <JobsiteMap jobsite={jobsite}/>;
 }

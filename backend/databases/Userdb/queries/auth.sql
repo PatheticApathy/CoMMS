@@ -1,2 +1,2 @@
 -- name: GetUserAndPass :one
-SELECT password FROM Users WHERE username = ?;
+SELECT password, id FROM Users WHERE username = ?;
