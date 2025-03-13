@@ -35,13 +35,13 @@ func TestAuth(t *testing.T) {
 			String: "Bobbert",
 			Valid:  true,
 		},
-		Company: sql.NullString{
-			String: "BobCo",
-			Valid:  true,
+		CompanyID: sql.NullInt64{
+			Int64: 1,
+			Valid: true,
 		},
-		Site: sql.NullString{
-			String: "BobbyTown",
-			Valid:  true,
+		JobsiteID: sql.NullInt64{
+			Int64: 1,
+			Valid: true,
 		},
 		Role: sql.NullString{
 			String: "user",
