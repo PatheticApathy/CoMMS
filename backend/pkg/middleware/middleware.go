@@ -30,7 +30,7 @@ func Logger(next http.Handler) http.Handler {
 }
 
 // Auth middlware locks sub routes unless user is authenticated
-func Auth(next http.Handler, secret []byte, e handler.Env, role string) http.Handler {
+func Auth(next http.Handler, secret []byte, e *handler.Env, role string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token := r.Header.Get("Authorization")
 		payload, err := auth.VerifyToken(token, []byte(e.Secret))
@@ -49,7 +49,7 @@ func Auth(next http.Handler, secret []byte, e handler.Env, role string) http.Han
 
 		if validation.Password == payload.Password && validation.Username == payload.Username {
 
-			if !payload.Role.Valid {
+			if role != "" && !payload.Role.Valid {
 				log.Print("If your seeing this message it's because your test account does not have a role. Fix it lol")
 				http.Error(w, "Invalid Credentials", http.StatusBadRequest)
 				return
