@@ -8,14 +8,31 @@ import (
 	"database/sql"
 )
 
+type Company struct {
+	ID          int64           `json:"id"`
+	Name        string          `json:"name"`
+	Addr        sql.NullString  `json:"addr"`
+	LocationLat sql.NullFloat64 `json:"location_lat"`
+	LocationLng sql.NullFloat64 `json:"location_lng"`
+}
+
+type JobSite struct {
+	ID          int64           `json:"id"`
+	Name        string          `json:"name"`
+	Addr        sql.NullString  `json:"addr"`
+	LocationLat sql.NullFloat64 `json:"location_lat"`
+	LocationLng sql.NullFloat64 `json:"location_lng"`
+	CompanyID   sql.NullInt64   `json:"company_id"`
+}
+
 type User struct {
 	ID             int64          `json:"id"`
 	Username       string         `json:"username"`
 	Password       string         `json:"password"`
 	Firstname      sql.NullString `json:"firstname"`
 	Lastname       sql.NullString `json:"lastname"`
-	Company        sql.NullString `json:"company"`
-	Site           sql.NullString `json:"site"`
+	CompanyID      sql.NullInt64  `json:"company_id"`
+	JobsiteID      sql.NullInt64  `json:"jobsite_id"`
 	Role           sql.NullString `json:"role"`
 	Email          string         `json:"email"`
 	Phone          string         `json:"phone"`
