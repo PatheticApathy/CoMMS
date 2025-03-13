@@ -320,7 +320,7 @@ paths:
         "200":
           description: User login token
           schema:
-            $ref: '#/definitions/auth.Token'
+            type: string
         "400":
           description: Invalid input
           schema:

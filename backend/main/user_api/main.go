@@ -26,6 +26,10 @@ import (
 //	@contact.name	Comms group
 //	@contact.url	http://github.com/PatheticApathy/CoMMS
 
+//> @securityDefinitions.apikey identity
+//	@in header
+//	@name Authorization
+
 //	@host		localhost:8082
 //	@BasePath	/
 //

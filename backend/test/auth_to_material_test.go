@@ -118,7 +118,7 @@ func TestAdminSignupToAddMaterial(t *testing.T) {
 		resp.Body.Close()
 	}()
 
-	t.Logf("\n\nAuthorization token is %s\n\n", token)
+	t.Logf("Authorization token is %s", token)
 
 	// add material
 	add := materialdb.AddMaterialParams{
