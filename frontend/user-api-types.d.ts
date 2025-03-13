@@ -1,7 +1,7 @@
 //********************************* User related types ***********************************
 
 export interface User {
-    company: Company
+    company_id: CompanyID
     email: string
     firstname: Firstname
     id: number
@@ -9,13 +9,13 @@ export interface User {
     password: string
     phone: string
     role: Role
-    site: Site
+    jobsite_id: JobSiteID
     username: string
     profilepicture: Profilepicture
   }
   
-  export interface Company {
-    String: string
+  export interface CompanyID {
+    Int64: number
     Valid: boolean
   }
   
@@ -34,8 +34,8 @@ export interface User {
     Valid: boolean
   }
   
-  export interface Site {
-    String: string
+  export interface JobSiteID {
+    Int64: number
     Valid: boolean
   }
 
@@ -49,4 +49,34 @@ export interface SignUpUser {
   password: string
   phone: string
   username: string
+}
+
+export interface UpdateUserParams {
+  username: {String: string, Valid: boolean}
+  password: {String: string, Valid: boolean}
+  firstname: {String: string, Valid: boolean}
+  lastname: {String: string, Valid: boolean}
+  role: {String: string, Valid: boolean}
+  email: {String: string, Valid: boolean}
+  phone: {String: string, Valid: boolean}
+  profilepicture: string
+  jobsite_id: JobSiteID
+  company_id: CompanyID
+}
+
+export interface LocationLat {
+  Float64: number
+  Valid: boolean
+}
+
+export interface LocationLng {
+  Float64: number
+  Valid: boolean
+}
+
+export interface AddCompanyParams {
+  Name: string
+  Addr: string
+  LocationLat: LocationLat
+  LocationLng: LocationLng
 }

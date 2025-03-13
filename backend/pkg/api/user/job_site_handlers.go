@@ -1,4 +1,4 @@
-package material
+package handler
 
 import (
 	"encoding/json"
@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/PatheticApathy/CoMMS/pkg/databases/materialdb"
+	"github.com/PatheticApathy/CoMMS/pkg/databases/userdb"
 )
 
 // getJobSite hanlder returns a jobsite based on given parameters godoc
@@ -16,7 +16,7 @@ import (
 //	@Tags			sites
 //	@Produce		json
 //	@Param			id	query		int					true	"jobsite's identification number"
-//	@Success		200	{object}	materialdb.JobSite	"job site"
+//	@Success		200	{object}	userdb.JobSite	"job site"
 //	@Failure		400	{string} string	"bad request"
 //	@Failure		500	{string}	string "Internal Server Error"
 //	@Router			/sites/search [get]
@@ -54,13 +54,13 @@ func (e *Env) getJobSiteHandler(w http.ResponseWriter, r *http.Request) {
 //	@Tags			sites
 //	@Accept			json
 //	@Produce		json
-//	@Param			jobsite	body		materialdb.AddJobSiteParams	true	"Format of add jobsite request"
-//	@Success		200		{object}	materialdb.JobSite				"jobsite"
+//	@Param			jobsite	body		userdb.AddJobSiteParams	true	"Format of add jobsite request"
+//	@Success		200		{object}	userdb.JobSite				"jobsite"
 //	@Failure		400		{string}	string "bad request"
 //	@Failure		500		{string}	string "Internal Server Error"
 //	@Router			/sites/add [post]
 func (e *Env) addJobSiteHandler(w http.ResponseWriter, r *http.Request) {
-	var args materialdb.AddJobSiteParams
+	var args userdb.AddJobSiteParams
 	if err := json.NewDecoder(r.Body).Decode(&args); err != nil {
 		log.Printf("Could not decode json jobsite, reason: %e", err)
 		http.Error(w, "Invalid Request", http.StatusBadRequest)
@@ -88,7 +88,7 @@ func (e *Env) addJobSiteHandler(w http.ResponseWriter, r *http.Request) {
 //	@Description	Get all jobsites
 //	@Tags			sites
 //	@Produce		json
-//	@Success		200	 {array} 	materialdb.JobSite	"job site"
+//	@Success		200	 {array} 	userdb.JobSite	"job site"
 //	@Failure		500	 {string} 	"Internal Server Error"
 //	@Router			/sites/all [get]
 func (e *Env) getAllJobSitesHandler(w http.ResponseWriter, r *http.Request) {

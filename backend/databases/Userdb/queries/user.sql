@@ -25,18 +25,6 @@ SET
     profilepicture = COALESCE(?,profilepicture)
 WHERE id = ? RETURNING *;
 
--- name: UpdateUserUsername :one
-UPDATE Users SET username = ? WHERE id = ? RETURNING *;
-
--- name: UpdateUserPassword :one
-UPDATE Users SET password = ? WHERE id = ? RETURNING *;
-
--- name: UpdateUserFirstname :one
-UPDATE Users SET firstname = ? WHERE id = ? RETURNING *;
-
--- name: UpdateUserLastname :one
-UPDATE Users SET lastname = ? WHERE id = ? RETURNING *;
-
 -- name: UpdateUserCompany :one
 UPDATE Users SET company_id = ? WHERE id = ? RETURNING *;
 
