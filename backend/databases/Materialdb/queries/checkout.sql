@@ -9,6 +9,7 @@ SET checkin_time = date()
 WHERE id = ?
 RETURNING *;
 
+
 -- name: GetAllCheckoutLogs :many
 SELECT * 
 FROM  CheckoutLogs;

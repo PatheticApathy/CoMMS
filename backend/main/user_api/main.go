@@ -9,7 +9,6 @@ import (
 	"net/url"
 	"os"
 
-	_ "github.com/PatheticApathy/CoMMS/docs/users"
 	handler "github.com/PatheticApathy/CoMMS/pkg/api/user"
 	"github.com/joho/godotenv"
 	httpSwagger "github.com/swaggo/http-swagger"
