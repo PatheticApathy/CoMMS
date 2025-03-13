@@ -127,7 +127,7 @@ func (e *Env) getUsers(w http.ResponseWriter, r *http.Request) {
 //	@Tags			users
 //	@Accept			json
 //	@Produce		json
-//	@Param			users	body		user_db.SignUpParams	true	"Format of signup user request"
+//	@Param			users	body		userdb.SignUpParams	true	"Format of signup user request"
 //	@Success		200		{object}	auth.Token			"User login token"
 //	@Failure		400		{string}	string					"Invalid input"
 //	@Failure		500		{string}	string					"Failed to signup user"

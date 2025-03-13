@@ -184,6 +184,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/company/create": {
+            "post": {
+                "description": "Adds company to the database and assigns the user as a company admin",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "companies"
+                ],
+                "summary": "post company to database",
+                "parameters": [
+                    {
+                        "description": "Format of add company request",
+                        "name": "company",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/userdb.AddCompanyParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "company",
+                        "schema": {
+                            "$ref": "#/definitions/userdb.Company"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to create company",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/material/add": {
             "post": {
                 "description": "Adds materials to the database using valid json structure",
@@ -646,7 +692,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/materialdb.AddJobSiteParams"
+                            "$ref": "#/definitions/userdb.AddJobSiteParams"
                         }
                     }
                 ],
@@ -654,7 +700,7 @@ const docTemplate = `{
                     "200": {
                         "description": "jobsite",
                         "schema": {
-                            "$ref": "#/definitions/materialdb.JobSite"
+                            "$ref": "#/definitions/userdb.JobSite"
                         }
                     },
                     "400": {
@@ -688,7 +734,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/materialdb.JobSite"
+                                "$ref": "#/definitions/userdb.JobSite"
                             }
                         }
                     },
@@ -724,50 +770,7 @@ const docTemplate = `{
                     "200": {
                         "description": "job site",
                         "schema": {
-                            "$ref": "#/definitions/materialdb.JobSite"
-                        }
-                    },
-                    "400": {
-                        "description": "bad request",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/user/add": {
-            "post": {
-                "description": "The use defined in the material database is only the bear essentials for logging",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "adds user to the material database",
-                "parameters": [
-                    {
-                        "description": "Format of add user request",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/materialdb.AddUserParams"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "user",
-                        "schema": {
-                            "$ref": "#/definitions/materialdb.User"
+                            "$ref": "#/definitions/userdb.JobSite"
                         }
                     },
                     "400": {
@@ -857,6 +860,49 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/decrypt": {
+            "post": {
+                "description": "Decrypt user login token",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Decrypts token",
+                "parameters": [
+                    {
+                        "description": "Format of login user request",
+                        "name": "users",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.Token"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User login data token",
+                        "schema": {
+                            "$ref": "#/definitions/auth.UnEncrypted"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/user/delete": {
             "delete": {
                 "description": "Deletes user using id(may add more parameters later)",
@@ -938,15 +984,15 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/auth.UserAndPass"
+                            "$ref": "#/definitions/auth.UnEncrypted"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Success",
+                        "description": "User login token",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/auth.Token"
                         }
                     },
                     "400": {
@@ -966,7 +1012,7 @@ const docTemplate = `{
         },
         "/user/search": {
             "get": {
-                "description": "Gets user using id(may add more parameters later)",
+                "description": "Gets user using username",
                 "produces": [
                     "application/json"
                 ],
@@ -976,9 +1022,9 @@ const docTemplate = `{
                 "summary": "fetches user based on given paremeters",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "user's identification number",
-                        "name": "id",
+                        "name": "username",
                         "in": "query",
                         "required": true
                     }
@@ -991,7 +1037,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Invalid id",
+                        "description": "Invalid username",
                         "schema": {
                             "type": "string"
                         }
@@ -1031,9 +1077,9 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "users",
+                        "description": "User login token",
                         "schema": {
-                            "$ref": "#/definitions/userdb.User"
+                            "$ref": "#/definitions/auth.Token"
                         }
                     },
                     "400": {
@@ -1068,8 +1114,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/userdb.UpdateUserParams"
                         }
                     }
                 ],
@@ -1094,51 +1139,23 @@ const docTemplate = `{
                     }
                 }
             }
-        },
-        "/user/{id}": {
-            "get": {
-                "description": "gets user from db",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "get user from the material database",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "name": "id",
-                        "in": "path"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "user",
-                        "schema": {
-                            "$ref": "#/definitions/materialdb.User"
-                        }
-                    },
-                    "400": {
-                        "description": "bad request",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {
-        "auth.UserAndPass": {
+        "auth.Token": {
             "type": "object",
             "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "auth.UnEncrypted": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
                 "password": {
                     "type": "string"
                 },
@@ -1155,23 +1172,6 @@ const docTemplate = `{
                 },
                 "user_id": {
                     "type": "integer"
-                }
-            }
-        },
-        "materialdb.AddJobSiteParams": {
-            "type": "object",
-            "properties": {
-                "addr": {
-                    "$ref": "#/definitions/sql.NullString"
-                },
-                "location_lat": {
-                    "$ref": "#/definitions/sql.NullFloat64"
-                },
-                "location_lng": {
-                    "$ref": "#/definitions/sql.NullFloat64"
-                },
-                "name": {
-                    "type": "string"
                 }
             }
         },
@@ -1221,17 +1221,6 @@ const docTemplate = `{
                 }
             }
         },
-        "materialdb.AddUserParams": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "site_id": {
-                    "$ref": "#/definitions/sql.NullInt64"
-                }
-            }
-        },
         "materialdb.ChangeMaterialNoteParams": {
             "type": "object",
             "properties": {
@@ -1271,26 +1260,6 @@ const docTemplate = `{
                 },
                 "user_id": {
                     "type": "integer"
-                }
-            }
-        },
-        "materialdb.JobSite": {
-            "type": "object",
-            "properties": {
-                "addr": {
-                    "$ref": "#/definitions/sql.NullString"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "location_lat": {
-                    "$ref": "#/definitions/sql.NullFloat64"
-                },
-                "location_lng": {
-                    "$ref": "#/definitions/sql.NullFloat64"
-                },
-                "name": {
-                    "type": "string"
                 }
             }
         },
@@ -1350,17 +1319,6 @@ const docTemplate = `{
                 }
             }
         },
-        "materialdb.User": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "site_id": {
-                    "$ref": "#/definitions/sql.NullInt64"
-                }
-            }
-        },
         "sql.NullFloat64": {
             "type": "object",
             "properties": {
@@ -1409,17 +1367,57 @@ const docTemplate = `{
                 }
             }
         },
+        "userdb.AddCompanyParams": {
+            "type": "object",
+            "properties": {
+                "addr": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "location_lat": {
+                    "$ref": "#/definitions/sql.NullFloat64"
+                },
+                "location_lng": {
+                    "$ref": "#/definitions/sql.NullFloat64"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "userdb.AddJobSiteParams": {
+            "type": "object",
+            "properties": {
+                "addr": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "company_id": {
+                    "$ref": "#/definitions/sql.NullInt64"
+                },
+                "location_lat": {
+                    "$ref": "#/definitions/sql.NullFloat64"
+                },
+                "location_lng": {
+                    "$ref": "#/definitions/sql.NullFloat64"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "userdb.AddUserParams": {
             "type": "object",
             "properties": {
-                "company": {
-                    "$ref": "#/definitions/sql.NullString"
+                "company_id": {
+                    "$ref": "#/definitions/sql.NullInt64"
                 },
                 "email": {
                     "type": "string"
                 },
                 "firstname": {
                     "$ref": "#/definitions/sql.NullString"
+                },
+                "jobsite_id": {
+                    "$ref": "#/definitions/sql.NullInt64"
                 },
                 "lastname": {
                     "$ref": "#/definitions/sql.NullString"
@@ -1436,10 +1434,50 @@ const docTemplate = `{
                 "role": {
                     "$ref": "#/definitions/sql.NullString"
                 },
-                "site": {
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "userdb.Company": {
+            "type": "object",
+            "properties": {
+                "addr": {
                     "$ref": "#/definitions/sql.NullString"
                 },
-                "username": {
+                "id": {
+                    "type": "integer"
+                },
+                "location_lat": {
+                    "$ref": "#/definitions/sql.NullFloat64"
+                },
+                "location_lng": {
+                    "$ref": "#/definitions/sql.NullFloat64"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "userdb.JobSite": {
+            "type": "object",
+            "properties": {
+                "addr": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "company_id": {
+                    "$ref": "#/definitions/sql.NullInt64"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "location_lat": {
+                    "$ref": "#/definitions/sql.NullFloat64"
+                },
+                "location_lng": {
+                    "$ref": "#/definitions/sql.NullFloat64"
+                },
+                "name": {
                     "type": "string"
                 }
             }
@@ -1461,11 +1499,49 @@ const docTemplate = `{
                 }
             }
         },
+        "userdb.UpdateUserParams": {
+            "type": "object",
+            "properties": {
+                "company_id": {
+                    "$ref": "#/definitions/sql.NullInt64"
+                },
+                "email": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "firstname": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "jobsite_id": {
+                    "$ref": "#/definitions/sql.NullInt64"
+                },
+                "lastname": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "password": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "phone": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "profilepicture": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "role": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "username": {
+                    "$ref": "#/definitions/sql.NullString"
+                }
+            }
+        },
         "userdb.User": {
             "type": "object",
             "properties": {
-                "company": {
-                    "$ref": "#/definitions/sql.NullString"
+                "company_id": {
+                    "$ref": "#/definitions/sql.NullInt64"
                 },
                 "email": {
                     "type": "string"
@@ -1475,6 +1551,9 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "jobsite_id": {
+                    "$ref": "#/definitions/sql.NullInt64"
                 },
                 "lastname": {
                     "$ref": "#/definitions/sql.NullString"
@@ -1489,9 +1568,6 @@ const docTemplate = `{
                     "$ref": "#/definitions/sql.NullString"
                 },
                 "role": {
-                    "$ref": "#/definitions/sql.NullString"
-                },
-                "site": {
                     "$ref": "#/definitions/sql.NullString"
                 },
                 "username": {

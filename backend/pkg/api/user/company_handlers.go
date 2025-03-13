@@ -18,8 +18,8 @@ import (
 //	@Tags			companies
 //	@Accept			json
 //	@Produce		json
-//	@Param			company	body		AddCompanyParams	true	"Format of add company request"
-//	@Success		200		{object}	user_db.Company		"company"
+//	@Param			company	body		userdb.AddCompanyParams	true	"Format of add company request"
+//	@Success		200		{object}	userdb.Company		"company"
 //	@Failure		400		{string}	string				"Invalid input"
 //	@Failure		500		{string}	string				"Failed to create company"
 //	@Router			/company/create [post]
@@ -50,5 +50,4 @@ func (e *Env) createCompany(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Println("Company response successfully sent")
-
 }
