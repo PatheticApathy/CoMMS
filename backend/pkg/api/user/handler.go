@@ -259,10 +259,6 @@ func (e *Env) updateUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
-
-	log.Println("User successfully updated")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("User updated successfully"))
 }
 
 // deleteUser hanlder removes a user based on given parameters godoc
@@ -301,6 +297,4 @@ func (e *Env) deleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Printf("User with ID: %d successfully deleted", userID)
-	w.Write([]byte("User deleted"))
-	log.Println("Delete user response successfully sent")
 }

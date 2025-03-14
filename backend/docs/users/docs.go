@@ -477,7 +477,7 @@ const docTemplate = `{
                     "200": {
                         "description": "User login token",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/auth.Token"
                         }
                     },
                     "400": {
