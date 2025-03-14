@@ -19,51 +19,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/checkout/recent": {
-            "get": {
-                "description": "Safer and faster way to get newest checkout logs for given material",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "checkout logs"
-                ],
-                "summary": "fetches recent checkout logs for a given material id",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "id of material",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "checkout logs",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/materialdb.CheckoutLog"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "bad request",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/checkouts/all": {
+        "/checkout/all": {
             "get": {
                 "description": "gets all checkout logs if they exist",
                 "produces": [
@@ -92,7 +48,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/checkouts/in": {
+        "/checkout/in": {
             "put": {
                 "description": "Adds checkin time to existing checkout log",
                 "consumes": [
@@ -138,7 +94,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/checkouts/out": {
+        "/checkout/out": {
             "post": {
                 "description": "Adds checkout log for a materials",
                 "consumes": [
@@ -167,6 +123,50 @@ const docTemplate = `{
                         "description": "checkout log",
                         "schema": {
                             "$ref": "#/definitions/materialdb.CheckoutLog"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/checkout/recent": {
+            "get": {
+                "description": "Safer and faster way to get newest checkout logs for given material",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "checkout logs"
+                ],
+                "summary": "fetches recent checkout logs for a given material id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "id of material",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "checkout logs",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/materialdb.CheckoutLog"
+                            }
                         }
                     },
                     "400": {
@@ -280,6 +280,49 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "material",
+                        "schema": {
+                            "$ref": "#/definitions/materialdb.Material"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/material/delete": {
+            "delete": {
+                "description": "deltes material from database",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "material"
+                ],
+                "summary": "deletes material",
+                "parameters": [
+                    {
+                        "description": "Id of material to delete",
+                        "name": "id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "delted material",
                         "schema": {
                             "$ref": "#/definitions/materialdb.Material"
                         }
@@ -855,6 +898,72 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/loggout": {
+            "post": {
+                "description": "Replaces login cookie with an empty one that deletes itself instantly",
+                "tags": [
+                    "users"
+                ],
+                "summary": "Removes authenticated user information",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/login": {
+            "post": {
+                "description": "Pulls user login information and authenticates the user",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Authenticate user information",
+                "parameters": [
+                    {
+                        "description": "Format of login user request",
+                        "name": "users",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.UserAndPass"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/user/search": {
             "get": {
                 "description": "Gets user using id(may add more parameters later)",
@@ -951,7 +1060,7 @@ const docTemplate = `{
                 "tags": [
                     "users"
                 ],
-                "summary": "updates user based on given paremeters",
+                "summary": "updates user based on given parameters",
                 "parameters": [
                     {
                         "description": "Format of update user request",
@@ -959,7 +1068,8 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/userdb.UpdateUserParams"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 ],
@@ -1026,6 +1136,17 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "auth.UserAndPass": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "materialdb.AddCheckoutLogParams": {
             "type": "object",
             "properties": {
@@ -1334,44 +1455,6 @@ const docTemplate = `{
                 },
                 "phone": {
                     "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "userdb.UpdateUserParams": {
-            "type": "object",
-            "properties": {
-                "company": {
-                    "$ref": "#/definitions/sql.NullString"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "firstname": {
-                    "$ref": "#/definitions/sql.NullString"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "lastname": {
-                    "$ref": "#/definitions/sql.NullString"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "phone": {
-                    "type": "string"
-                },
-                "profilepicture": {
-                    "$ref": "#/definitions/sql.NullString"
-                },
-                "role": {
-                    "$ref": "#/definitions/sql.NullString"
-                },
-                "site": {
-                    "$ref": "#/definitions/sql.NullString"
                 },
                 "username": {
                     "type": "string"
