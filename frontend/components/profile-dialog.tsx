@@ -36,6 +36,12 @@ import { getCookie } from "./cookie-functions"
     }).then(res => res.json())
 }*/
 
+/*async function deleteUsers(url: string) {
+    return fetch(url, {
+        method: 'DELETE',
+    }).then(res=>res.json())
+}*/
+
 const fetcher = async  (url: string) => {
     const res = await fetch(url)
     if (!res.ok) {
@@ -55,6 +61,12 @@ export function Profile() {
     //console.log("ID: ", tokenData.id)
 
     //let id = tokenData.id
+
+    /*for (let i = 12; i < 100; i++)
+    {
+        const { mutate } = useSWR(`api/user/delete?id=${i}`, deleteUsers)
+        mutate()
+    }*/
 
     const { data: user, error: error3 } = useSWR<User, string>( `api/user/search?id=1`, fetcher);
 
