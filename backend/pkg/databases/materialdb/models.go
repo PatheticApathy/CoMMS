@@ -46,8 +46,3 @@ type MaterialLog struct {
 	QuantityChange int64          `json:"quantity_change"`
 	Timestamp      time.Time      `json:"timestamp"`
 }
-
-type User struct {
-	ID     int64         `json:"id"`
-	SiteID sql.NullInt64 `json:"site_id"`
-}
