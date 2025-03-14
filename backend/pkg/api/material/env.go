@@ -34,6 +34,7 @@ func (e *Env) materialHandlers() http.Handler {
 	mux.HandleFunc("POST /add", e.postMaterialHandler)
 	mux.HandleFunc("GET /all", e.getAllMaterial)
 	mux.HandleFunc("PUT /change", e.changeMaterialQuantity)
+	mux.HandleFunc("DELETE /delete", e.deleteMaterialHandler)
 	return mux
 }
 
@@ -49,15 +50,18 @@ func (e *Env) materialLogHandlers() http.Handler {
 
 func (e *Env) jobSiteHandlers() http.Handler {
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /search", e.getMaterialHandler)
-	mux.HandleFunc("GET /all", e.getAllMaterialLogsHandler)
+
+	// TODO: Make serach for jobsites
+	mux.HandleFunc("GET /search", e.getAllMaterialLogsHandler)
+
+	mux.HandleFunc("GET /all", e.getAllJobSitesHandler)
 	mux.HandleFunc("POST /add", e.addJobSiteHandler)
 	return mux
 }
 
 func (e *Env) checkoutHandlers() http.Handler {
 	mux := http.NewServeMux()
-	mux.HandleFunc("Get /all", e.getAllCheckoutLogs)
+	mux.HandleFunc("GET /all", e.getAllCheckoutLogs)
 	mux.HandleFunc("POST /out", e.postCheckout)
 	mux.HandleFunc("PUT /in", e.putCheckin)
 	mux.HandleFunc("GET /recent", e.getRecentCheckoutLogsForMaterialHandler)

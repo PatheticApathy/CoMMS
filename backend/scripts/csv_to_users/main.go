@@ -10,6 +10,7 @@ import (
 	"log"
 	"os"
 
+	auth "github.com/PatheticApathy/CoMMS/pkg/auth"
 	user_db "github.com/PatheticApathy/CoMMS/pkg/databases/userdb"
 	_ "modernc.org/sqlite"
 )
@@ -62,7 +63,7 @@ func main() {
 
 		user := user_db.AddUserParams{
 			Username: row[0],
-			Password: row[1],
+			Password: auth.Hash(row[1]),
 			Firstname: sql.NullString{
 				String: row[2],
 				Valid:  true,
