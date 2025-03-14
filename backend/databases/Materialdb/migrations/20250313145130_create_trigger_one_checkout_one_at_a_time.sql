@@ -1,7 +1,7 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TRIGGER one_at_a_time BEFORE INSERT ON CheckoutLogs
-FOR EACH ROW 
+FOR EACH ROW
 WHEN EXISTS (
  SELECT * FROM CheckoutLogs
  WHERE checkin_time IS NULL 
