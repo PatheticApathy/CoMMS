@@ -17,14 +17,6 @@ type CheckoutLog struct {
 	CheckoutTime time.Time    `json:"checkout_time"`
 }
 
-type JobSite struct {
-	ID          int64           `json:"id"`
-	Name        string          `json:"name"`
-	Addr        sql.NullString  `json:"addr"`
-	LocationLat sql.NullFloat64 `json:"location_lat"`
-	LocationLng sql.NullFloat64 `json:"location_lng"`
-}
-
 type Material struct {
 	ID             int64           `json:"id"`
 	Name           sql.NullString  `json:"name"`
