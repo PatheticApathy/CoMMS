@@ -1,7 +1,25 @@
 basePath: /
 definitions:
-  auth.UserAndPass:
+  auth.Identity:
     properties:
+      id:
+        type: integer
+      password:
+        type: string
+      role:
+        $ref: '#/definitions/sql.NullString'
+      username:
+        type: string
+    type: object
+  auth.Token:
+    properties:
+      token:
+        type: string
+    type: object
+  auth.UnEncrypted:
+    properties:
+      id:
+        type: integer
       password:
         type: string
       username:
@@ -13,17 +31,6 @@ definitions:
         type: integer
       user_id:
         type: integer
-    type: object
-  materialdb.AddJobSiteParams:
-    properties:
-      addr:
-        $ref: '#/definitions/sql.NullString'
-      location_lat:
-        $ref: '#/definitions/sql.NullFloat64'
-      location_lng:
-        $ref: '#/definitions/sql.NullFloat64'
-      name:
-        type: string
     type: object
   materialdb.AddMaterialLogParams:
     properties:
@@ -55,13 +62,6 @@ definitions:
       unit:
         type: string
     type: object
-  materialdb.AddUserParams:
-    properties:
-      id:
-        type: integer
-      site_id:
-        $ref: '#/definitions/sql.NullInt64'
-    type: object
   materialdb.ChangeMaterialNoteParams:
     properties:
       id:
@@ -88,19 +88,6 @@ definitions:
         type: integer
       user_id:
         type: integer
-    type: object
-  materialdb.JobSite:
-    properties:
-      addr:
-        $ref: '#/definitions/sql.NullString'
-      id:
-        type: integer
-      location_lat:
-        $ref: '#/definitions/sql.NullFloat64'
-      location_lng:
-        $ref: '#/definitions/sql.NullFloat64'
-      name:
-        type: string
     type: object
   materialdb.Material:
     properties:
@@ -139,13 +126,6 @@ definitions:
       timestamp:
         type: string
     type: object
-  materialdb.User:
-    properties:
-      id:
-        type: integer
-      site_id:
-        $ref: '#/definitions/sql.NullInt64'
-    type: object
   sql.NullFloat64:
     properties:
       float64:
@@ -178,14 +158,40 @@ definitions:
         description: Valid is true if Time is not NULL
         type: boolean
     type: object
+  userdb.AddCompanyParams:
+    properties:
+      addr:
+        $ref: '#/definitions/sql.NullString'
+      location_lat:
+        $ref: '#/definitions/sql.NullFloat64'
+      location_lng:
+        $ref: '#/definitions/sql.NullFloat64'
+      name:
+        type: string
+    type: object
+  userdb.AddJobSiteParams:
+    properties:
+      addr:
+        $ref: '#/definitions/sql.NullString'
+      company_id:
+        $ref: '#/definitions/sql.NullInt64'
+      location_lat:
+        $ref: '#/definitions/sql.NullFloat64'
+      location_lng:
+        $ref: '#/definitions/sql.NullFloat64'
+      name:
+        type: string
+    type: object
   userdb.AddUserParams:
     properties:
-      company:
-        $ref: '#/definitions/sql.NullString'
+      company_id:
+        $ref: '#/definitions/sql.NullInt64'
       email:
         type: string
       firstname:
         $ref: '#/definitions/sql.NullString'
+      jobsite_id:
+        $ref: '#/definitions/sql.NullInt64'
       lastname:
         $ref: '#/definitions/sql.NullString'
       password:
@@ -196,9 +202,35 @@ definitions:
         $ref: '#/definitions/sql.NullString'
       role:
         $ref: '#/definitions/sql.NullString'
-      site:
-        $ref: '#/definitions/sql.NullString'
       username:
+        type: string
+    type: object
+  userdb.Company:
+    properties:
+      addr:
+        $ref: '#/definitions/sql.NullString'
+      id:
+        type: integer
+      location_lat:
+        $ref: '#/definitions/sql.NullFloat64'
+      location_lng:
+        $ref: '#/definitions/sql.NullFloat64'
+      name:
+        type: string
+    type: object
+  userdb.JobSite:
+    properties:
+      addr:
+        $ref: '#/definitions/sql.NullString'
+      company_id:
+        $ref: '#/definitions/sql.NullInt64'
+      id:
+        type: integer
+      location_lat:
+        $ref: '#/definitions/sql.NullFloat64'
+      location_lng:
+        $ref: '#/definitions/sql.NullFloat64'
+      name:
         type: string
     type: object
   userdb.SignUpParams:
@@ -212,16 +244,43 @@ definitions:
       username:
         type: string
     type: object
+  userdb.UpdateUserParams:
+    properties:
+      company_id:
+        $ref: '#/definitions/sql.NullInt64'
+      email:
+        $ref: '#/definitions/sql.NullString'
+      firstname:
+        $ref: '#/definitions/sql.NullString'
+      id:
+        type: integer
+      jobsite_id:
+        $ref: '#/definitions/sql.NullInt64'
+      lastname:
+        $ref: '#/definitions/sql.NullString'
+      password:
+        $ref: '#/definitions/sql.NullString'
+      phone:
+        $ref: '#/definitions/sql.NullString'
+      profilepicture:
+        $ref: '#/definitions/sql.NullString'
+      role:
+        $ref: '#/definitions/sql.NullString'
+      username:
+        $ref: '#/definitions/sql.NullString'
+    type: object
   userdb.User:
     properties:
-      company:
-        $ref: '#/definitions/sql.NullString'
+      company_id:
+        $ref: '#/definitions/sql.NullInt64'
       email:
         type: string
       firstname:
         $ref: '#/definitions/sql.NullString'
       id:
         type: integer
+      jobsite_id:
+        $ref: '#/definitions/sql.NullInt64'
       lastname:
         $ref: '#/definitions/sql.NullString'
       password:
@@ -231,8 +290,6 @@ definitions:
       profilepicture:
         $ref: '#/definitions/sql.NullString'
       role:
-        $ref: '#/definitions/sql.NullString'
-      site:
         $ref: '#/definitions/sql.NullString'
       username:
         type: string
@@ -359,6 +416,37 @@ paths:
       summary: fetches recent checkout logs for a given material id
       tags:
       - checkout logs
+  /company/create:
+    post:
+      consumes:
+      - application/json
+      description: Adds company to the database and assigns the user as a company
+        admin
+      parameters:
+      - description: Format of add company request
+        in: body
+        name: company
+        required: true
+        schema:
+          $ref: '#/definitions/userdb.AddCompanyParams'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: company
+          schema:
+            $ref: '#/definitions/userdb.Company'
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "500":
+          description: Failed to create company
+          schema:
+            type: string
+      summary: post company to database
+      tags:
+      - companies
   /material/add:
     post:
       description: Adds materials to the database using valid json structure
@@ -660,14 +748,14 @@ paths:
         name: jobsite
         required: true
         schema:
-          $ref: '#/definitions/materialdb.AddJobSiteParams'
+          $ref: '#/definitions/userdb.AddJobSiteParams'
       produces:
       - application/json
       responses:
         "200":
           description: jobsite
           schema:
-            $ref: '#/definitions/materialdb.JobSite'
+            $ref: '#/definitions/userdb.JobSite'
         "400":
           description: bad request
           schema:
@@ -689,7 +777,7 @@ paths:
           description: job site
           schema:
             items:
-              $ref: '#/definitions/materialdb.JobSite'
+              $ref: '#/definitions/userdb.JobSite'
             type: array
         "500":
           description: Internal Server Error
@@ -713,7 +801,7 @@ paths:
         "200":
           description: job site
           schema:
-            $ref: '#/definitions/materialdb.JobSite'
+            $ref: '#/definitions/userdb.JobSite'
         "400":
           description: bad request
           schema:
@@ -725,60 +813,6 @@ paths:
       summary: fetches job_site based on given paremeters
       tags:
       - sites
-  /user/{id}:
-    get:
-      description: gets user from db
-      parameters:
-      - in: path
-        name: id
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: user
-          schema:
-            $ref: '#/definitions/materialdb.User'
-        "400":
-          description: bad request
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            type: string
-      summary: get user from the material database
-      tags:
-      - user
-  /user/add:
-    post:
-      description: The use defined in the material database is only the bear essentials
-        for logging
-      parameters:
-      - description: Format of add user request
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/materialdb.AddUserParams'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: user
-          schema:
-            $ref: '#/definitions/materialdb.User'
-        "400":
-          description: bad request
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            type: string
-      summary: adds user to the material database
-      tags:
-      - user
   /user/all:
     get:
       description: Gets users
@@ -823,7 +857,37 @@ paths:
           description: Failed to create user
           schema:
             type: string
+      security:
+      - identity: []
       summary: post user to database
+      tags:
+      - users
+  /user/decrypt:
+    post:
+      consumes:
+      - application/json
+      description: Decrypt user login token
+      parameters:
+      - description: Format of login user request
+        in: body
+        name: users
+        required: true
+        schema:
+          $ref: '#/definitions/auth.Token'
+      responses:
+        "200":
+          description: User login data token
+          schema:
+            $ref: '#/definitions/auth.Identity'
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Server Error
+          schema:
+            type: string
+      summary: Decrypts token
       tags:
       - users
   /user/delete:
@@ -872,17 +936,19 @@ paths:
     post:
       consumes:
       - application/json
-      description: Pulls user login information and authenticates the user
+      description: |-
+        Pulls user login information and authenticates the user
+        The id can be left blank
       parameters:
       - description: Format of login user request
         in: body
         name: users
         required: true
         schema:
-          $ref: '#/definitions/auth.UserAndPass'
+          $ref: '#/definitions/auth.UnEncrypted'
       responses:
         "200":
-          description: Success
+          description: User login token
           schema:
             type: string
         "400":
@@ -898,13 +964,13 @@ paths:
       - users
   /user/search:
     get:
-      description: Gets user using id(may add more parameters later)
+      description: Gets user using username
       parameters:
       - description: user's identification number
         in: query
-        name: id
+        name: username
         required: true
-        type: integer
+        type: string
       produces:
       - application/json
       responses:
@@ -913,7 +979,7 @@ paths:
           schema:
             $ref: '#/definitions/userdb.User'
         "400":
-          description: Invalid id
+          description: Invalid username
           schema:
             type: string
         "500":
@@ -939,9 +1005,9 @@ paths:
       - application/json
       responses:
         "200":
-          description: users
+          description: User login token
           schema:
-            $ref: '#/definitions/userdb.User'
+            $ref: '#/definitions/auth.Token'
         "400":
           description: Invalid input
           schema:
@@ -962,8 +1028,7 @@ paths:
         name: users
         required: true
         schema:
-          additionalProperties: true
-          type: object
+          $ref: '#/definitions/userdb.UpdateUserParams'
       produces:
       - application/json
       responses:

@@ -21,7 +21,7 @@ func TestAuth(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer db.Close()
-	env := NewEnv(db, "secretsecretpass")
+	env := NewEnv(db, "%��7��$Oh:6�~Y���`�u�%")
 
 	passwrd := auth.Hash("bassword")
 	adduser := user_db.AddUserParams{
@@ -35,13 +35,13 @@ func TestAuth(t *testing.T) {
 			String: "Bobbert",
 			Valid:  true,
 		},
-		Company: sql.NullString{
-			String: "BobCo",
-			Valid:  true,
+		CompanyID: sql.NullInt64{
+			Int64: 1,
+			Valid: true,
 		},
-		Site: sql.NullString{
-			String: "BobbyTown",
-			Valid:  true,
+		JobsiteID: sql.NullInt64{
+			Int64: 1,
+			Valid: true,
 		},
 		Role: sql.NullString{
 			String: "user",

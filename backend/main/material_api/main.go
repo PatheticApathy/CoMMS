@@ -29,6 +29,7 @@ import (
 // @externalDocs.description	OpenAPI
 // @externalDocs.url			https://app.swaggerhub.com/apis/CJW041/material-tracker_api/1.0
 func main() {
+	//TODO: Integration test for adding materials and checkoutlogs for a jobsite/user
 	if err := godotenv.Load(); err != nil {
 		log.Fatalf("No .env file found LOL: %e", err)
 	}
@@ -43,12 +44,19 @@ func main() {
 		log.Fatal("No database path set in environment variable")
 	}
 
+	user_host := os.Getenv("USER_HOST")
+	if err != nil {
+		log.Printf("Warning: user api host not set: %e", err)
+	}
+
 	db, err := sql.Open("sqlite", db_path)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	env := material.NewEnv(db)
+	env.UserHost = user_host
+
 	router := http.NewServeMux()
 	router.Handle("/", env.Handlers())
 	router.Handle("/swagger/", httpSwagger.Handler())

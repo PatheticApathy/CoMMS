@@ -45,7 +45,7 @@ OG=$PWD
 
 ##########setup frontend#################
 cd ./frontend/
-npm install
+npm update --save
 cd $OG
 
 ###########setup backend#################

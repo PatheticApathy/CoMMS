@@ -18,7 +18,7 @@ import (
 //	@Produce		json
 //	@Param			checkoutlg	body		materialdb.AddCheckoutLogParams	true	"Format of add ckeckout log"
 //	@Success		200			{object}	materialdb.CheckoutLog			"checkout log"
-//	@Failure		400			{string} string	"bad request"
+//	@Failure		400			{string} 	string	"bad request"
 //	@Failure		500			{string}	string "Internal Server Error"
 //	@Router			/checkout/out [post]
 func (e *Env) postCheckout(w http.ResponseWriter, r *http.Request) {
@@ -26,6 +26,18 @@ func (e *Env) postCheckout(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewDecoder(r.Body).Decode(&args); err != nil {
 		log.Printf("could not decode to json, reason %e", err)
 		http.Error(w, "bad request", http.StatusBadRequest)
+		return
+	}
+
+	resp, err := http.Get(e.UserHost + "/user/search?id=" + strconv.Itoa(int(args.UserID)))
+	if err != nil {
+		log.Printf("could not connect to user api, reason %e", err)
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+	if resp.StatusCode != http.StatusOK {
+		log.Printf("could not add checkout log, invalid user id: %d", args.UserID)
+		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
 	}
 
