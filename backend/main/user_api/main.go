@@ -92,7 +92,7 @@ func main() {
 
 	env := handler.NewEnv(db, secret)
 	router := http.NewServeMux()
-	router.Handle("/", env.Handler())
+	router.Handle("/", env.Handlers())
 	router.Handle("/material/", http.StripPrefix("/material", mat_proxy))
 	router.Handle("/geo/", http.StripPrefix("/geo", nom_proxy))
 	router.Handle("/map/", http.StripPrefix("/map", osm_proxy))

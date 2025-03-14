@@ -34,13 +34,13 @@ func main() {
 			String: "Doe",
 			Valid:  true,
 		},
-		Company: sql.NullString{
-			String: "Acme Inc",
-			Valid:  true,
+		CompanyID: sql.NullInt64{
+			Int64: 1,
+			Valid: true,
 		},
-		Site: sql.NullString{
-			String: "acme.com",
-			Valid:  true,
+		JobsiteID: sql.NullInt64{
+			Int64: 1,
+			Valid: true,
 		},
 		Role: sql.NullString{
 			String: "admin",

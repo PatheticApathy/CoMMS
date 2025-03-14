@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -21,7 +20,7 @@ import (
 //	@Tags			users
 //	@Produce		json
 //	@Param			id	query		int				true	"user's identification number"
-//	@Success		200	{object}	userdb.User	"users"
+//	@Success		200	{object}	userdb.User		"users"
 //	@Failure		400	{string}	string			"Invalid id"
 //	@Failure		500	{string}	string			"Internal Server Error"
 //	@Router			/user/search [get]
@@ -56,13 +55,50 @@ func (e *Env) getUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// getUserName hanlder returns a user based on given parameters godoc
+//
+//	@Summary		fetches user based on given paremeters
+//	@Description	Gets user using username
+//	@Tags			users
+//	@Produce		json
+//	@Param			username query	string			true	"user's identification number"
+//	@Success		200	{object}	userdb.User		"users"
+//	@Failure		400	{string}	string			"Invalid username"
+//	@Failure		500	{string}	string			"Internal Server Error"
+//	@Router			/user/search [get]
+func (e *Env) getUserName(w http.ResponseWriter, r *http.Request) {
+	log.Println("Handling getUserName request")
+	query := r.URL.Query()
+	if query.Has("username") {
+		username := query.Get("username")
+		log.Printf("Received request with username: %s", username)
+
+		log.Printf("Fetching user with username: %s", username)
+		user, err := e.Queries.GetUserName(r.Context(), string(username))
+		if err != nil {
+			log.Printf("Could not find user, reason: %e", err)
+			http.Error(w, "Invalid username", http.StatusBadRequest)
+			return
+		}
+
+		log.Printf("User found: %+v", user)
+		if err := json.NewEncoder(w).Encode(&user); err != nil {
+			log.Printf("Could not encode json user, reason: %e", err)
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		log.Println("User response successfully sent")
+	}
+}
+
 // getUsers hanlder returns all users godoc
 //
 //	@Summary		fetches all users
 //	@Description	Gets users
 //	@Tags			users
 //	@Produce		json
-//	@Success		200	{object}	userdb.User	"users"
+//	@Success		200	{object}	userdb.User		"users"
 //	@Failure		500	{string}	string			"Faliled to get users"
 //	@Router			/user/all [get]
 func (e *Env) getUsers(w http.ResponseWriter, r *http.Request) {
@@ -92,7 +128,7 @@ func (e *Env) getUsers(w http.ResponseWriter, r *http.Request) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			users	body		userdb.SignUpParams	true	"Format of signup user request"
-//	@Success		200		{string}	string			"User login token"
+//	@Success		200		{object}	auth.Token			"User login token"
 //	@Failure		400		{string}	string					"Invalid input"
 //	@Failure		500		{string}	string					"Failed to signup user"
 //	@Router			/user/signup [post]
@@ -193,109 +229,33 @@ func (e *Env) createUser(w http.ResponseWriter, r *http.Request) {
 //	@Description	Updates user using id(may add more parameters later)
 //	@Tags			users
 //	@Produce		json
-//	@Param			users	body		map[string]interface{}	true	"Format of update user request"
-//	@Success		200		{object}	user_db.User				"users"
+//	@Param			users	body		userdb.UpdateUserParams  	true	"Format of update user request"
+//	@Success		200		{object}	userdb.User					"users"
 //	@Failure		400		{string}	string						"Invalid input"
 //	@Failure		500		{string}	string						"Failed to update user"
 //	@Router			/user/update [put]
 func (e *Env) updateUser(w http.ResponseWriter, r *http.Request) {
 	log.Println("Handling updateUser request")
-	var params map[string]interface{}
+	var params userdb.UpdateUserParams
 	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
 		log.Printf("Failed to decode request body, reason: %v", err)
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 		return
 	}
 
-	id, ok := params["id"].(float64)
-	if !ok {
-		log.Println("Missing or invalid 'id' parameter")
-		http.Error(w, "Invalid input", http.StatusBadRequest)
+	log.Printf("Received user update request: %v", params)
+	log.Printf("Attempting to update user with id: %d", params.ID)
+
+	user, err := e.Queries.UpdateUser(r.Context(), params)
+	if err != nil {
+		log.Printf("Failed to update user %s, reason: %v", user.Username, err)
+		http.Error(w, "Failed to update user", http.StatusInternalServerError)
 		return
-	}
-
-	log.Printf("Received user update request: %+v", params)
-
-	for field, value := range params {
-		if field == "id" {
-			continue
-		}
-
-		var err error
-		switch field {
-		case "username":
-			_, err = e.Queries.UpdateUserUsername(context.Background(), user_db.UpdateUserUsernameParams{
-				Username: value.(string),
-				ID:       int64(id),
-			})
-		case "password":
-			_, err = e.Queries.UpdateUserPassword(context.Background(), user_db.UpdateUserPasswordParams{
-				Password: auth.Hash(value.(string)),
-				ID:       int64(id),
-			})
-		case "firstname":
-			_, err = e.Queries.UpdateUserFirstname(context.Background(), user_db.UpdateUserFirstnameParams{
-				Firstname: parseNullString(value),
-				ID:        int64(id),
-			})
-		case "lastname":
-			_, err = e.Queries.UpdateUserLastname(context.Background(), user_db.UpdateUserLastnameParams{
-				Lastname: parseNullString(value),
-				ID:       int64(id),
-			})
-		case "company":
-			_, err = e.Queries.UpdateUserCompany(context.Background(), user_db.UpdateUserCompanyParams{
-				Company: parseNullString(value),
-				ID:      int64(id),
-			})
-		case "site":
-			_, err = e.Queries.UpdateUserSite(context.Background(), user_db.UpdateUserSiteParams{
-				Site: parseNullString(value),
-				ID:   int64(id),
-			})
-		case "role":
-			_, err = e.Queries.UpdateUserRole(context.Background(), user_db.UpdateUserRoleParams{
-				Role: parseNullString(value),
-				ID:   int64(id),
-			})
-		case "email":
-			_, err = e.Queries.UpdateUserEmail(context.Background(), user_db.UpdateUserEmailParams{
-				Email: value.(string),
-				ID:    int64(id),
-			})
-		case "phone":
-			_, err = e.Queries.UpdateUserPhone(context.Background(), user_db.UpdateUserPhoneParams{
-				Phone: value.(string),
-				ID:    int64(id),
-			})
-		case "profilepicture":
-			_, err = e.Queries.UpdateUserProfilePicture(context.Background(), user_db.UpdateUserProfilePictureParams{
-				Profilepicture: parseNullString(value),
-				ID:             int64(id),
-			})
-		default:
-			log.Printf("Unknown field: %s", field)
-			http.Error(w, "Invalid input", http.StatusBadRequest)
-			return
-		}
-
-		if err != nil {
-			log.Printf("Failed to update user field %s, reason: %v", field, err)
-			http.Error(w, "Failed to update user", http.StatusInternalServerError)
-			return
-		}
 	}
 
 	log.Println("User successfully updated")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("User updated successfully"))
-}
-
-func parseNullString(value interface{}) sql.NullString {
-	if v, ok := value.(string); ok {
-		return sql.NullString{String: v, Valid: v != ""}
-	}
-	return sql.NullString{String: "", Valid: false}
 }
 
 // deleteUser hanlder removes a user based on given parameters godoc
@@ -305,7 +265,7 @@ func parseNullString(value interface{}) sql.NullString {
 //	@Tags			users
 //	@Produce		json
 //	@Param			id	query		int				true	"user's identification number"
-//	@Success		200	{object}	userdb.User	"users"
+//	@Success		200	{object}	userdb.User		"users"
 //	@Failure		400	{string}	string			"Invalid user ID"
 //	@Failure		500	{string}	string			"Failed to delete user"
 //	@Router			/user/delete [delete]
