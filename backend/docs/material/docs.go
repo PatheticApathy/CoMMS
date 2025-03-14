@@ -816,6 +816,11 @@ const docTemplate = `{
         },
         "/user/create": {
             "post": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Adds user to the database using valid json structure",
                 "consumes": [
                     "application/json"
@@ -885,7 +890,7 @@ const docTemplate = `{
                     "200": {
                         "description": "User login data token",
                         "schema": {
-                            "$ref": "#/definitions/auth.UnEncrypted"
+                            "$ref": "#/definitions/auth.Identity"
                         }
                     },
                     "400": {
@@ -969,7 +974,7 @@ const docTemplate = `{
         },
         "/user/login": {
             "post": {
-                "description": "Pulls user login information and authenticates the user",
+                "description": "Pulls user login information and authenticates the user\nThe id can be left blank",
                 "consumes": [
                     "application/json"
                 ],
@@ -992,7 +997,7 @@ const docTemplate = `{
                     "200": {
                         "description": "User login token",
                         "schema": {
-                            "$ref": "#/definitions/auth.Token"
+                            "type": "string"
                         }
                     },
                     "400": {
@@ -1142,6 +1147,23 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "auth.Identity": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "role": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "auth.Token": {
             "type": "object",
             "properties": {

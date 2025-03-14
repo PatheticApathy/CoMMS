@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
-	auth "github.com/PatheticApathy/CoMMS/pkg/auth"
+	"github.com/PatheticApathy/CoMMS/pkg/auth"
 	"github.com/PatheticApathy/CoMMS/pkg/databases/userdb"
 
 	_ "modernc.org/sqlite"
@@ -147,11 +147,6 @@ func (e *Env) SignUp(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("Hashing user password")
 
-	userandpass := auth.UnEncrypted{
-		Username: params.Username,
-		Password: params.Password,
-	}
-
 	params.Password = auth.Hash(params.Password)
 
 	log.Println("Attempting to create user in database")
@@ -163,49 +158,35 @@ func (e *Env) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("User successfully created: %+v", user)
+	// create token and save public key
+	identity := auth.Identity{
+		Username: user.Username,
+		Password: user.Password,
+		ID:       user.ID,
+	}
 
-	log.Println("Marshaling user credentials for cookie storage")
-	jsonUserandPass, err := json.Marshal(userandpass)
+	token, err := auth.CreateToken(identity, []byte(e.Secret))
 	if err != nil {
-		log.Printf("Failed to marshal user credentials, reason: %v", err)
-		http.Error(w, "Server Error", http.StatusInternalServerError)
-	}
-	cookie := http.Cookie{
-		Name:     "LoginCookie",
-		Value:    string(jsonUserandPass),
-		Path:     "/",
-		MaxAge:   0,
-		HttpOnly: true,
-		Secure:   false,
-		SameSite: http.SameSiteLaxMode,
-	}
-
-	log.Println("Writing encrypted cookie")
-	encrypted, err := auth.WriteEncrypted(w, cookie, []byte(e.Secret))
-	if err != nil {
-		log.Printf("Failed to write encrypted cookie, reason: %v", err)
-		http.Error(w, "server error", http.StatusInternalServerError)
-	}
-
-	token := auth.Token{
-		Token: encrypted,
-	}
-
-	log.Println("Sending user response")
-	if err := json.NewEncoder(w).Encode(&token); err != nil {
-		log.Printf("Failed to encode user response, reason: %v", err)
+		log.Printf("Could not create id token: %e", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 
-	log.Println("SignUp process completed successfully")
+	// send to client
+	if err := json.NewEncoder(w).Encode(&token); err != nil {
+		log.Printf("Could not encode json token, reason: %e", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("User successfully created: %+v", user)
 }
 
 // createUser handler that adds a user to the the db  godoc
 //
 //	@Summary		post user to database
 //	@Description	Adds user to the database using valid json structure
+//	@Security identity
 //	@Tags			users
 //	@Accept			json
 //	@Produce		json
@@ -232,7 +213,7 @@ func (e *Env) createUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to create user", http.StatusInternalServerError)
 		return
 	}
-	log.Printf("User successfully created: %+v", user)
+	log.Printf("User %s successfully created", user.Username)
 	if err := json.NewEncoder(w).Encode(&user); err != nil {
 		log.Printf("Failed to encode user response, reason: %v", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)

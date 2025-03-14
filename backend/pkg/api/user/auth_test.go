@@ -21,7 +21,7 @@ func TestAuth(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer db.Close()
-	env := NewEnv(db, "secretsecretpass")
+	env := NewEnv(db, "%��7��$Oh:6�~Y���`�u�%")
 
 	passwrd := auth.Hash("bassword")
 	adduser := user_db.AddUserParams{

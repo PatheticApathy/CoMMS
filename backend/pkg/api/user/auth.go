@@ -14,10 +14,11 @@ import (
 //
 //		@Summary		Authenticate user information
 //		@Description	Pulls user login information and authenticates the user
+//		@Description  The id can be left blank
 //		@Tags			users
 //	  @Accept			json
 //		@Param			users	body		auth.UnEncrypted		true	"Format of login user request"
-//		@Success		200		{object}	auth.Token					"User login token"
+//		@Success		200		{string}	string					"User login token"
 //		@Failure		400		{string}	string					"Invalid input"
 //		@Failure		500		{string}	string					"Invalid User or Password"
 //	  @Failure		500		{string}	string					"Server Error"
@@ -30,49 +31,34 @@ func (e *Env) authenticate(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 		return
 	}
+
 	log.Printf("Checking user %s", userandpass.Username)
-	err := auth.CheckUserAndPass(e.Queries, r.Context(), &userandpass)
+	identification, err := auth.CheckUserAndPass(e.Queries, r.Context(), &userandpass)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "Invalid User or Password", http.StatusBadRequest)
 		return
 	}
-	log.Println("Repackaging userandpass to json")
-	jsonUserandPass, err := json.Marshal(userandpass)
+
+	token, err := auth.CreateToken(identification, []byte(e.Secret))
 	if err != nil {
-		log.Println(err)
-		http.Error(w, "Server Error", http.StatusInternalServerError)
-		return
-	}
-	log.Println("Generating cookie")
-	cookie := http.Cookie{
-		Name:     "LoginCookie",
-		Value:    string(jsonUserandPass),
-		Path:     "/",
-		MaxAge:   0,
-		HttpOnly: true,
-		Secure:   false,
-		SameSite: http.SameSiteLaxMode,
-	}
-	log.Println("Encrypting Cookie")
-	encrypted, err := auth.WriteEncrypted(w, cookie, []byte(e.Secret))
-	if err != nil {
-		log.Println(err)
-		http.Error(w, "Server Error", http.StatusInternalServerError)
-		return
-	}
-	log.Println("Encoding json")
-	token := auth.Token{
-		Token: encrypted,
-	}
-	if err := json.NewEncoder(w).Encode(&token); err != nil {
-		log.Printf("Could not encode json user, reason: %e", err)
+		log.Printf("Could not create id token: %e", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
-	log.Printf("User successfully logged in")
+
+	// send to client
+	if err := json.NewEncoder(w).Encode(&token); err != nil {
+		log.Printf("Could not encode json token, reason: %e", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("User  %ssuccessfully logged in", userandpass.Username)
 }
 
+// WARNING: WIll probably be deprecated
+//
 //	 loggout handler that removes an authentication cookie godoc
 //
 //		@Summary		Removes authenticated user information
@@ -102,26 +88,26 @@ func (e *Env) loggout(w http.ResponseWriter, _ *http.Request) {
 //		@Tags			users
 //	  @Accept			json
 //		@Param			users	body		auth.Token		true	"Format of login user request"
-//		@Success		200		{object}	auth.UnEncrypted					"User login data token"
+//		@Success		200		{object}	auth.Identity					"User login data token"
 //		@Failure		400		{string}	string					"Invalid request"
 //	  @Failure		500		{string}	string					"Server Error"
 //		@Router			/user/decrypt [post]
 func (e *Env) DecryptHanlder(w http.ResponseWriter, r *http.Request) {
-	var token auth.Token
-	if err := json.NewEncoder(w).Encode(&token); err != nil {
-		log.Printf("Could not encode json token, reason: %e", err)
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+	var token string
+	if err := json.NewDecoder(r.Body).Decode(&token); err != nil {
+		log.Printf("Could not decode json token, reason: %e", err)
+		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
 	}
 
-	decrypt_token, err := auth.ReadEncrypted(r, "LoginCookie", []byte(e.Secret))
+	payload, err := auth.VerifyToken(token, []byte(e.Secret))
 	if err != nil {
 		log.Printf("Error for authorization request: %e", err)
 		http.Error(w, "Invalid request", http.StatusBadRequest)
 		return
 	}
 
-	if err := json.NewEncoder(w).Encode(&decrypt_token); err != nil {
+	if err := json.NewEncoder(w).Encode(&payload); err != nil {
 		log.Printf("Could not encode json user, reason: %e", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return

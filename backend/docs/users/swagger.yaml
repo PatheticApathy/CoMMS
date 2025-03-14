@@ -1,5 +1,16 @@
 basePath: /
 definitions:
+  auth.Identity:
+    properties:
+      id:
+        type: integer
+      password:
+        type: string
+      role:
+        $ref: '#/definitions/sql.NullString'
+      username:
+        type: string
+    type: object
   auth.Token:
     properties:
       token:
@@ -174,9 +185,6 @@ definitions:
       username:
         type: string
     type: object
-externalDocs:
-  description: OpenAPI
-  url: https://swagger.io/resources/open-api/
 host: localhost:8082
 info:
   contact:
@@ -338,6 +346,8 @@ paths:
           description: Failed to create user
           schema:
             type: string
+      security:
+      - identity: []
       summary: post user to database
       tags:
       - users
@@ -357,7 +367,7 @@ paths:
         "200":
           description: User login data token
           schema:
-            $ref: '#/definitions/auth.UnEncrypted'
+            $ref: '#/definitions/auth.Identity'
         "400":
           description: Invalid request
           schema:
@@ -415,7 +425,9 @@ paths:
     post:
       consumes:
       - application/json
-      description: Pulls user login information and authenticates the user
+      description: |-
+        Pulls user login information and authenticates the user
+        The id can be left blank
       parameters:
       - description: Format of login user request
         in: body
@@ -427,7 +439,7 @@ paths:
         "200":
           description: User login token
           schema:
-            $ref: '#/definitions/auth.Token'
+            type: string
         "400":
           description: Invalid input
           schema:
@@ -524,4 +536,10 @@ paths:
       summary: updates user based on given parameters
       tags:
       - users
+securityDefinitions:
+  identity:
+    description: gives read and write access to api
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

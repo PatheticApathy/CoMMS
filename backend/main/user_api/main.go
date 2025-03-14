@@ -26,8 +26,14 @@ import (
 //	@contact.name	Comms group
 //	@contact.url	http://github.com/PatheticApathy/CoMMS
 
-//	@host		localhost:8082
-//	@BasePath	/
+// @host						localhost:8082
+// @BasePath					/
+//
+// @securityDefinitions.apikey	identity
+// @in							header
+// @name						Authorization
+// @tokenUrl					localhost:8082/user/login
+// @description				gives read and write access to api
 //
 // @externalDocs.description	OpenAPI
 // @externalDocs.url			https://swagger.io/resources/open-api/
@@ -64,8 +70,8 @@ func main() {
 	if secret == "" {
 		log.Fatal("No secret set in environment variable")
 	}
-	if len([]byte(secret)) != 16 {
-		log.Fatal("Error: Invalid secret length(must be 16 charcaters)")
+	if len([]byte(secret)) != 32 {
+		log.Fatal("Error: Invalid secret length(must be 32 charcaters)")
 	}
 
 	url, err := url.Parse(os.Getenv("USER_HOST"))
