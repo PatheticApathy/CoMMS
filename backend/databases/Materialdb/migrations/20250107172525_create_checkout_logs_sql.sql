@@ -6,8 +6,7 @@ CREATE TABLE CheckoutLogs (
   user_id INTEGER NOT NULL,
   checkin_time DATE ,
   checkout_time DATE NOT NULL,
-  FOREIGN KEY(item_id) REFERENCES Materials(id),
-  FOREIGN KEY(user_id) REFERENCES Users(id)
+  FOREIGN KEY(item_id) REFERENCES Materials(id)
 );
 -- +goose StatementEnd
 

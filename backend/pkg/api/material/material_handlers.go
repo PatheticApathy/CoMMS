@@ -186,8 +186,25 @@ func (e *Env) postMaterialHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err := json.NewDecoder(r.Body).Decode(&material); err != nil {
 		log.Printf("Could not parse json obj: %e", err)
-		http.Error(w, "Error parsing json", http.StatusBadRequest)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
+	}
+
+	if material.JobSite.Valid {
+		id := strconv.Itoa(int(material.JobSite.Int64))
+		resp, err := http.Get(e.UserHost + "/sites/search?id=" + id)
+
+		if err != nil {
+			log.Printf("Error occured while trying to connect to user api: %e", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		if !(resp.StatusCode == http.StatusOK) {
+			log.Printf("Invalid Jobsite Id  %s given", id)
+			http.Error(w, "Bad request", http.StatusBadRequest)
+			return
+		}
 	}
 
 	ret, err := e.Queries.AddMaterial(r.Context(), material)
@@ -239,6 +256,41 @@ func (e *Env) changeMaterialQuantity(w http.ResponseWriter, r *http.Request) {
 
 	if material.Quantity <= 0 {
 		log.Printf(`Out of material %v, changing status changed`, material.Name)
+	}
+
+	if err := json.NewEncoder(w).Encode(&material); err != nil {
+		log.Printf("Could not create json obj: %e", err)
+		http.Error(w, "Error creating json", http.StatusInternalServerError)
+		return
+	}
+}
+
+// deleteMaterialHandler handler to delete material from database
+//
+//	@Summary	deletes material
+//	@Description	 deltes material from database
+//	@Tags			material
+//	@Produce		json
+//	@Accepts		json
+//	@Param			id	body		int	true	"Id of material to delete"
+//	@Success		200			{object}	materialdb.Material				"delted material"
+//	@Failure		400			{string} string	"bad request"
+//	@Failure		500			{string}	string "Internal Server Error"
+//	@Router			/material/delete [delete]
+func (e *Env) deleteMaterialHandler(w http.ResponseWriter, r *http.Request) {
+	var id int64
+	if err := json.NewDecoder(r.Body).Decode(&id); err != nil {
+		log.Printf("Could not parse json obj: %e", err)
+		http.Error(w, "Error parsing json", http.StatusBadRequest)
+		return
+	}
+
+	log.Printf("Deleting material with id: %d", id)
+	material, err := e.Queries.DeleteMaterial(r.Context(), id)
+	if err != nil {
+		log.Printf(`Invalid Material change, reason %e`, err)
+		http.Error(w, `Could not delete material`, http.StatusBadRequest)
+		return
 	}
 
 	if err := json.NewEncoder(w).Encode(&material); err != nil {

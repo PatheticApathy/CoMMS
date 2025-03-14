@@ -10,8 +10,7 @@ CREATE TABLE Materials (
   location_lat FLOAT,
   location_lng FLOAT,
   last_checked_out DATEIME,
-  job_site INTEGER,
-  FOREIGN KEY(job_site) REFERENCES JobSites(id)
+  job_site INTEGER
 );
 -- +goose StatementEnd
 

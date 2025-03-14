@@ -17,6 +17,11 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenuButton asChild>
+            <a href="/dashboard/jobsites">
+              <span>Jobsites</span>
+            </a>
+          </SidebarMenuButton>
+          <SidebarMenuButton asChild>
             <a href="/dashboard/material">
               <span>Materials</span>
             </a>
@@ -29,6 +34,11 @@ export function AppSidebar() {
           <SidebarMenuButton asChild>
             <a href="#">
               <span>Company</span>
+            </a>
+          </SidebarMenuButton>
+          <SidebarMenuButton asChild>
+            <a href="/dashboard/admin">
+              <span>Admin</span>
             </a>
           </SidebarMenuButton>
           <SidebarGroupContent></SidebarGroupContent>

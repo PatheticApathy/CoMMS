@@ -45,7 +45,7 @@ OG=$PWD
 
 ##########setup frontend#################
 cd ./frontend/
-npm install
+npm update --save
 cd $OG
 
 ###########setup backend#################
@@ -55,6 +55,7 @@ cd $OG
 
 #setup material db
 cd ./backend/databases/Materialdb/
+$GOOSE down-to 0
 $GOOSE up
 $SQLC generate
 cd ./../../
@@ -63,6 +64,7 @@ cd $OG
 
 #setup userdb
 cd ./backend/databases/Userdb/
+$GOOSE down-to 0
 $GOOSE up
 $SQLC generate
 cd ./../../

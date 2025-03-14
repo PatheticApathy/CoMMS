@@ -18,14 +18,26 @@ import (
 //	@Produce		json
 //	@Param			checkoutlg	body		materialdb.AddCheckoutLogParams	true	"Format of add ckeckout log"
 //	@Success		200			{object}	materialdb.CheckoutLog			"checkout log"
-//	@Failure		400			{string} string	"bad request"
+//	@Failure		400			{string} 	string	"bad request"
 //	@Failure		500			{string}	string "Internal Server Error"
-//	@Router			/checkouts/out [post]
+//	@Router			/checkout/out [post]
 func (e *Env) postCheckout(w http.ResponseWriter, r *http.Request) {
 	var args materialdb.AddCheckoutLogParams
 	if err := json.NewDecoder(r.Body).Decode(&args); err != nil {
 		log.Printf("could not decode to json, reason %e", err)
 		http.Error(w, "bad request", http.StatusBadRequest)
+		return
+	}
+
+	resp, err := http.Get(e.UserHost + "/user/search?id=" + strconv.Itoa(int(args.UserID)))
+	if err != nil {
+		log.Printf("could not connect to user api, reason %e", err)
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+	if resp.StatusCode != http.StatusOK {
+		log.Printf("could not add checkout log, invalid user id: %d", args.UserID)
+		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
 	}
 
@@ -55,7 +67,7 @@ func (e *Env) postCheckout(w http.ResponseWriter, r *http.Request) {
 //	@Failure		400		{string}	string "bad request"
 //	@Failure		500		{string} string "Internal Server Error"
 //	@Success		200		{object}	materialdb.CheckoutLog	"checkout log"
-//	@Router			/checkouts/in [put]
+//	@Router			/checkout/in [put]
 func (e *Env) putCheckin(w http.ResponseWriter, r *http.Request) {
 	var arg int64
 	if err := json.NewDecoder(r.Body).Decode(&arg); err != nil {
@@ -87,7 +99,7 @@ func (e *Env) putCheckin(w http.ResponseWriter, r *http.Request) {
 //	@Produce		json
 //	@Success		200	{array}	materialdb.CheckoutLog	"checkout logs"
 //	@Failure		500	{string} string	"Internal Server Error"
-//	@Router			/checkouts/all [get]
+//	@Router			/checkout/all [get]
 func (e *Env) getAllCheckoutLogs(w http.ResponseWriter, r *http.Request) {
 	logs, err := e.Queries.GetAllCheckoutLogs(r.Context())
 	if err != nil {

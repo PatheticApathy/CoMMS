@@ -9,7 +9,9 @@ import (
 	"io"
 	"log"
 	"os"
+	"strconv"
 
+	auth "github.com/PatheticApathy/CoMMS/pkg/auth"
 	user_db "github.com/PatheticApathy/CoMMS/pkg/databases/userdb"
 	_ "modernc.org/sqlite"
 )
@@ -62,7 +64,7 @@ func main() {
 
 		user := user_db.AddUserParams{
 			Username: row[0],
-			Password: row[1],
+			Password: auth.Hash(row[1]),
 			Firstname: sql.NullString{
 				String: row[2],
 				Valid:  true,
@@ -71,13 +73,25 @@ func main() {
 				String: row[3],
 				Valid:  true,
 			},
-			Company: sql.NullString{
-				String: row[4],
-				Valid:  true,
+			CompanyID: sql.NullInt64{
+				Int64: func() int64 {
+					val, err := strconv.ParseInt(row[4], 10, 64)
+					if err != nil {
+						log.Fatal(err)
+					}
+					return val
+				}(),
+				Valid: true,
 			},
-			Site: sql.NullString{
-				String: row[5],
-				Valid:  true,
+			JobsiteID: sql.NullInt64{
+				Int64: func() int64 {
+					val, err := strconv.ParseInt(row[5], 10, 64)
+					if err != nil {
+						log.Fatal(err)
+					}
+					return val
+				}(),
+				Valid: true,
 			},
 			Role: sql.NullString{
 				String: row[6],

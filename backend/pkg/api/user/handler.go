@@ -20,7 +20,7 @@ import (
 //	@Tags			users
 //	@Produce		json
 //	@Param			id	query		int				true	"user's identification number"
-//	@Success		200	{object}	userdb.User	"users"
+//	@Success		200	{object}	userdb.User		"users"
 //	@Failure		400	{string}	string			"Invalid id"
 //	@Failure		500	{string}	string			"Internal Server Error"
 //	@Router			/user/search [get]
@@ -55,13 +55,50 @@ func (e *Env) getUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// getUserName hanlder returns a user based on given parameters godoc
+//
+//	@Summary		fetches user based on given paremeters
+//	@Description	Gets user using username
+//	@Tags			users
+//	@Produce		json
+//	@Param			username query	string			true	"user's identification number"
+//	@Success		200	{object}	userdb.User		"users"
+//	@Failure		400	{string}	string			"Invalid username"
+//	@Failure		500	{string}	string			"Internal Server Error"
+//	@Router			/user/search [get]
+func (e *Env) getUserName(w http.ResponseWriter, r *http.Request) {
+	log.Println("Handling getUserName request")
+	query := r.URL.Query()
+	if query.Has("username") {
+		username := query.Get("username")
+		log.Printf("Received request with username: %s", username)
+
+		log.Printf("Fetching user with username: %s", username)
+		user, err := e.Queries.GetUserName(r.Context(), string(username))
+		if err != nil {
+			log.Printf("Could not find user, reason: %e", err)
+			http.Error(w, "Invalid username", http.StatusBadRequest)
+			return
+		}
+
+		log.Printf("User found: %+v", user)
+		if err := json.NewEncoder(w).Encode(&user); err != nil {
+			log.Printf("Could not encode json user, reason: %e", err)
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		log.Println("User response successfully sent")
+	}
+}
+
 // getUsers hanlder returns all users godoc
 //
 //	@Summary		fetches all users
 //	@Description	Gets users
 //	@Tags			users
 //	@Produce		json
-//	@Success		200	{object}	userdb.User	"users"
+//	@Success		200	{object}	userdb.User		"users"
 //	@Failure		500	{string}	string			"Faliled to get users"
 //	@Router			/user/all [get]
 func (e *Env) getUsers(w http.ResponseWriter, r *http.Request) {
@@ -186,14 +223,14 @@ func (e *Env) createUser(w http.ResponseWriter, r *http.Request) {
 	log.Println("User response successfully sent")
 }
 
-// updateUser hanlder returns an updated user based on given parameters godoc
+// updateUser handler returns an updated user based on given parameters godoc
 //
-//	@Summary		updates user based on given paremeters
+//	@Summary		updates user based on given parameters
 //	@Description	Updates user using id(may add more parameters later)
 //	@Tags			users
 //	@Produce		json
-//	@Param			users	body		userdb.UpdateUserParams	true	"Format of update user request"
-//	@Success		200		{object}	userdb.User				"users"
+//	@Param			users	body		userdb.UpdateUserParams  	true	"Format of update user request"
+//	@Success		200		{object}	userdb.User					"users"
 //	@Failure		400		{string}	string						"Invalid input"
 //	@Failure		500		{string}	string						"Failed to update user"
 //	@Router			/user/update [put]
@@ -206,15 +243,16 @@ func (e *Env) updateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("Received user update request: %+v", params)
+	log.Printf("Received user update request: %v", params)
+	log.Printf("Attempting to update user with id: %d", params.ID)
 
-	log.Println("Attempting to update user in database")
-	user, err := e.Queries.UpdateUser(context.Background(), params)
+	user, err := e.Queries.UpdateUser(r.Context(), params)
 	if err != nil {
-		log.Printf("Failed to update user, reason: %v", err)
+		log.Printf("Failed to update user %s, reason: %v", user.Username, err)
 		http.Error(w, "Failed to update user", http.StatusInternalServerError)
 		return
 	}
+
 	log.Printf("User %s successfully updated", user.Username)
 	if err := json.NewEncoder(w).Encode(&user); err != nil {
 		log.Printf("Failed to encode user response, reason: %v", err)
@@ -222,7 +260,9 @@ func (e *Env) updateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println("User response successfully sent")
+	log.Println("User successfully updated")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("User updated successfully"))
 }
 
 // deleteUser hanlder removes a user based on given parameters godoc
@@ -232,7 +272,7 @@ func (e *Env) updateUser(w http.ResponseWriter, r *http.Request) {
 //	@Tags			users
 //	@Produce		json
 //	@Param			id	query		int				true	"user's identification number"
-//	@Success		200	{object}	userdb.User	"users"
+//	@Success		200	{object}	userdb.User		"users"
 //	@Failure		400	{string}	string			"Invalid user ID"
 //	@Failure		500	{string}	string			"Failed to delete user"
 //	@Router			/user/delete [delete]

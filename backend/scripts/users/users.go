@@ -34,13 +34,13 @@ func main() {
 			String: "Doe",
 			Valid:  true,
 		},
-		Company: sql.NullString{
-			String: "Acme Inc",
-			Valid:  true,
+		CompanyID: sql.NullInt64{
+			Int64: 1,
+			Valid: true,
 		},
-		Site: sql.NullString{
-			String: "acme.com",
-			Valid:  true,
+		JobsiteID: sql.NullInt64{
+			Int64: 1,
+			Valid: true,
 		},
 		Role: sql.NullString{
 			String: "admin",
@@ -70,39 +70,39 @@ func main() {
 	}
 	fmt.Printf("List of users: %+v\n", users)
 
-	// Update a user
-	updateParams := user_db.UpdateUserParams{
-		ID:       userID,
-		Username: "john_doe_updated",
-		Password: "new_password",
-		Firstname: sql.NullString{
-			String: "John_updated",
-			Valid:  true,
-		},
-		Lastname: sql.NullString{
-			String: "Doe_updated",
-			Valid:  true,
-		},
-		Company: sql.NullString{
-			String: "Acme Inc",
-			Valid:  true,
-		},
-		Site: sql.NullString{
-			String: "acme.com",
-			Valid:  true,
-		},
-		Role: sql.NullString{
-			String: "admin",
-			Valid:  true,
-		},
-		Email: "test@gmail.com",
-		Phone: "1234567890",
-	}
-	updatedUser, err := queries.UpdateUser(context.Background(), updateParams)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("Updated user: %+v\n", updatedUser)
+	// // Update a user
+	// updateParams := user_db.UpdateUserParams{
+	// 	ID:       userID,
+	// 	Username: "john_doe_updated",
+	// 	Password: "new_password",
+	// 	Firstname: sql.NullString{
+	// 		String: "John_updated",
+	// 		Valid:  true,
+	// 	},
+	// 	Lastname: sql.NullString{
+	// 		String: "Doe_updated",
+	// 		Valid:  true,
+	// 	},
+	// 	Company: sql.NullString{
+	// 		String: "Acme Inc",
+	// 		Valid:  true,
+	// 	},
+	// 	Site: sql.NullString{
+	// 		String: "acme.com",
+	// 		Valid:  true,
+	// 	},
+	// 	Role: sql.NullString{
+	// 		String: "admin",
+	// 		Valid:  true,
+	// 	},
+	// 	Email: "test@gmail.com",
+	// 	Phone: "1234567890",
+	// }
+	// updatedUser, err := queries.UpdateUser(context.Background(), updateParams)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// fmt.Printf("Updated user: %+v\n", updatedUser)
 
 	// Delete a user
 	err = queries.DeleteUser(context.Background(), userID)

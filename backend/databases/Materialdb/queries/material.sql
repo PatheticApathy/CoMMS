@@ -31,3 +31,8 @@ UPDATE Materials
   SET status = ?
   WHERE  id = ?
 RETURNING *;
+
+-- name: DeleteMaterial :one
+DELETE FROM Materials
+WHERE id = ?
+RETURNING *;

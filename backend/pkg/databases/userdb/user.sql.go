@@ -11,7 +11,7 @@ import (
 )
 
 const addUser = `-- name: AddUser :one
-INSERT INTO Users(username, password, firstname, lastname, company, site, role, email, phone, profilepicture) VALUES (?,?,?,?,?,?,?,?,?,?) RETURNING id, username, password, firstname, lastname, company, site, role, email, phone, profilepicture
+INSERT INTO Users(username, password, firstname, lastname, company_id, jobsite_id, role, email, phone, profilepicture) VALUES (?,?,?,?,?,?,?,?,?,?) RETURNING id, username, password, firstname, lastname, company_id, jobsite_id, role, email, phone, profilepicture
 `
 
 type AddUserParams struct {
@@ -19,8 +19,8 @@ type AddUserParams struct {
 	Password       string         `json:"password"`
 	Firstname      sql.NullString `json:"firstname"`
 	Lastname       sql.NullString `json:"lastname"`
-	Company        sql.NullString `json:"company"`
-	Site           sql.NullString `json:"site"`
+	CompanyID      sql.NullInt64  `json:"company_id"`
+	JobsiteID      sql.NullInt64  `json:"jobsite_id"`
 	Role           sql.NullString `json:"role"`
 	Email          string         `json:"email"`
 	Phone          string         `json:"phone"`
@@ -33,8 +33,8 @@ func (q *Queries) AddUser(ctx context.Context, arg AddUserParams) (User, error) 
 		arg.Password,
 		arg.Firstname,
 		arg.Lastname,
-		arg.Company,
-		arg.Site,
+		arg.CompanyID,
+		arg.JobsiteID,
 		arg.Role,
 		arg.Email,
 		arg.Phone,
@@ -47,8 +47,8 @@ func (q *Queries) AddUser(ctx context.Context, arg AddUserParams) (User, error) 
 		&i.Password,
 		&i.Firstname,
 		&i.Lastname,
-		&i.Company,
-		&i.Site,
+		&i.CompanyID,
+		&i.JobsiteID,
 		&i.Role,
 		&i.Email,
 		&i.Phone,
@@ -67,7 +67,7 @@ func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
 }
 
 const getAllUsers = `-- name: GetAllUsers :many
-SELECT id, username, password, firstname, lastname, company, site, role, email, phone, profilepicture FROM Users
+SELECT id, username, password, firstname, lastname, company_id, jobsite_id, role, email, phone, profilepicture FROM Users
 `
 
 func (q *Queries) GetAllUsers(ctx context.Context) ([]User, error) {
@@ -85,8 +85,8 @@ func (q *Queries) GetAllUsers(ctx context.Context) ([]User, error) {
 			&i.Password,
 			&i.Firstname,
 			&i.Lastname,
-			&i.Company,
-			&i.Site,
+			&i.CompanyID,
+			&i.JobsiteID,
 			&i.Role,
 			&i.Email,
 			&i.Phone,
@@ -106,7 +106,7 @@ func (q *Queries) GetAllUsers(ctx context.Context) ([]User, error) {
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, username, password, firstname, lastname, company, site, role, email, phone, profilepicture FROM Users WHERE id = ?
+SELECT id, username, password, firstname, lastname, company_id, jobsite_id, role, email, phone, profilepicture FROM Users WHERE id = ?
 `
 
 func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
@@ -118,8 +118,31 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
 		&i.Password,
 		&i.Firstname,
 		&i.Lastname,
-		&i.Company,
-		&i.Site,
+		&i.CompanyID,
+		&i.JobsiteID,
+		&i.Role,
+		&i.Email,
+		&i.Phone,
+		&i.Profilepicture,
+	)
+	return i, err
+}
+
+const getUserName = `-- name: GetUserName :one
+SELECT id, username, password, firstname, lastname, company_id, jobsite_id, role, email, phone, profilepicture FROM Users WHERE username = ?
+`
+
+func (q *Queries) GetUserName(ctx context.Context, username string) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUserName, username)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Password,
+		&i.Firstname,
+		&i.Lastname,
+		&i.CompanyID,
+		&i.JobsiteID,
 		&i.Role,
 		&i.Email,
 		&i.Phone,
@@ -129,7 +152,7 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
 }
 
 const signUp = `-- name: SignUp :one
-INSERT INTO Users(username, password, email, phone) VALUES (?,?,?,?) RETURNING id, username, password, firstname, lastname, company, site, role, email, phone, profilepicture
+INSERT INTO Users(username, password, email, phone) VALUES (?,?,?,?) RETURNING id, username, password, firstname, lastname, company_id, jobsite_id, role, email, phone, profilepicture
 `
 
 type SignUpParams struct {
@@ -153,8 +176,8 @@ func (q *Queries) SignUp(ctx context.Context, arg SignUpParams) (User, error) {
 		&i.Password,
 		&i.Firstname,
 		&i.Lastname,
-		&i.Company,
-		&i.Site,
+		&i.CompanyID,
+		&i.JobsiteID,
 		&i.Role,
 		&i.Email,
 		&i.Phone,
@@ -164,19 +187,31 @@ func (q *Queries) SignUp(ctx context.Context, arg SignUpParams) (User, error) {
 }
 
 const updateUser = `-- name: UpdateUser :one
-UPDATE Users SET username = ?, password = ?, firstname = ?, lastname = ?, company = ?, site = ?, role = ?, email = ?, phone = ?, profilepicture = ? WHERE id = ? RETURNING id, username, password, firstname, lastname, company, site, role, email, phone, profilepicture
+UPDATE Users 
+SET 
+    username = COALESCE(?8,username),
+    password = COALESCE(?9,password),
+    firstname = COALESCE(?,firstname),
+    lastname = COALESCE(?,lastname),
+    company_id = COALESCE(?,company_id),
+    jobsite_id = COALESCE(?,jobsite_id),
+    role = COALESCE(?,role),
+    email = COALESCE(?10,email),
+    phone = COALESCE(?11,phone),
+    profilepicture = COALESCE(?,profilepicture)
+WHERE id = ? RETURNING id, username, password, firstname, lastname, company_id, jobsite_id, role, email, phone, profilepicture
 `
 
 type UpdateUserParams struct {
-	Username       string         `json:"username"`
-	Password       string         `json:"password"`
+	Username       sql.NullString `json:"username"`
+	Password       sql.NullString `json:"password"`
 	Firstname      sql.NullString `json:"firstname"`
 	Lastname       sql.NullString `json:"lastname"`
-	Company        sql.NullString `json:"company"`
-	Site           sql.NullString `json:"site"`
+	CompanyID      sql.NullInt64  `json:"company_id"`
+	JobsiteID      sql.NullInt64  `json:"jobsite_id"`
 	Role           sql.NullString `json:"role"`
-	Email          string         `json:"email"`
-	Phone          string         `json:"phone"`
+	Email          sql.NullString `json:"email"`
+	Phone          sql.NullString `json:"phone"`
 	Profilepicture sql.NullString `json:"profilepicture"`
 	ID             int64          `json:"id"`
 }
@@ -187,8 +222,8 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		arg.Password,
 		arg.Firstname,
 		arg.Lastname,
-		arg.Company,
-		arg.Site,
+		arg.CompanyID,
+		arg.JobsiteID,
 		arg.Role,
 		arg.Email,
 		arg.Phone,
@@ -202,8 +237,176 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		&i.Password,
 		&i.Firstname,
 		&i.Lastname,
-		&i.Company,
-		&i.Site,
+		&i.CompanyID,
+		&i.JobsiteID,
+		&i.Role,
+		&i.Email,
+		&i.Phone,
+		&i.Profilepicture,
+	)
+	return i, err
+}
+
+const updateUserCompany = `-- name: UpdateUserCompany :one
+UPDATE Users SET company_id = ? WHERE id = ? RETURNING id, username, password, firstname, lastname, company_id, jobsite_id, role, email, phone, profilepicture
+`
+
+type UpdateUserCompanyParams struct {
+	CompanyID sql.NullInt64 `json:"company_id"`
+	ID        int64         `json:"id"`
+}
+
+func (q *Queries) UpdateUserCompany(ctx context.Context, arg UpdateUserCompanyParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, updateUserCompany, arg.CompanyID, arg.ID)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Password,
+		&i.Firstname,
+		&i.Lastname,
+		&i.CompanyID,
+		&i.JobsiteID,
+		&i.Role,
+		&i.Email,
+		&i.Phone,
+		&i.Profilepicture,
+	)
+	return i, err
+}
+
+const updateUserEmail = `-- name: UpdateUserEmail :one
+UPDATE Users SET email = ? WHERE id = ? RETURNING id, username, password, firstname, lastname, company_id, jobsite_id, role, email, phone, profilepicture
+`
+
+type UpdateUserEmailParams struct {
+	Email string `json:"email"`
+	ID    int64  `json:"id"`
+}
+
+func (q *Queries) UpdateUserEmail(ctx context.Context, arg UpdateUserEmailParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, updateUserEmail, arg.Email, arg.ID)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Password,
+		&i.Firstname,
+		&i.Lastname,
+		&i.CompanyID,
+		&i.JobsiteID,
+		&i.Role,
+		&i.Email,
+		&i.Phone,
+		&i.Profilepicture,
+	)
+	return i, err
+}
+
+const updateUserPhone = `-- name: UpdateUserPhone :one
+UPDATE Users SET phone = ? WHERE id = ? RETURNING id, username, password, firstname, lastname, company_id, jobsite_id, role, email, phone, profilepicture
+`
+
+type UpdateUserPhoneParams struct {
+	Phone string `json:"phone"`
+	ID    int64  `json:"id"`
+}
+
+func (q *Queries) UpdateUserPhone(ctx context.Context, arg UpdateUserPhoneParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, updateUserPhone, arg.Phone, arg.ID)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Password,
+		&i.Firstname,
+		&i.Lastname,
+		&i.CompanyID,
+		&i.JobsiteID,
+		&i.Role,
+		&i.Email,
+		&i.Phone,
+		&i.Profilepicture,
+	)
+	return i, err
+}
+
+const updateUserProfilePicture = `-- name: UpdateUserProfilePicture :one
+UPDATE Users SET profilepicture = ? WHERE id = ? RETURNING id, username, password, firstname, lastname, company_id, jobsite_id, role, email, phone, profilepicture
+`
+
+type UpdateUserProfilePictureParams struct {
+	Profilepicture sql.NullString `json:"profilepicture"`
+	ID             int64          `json:"id"`
+}
+
+func (q *Queries) UpdateUserProfilePicture(ctx context.Context, arg UpdateUserProfilePictureParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, updateUserProfilePicture, arg.Profilepicture, arg.ID)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Password,
+		&i.Firstname,
+		&i.Lastname,
+		&i.CompanyID,
+		&i.JobsiteID,
+		&i.Role,
+		&i.Email,
+		&i.Phone,
+		&i.Profilepicture,
+	)
+	return i, err
+}
+
+const updateUserRole = `-- name: UpdateUserRole :one
+UPDATE Users SET role = ? WHERE id = ? RETURNING id, username, password, firstname, lastname, company_id, jobsite_id, role, email, phone, profilepicture
+`
+
+type UpdateUserRoleParams struct {
+	Role sql.NullString `json:"role"`
+	ID   int64          `json:"id"`
+}
+
+func (q *Queries) UpdateUserRole(ctx context.Context, arg UpdateUserRoleParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, updateUserRole, arg.Role, arg.ID)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Password,
+		&i.Firstname,
+		&i.Lastname,
+		&i.CompanyID,
+		&i.JobsiteID,
+		&i.Role,
+		&i.Email,
+		&i.Phone,
+		&i.Profilepicture,
+	)
+	return i, err
+}
+
+const updateUserSite = `-- name: UpdateUserSite :one
+UPDATE Users SET jobsite_id = ? WHERE id = ? RETURNING id, username, password, firstname, lastname, company_id, jobsite_id, role, email, phone, profilepicture
+`
+
+type UpdateUserSiteParams struct {
+	JobsiteID sql.NullInt64 `json:"jobsite_id"`
+	ID        int64         `json:"id"`
+}
+
+func (q *Queries) UpdateUserSite(ctx context.Context, arg UpdateUserSiteParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, updateUserSite, arg.JobsiteID, arg.ID)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Password,
+		&i.Firstname,
+		&i.Lastname,
+		&i.CompanyID,
+		&i.JobsiteID,
 		&i.Role,
 		&i.Email,
 		&i.Phone,
