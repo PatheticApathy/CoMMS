@@ -30,21 +30,42 @@ func Logger(next http.Handler) http.Handler {
 }
 
 // Auth middlware locks sub routes unless user is authenticated
-func Auth(next http.Handler, e *handler.Env) http.Handler {
+func Auth(next http.Handler, secret []byte, e *handler.Env, role string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		login, err := auth.ReadEncrypted(r, "LoginCookie", []byte(e.Secret))
-		if err != nil {
-			log.Printf("Error for authorization request: %e", err)
-			http.Error(w, "Invalid request", http.StatusBadRequest)
-			return
-		}
-		err = auth.CheckUserAndPass(e.Queries, r.Context(), &login)
+		token := r.Header.Get("Authorization")
+		payload, err := auth.VerifyToken(token, []byte(e.Secret))
 		if err != nil {
 			log.Printf("Error: %e", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
-		next.ServeHTTP(w, r)
+
+		validation, err := e.Queries.GetUserAndPass(r.Context(), payload.Username)
+		if err != nil {
+			log.Printf("Error: %e", err)
+			http.Error(w, "Invalid Credentials", http.StatusBadRequest)
+			return
+		}
+
+		if validation.Password == payload.Password && validation.Username == payload.Username {
+
+			if role != "" && !payload.Role.Valid {
+				log.Print("If your seeing this message it's because your test account does not have a role. Fix it lol")
+				http.Error(w, "Invalid Credentials", http.StatusBadRequest)
+				return
+			}
+
+			if role == "" || payload.Role.String == role {
+				log.Printf("User %s successfully authenticated", payload.Username)
+				next.ServeHTTP(w, r)
+				return
+			}
+			log.Print("User role invalid for this route")
+			http.Error(w, "Invalid Credentials", http.StatusBadRequest)
+		}
+
+		log.Print("User credentials did not match database")
+		http.Error(w, "Invalid Credentials", http.StatusBadRequest)
 	})
 }
 

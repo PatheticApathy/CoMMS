@@ -3,7 +3,7 @@
 //   sqlc v1.27.0
 // source: job_sites.sql
 
-package materialdb
+package userdb
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 )
 
 const addJobSite = `-- name: AddJobSite :one
-INSERT INTO JobSites(name, addr, location_lat, location_lng) VALUES (?,?,?,?) RETURNING id, name, addr, location_lat, location_lng
+INSERT INTO JobSites(name, addr, location_lat, location_lng, company_id) VALUES (?,?,?,?,?) RETURNING id, name, addr, location_lat, location_lng, company_id
 `
 
 type AddJobSiteParams struct {
@@ -19,6 +19,7 @@ type AddJobSiteParams struct {
 	Addr        sql.NullString  `json:"addr"`
 	LocationLat sql.NullFloat64 `json:"location_lat"`
 	LocationLng sql.NullFloat64 `json:"location_lng"`
+	CompanyID   sql.NullInt64   `json:"company_id"`
 }
 
 func (q *Queries) AddJobSite(ctx context.Context, arg AddJobSiteParams) (JobSite, error) {
@@ -27,6 +28,7 @@ func (q *Queries) AddJobSite(ctx context.Context, arg AddJobSiteParams) (JobSite
 		arg.Addr,
 		arg.LocationLat,
 		arg.LocationLng,
+		arg.CompanyID,
 	)
 	var i JobSite
 	err := row.Scan(
@@ -35,6 +37,7 @@ func (q *Queries) AddJobSite(ctx context.Context, arg AddJobSiteParams) (JobSite
 		&i.Addr,
 		&i.LocationLat,
 		&i.LocationLng,
+		&i.CompanyID,
 	)
 	return i, err
 }
@@ -43,15 +46,23 @@ const getAllJobSites = `-- name: GetAllJobSites :many
 SELECT id, name, addr, location_lat, location_lng FROM JobSites
 `
 
-func (q *Queries) GetAllJobSites(ctx context.Context) ([]JobSite, error) {
+type GetAllJobSitesRow struct {
+	ID          int64           `json:"id"`
+	Name        string          `json:"name"`
+	Addr        sql.NullString  `json:"addr"`
+	LocationLat sql.NullFloat64 `json:"location_lat"`
+	LocationLng sql.NullFloat64 `json:"location_lng"`
+}
+
+func (q *Queries) GetAllJobSites(ctx context.Context) ([]GetAllJobSitesRow, error) {
 	rows, err := q.db.QueryContext(ctx, getAllJobSites)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []JobSite
+	var items []GetAllJobSitesRow
 	for rows.Next() {
-		var i JobSite
+		var i GetAllJobSitesRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
@@ -76,9 +87,17 @@ const getJobSite = `-- name: GetJobSite :one
 SELECT id, name, addr, location_lat, location_lng FROM JobSites WHERE id=?
 `
 
-func (q *Queries) GetJobSite(ctx context.Context, id int64) (JobSite, error) {
+type GetJobSiteRow struct {
+	ID          int64           `json:"id"`
+	Name        string          `json:"name"`
+	Addr        sql.NullString  `json:"addr"`
+	LocationLat sql.NullFloat64 `json:"location_lat"`
+	LocationLng sql.NullFloat64 `json:"location_lng"`
+}
+
+func (q *Queries) GetJobSite(ctx context.Context, id int64) (GetJobSiteRow, error) {
 	row := q.db.QueryRowContext(ctx, getJobSite, id)
-	var i JobSite
+	var i GetJobSiteRow
 	err := row.Scan(
 		&i.ID,
 		&i.Name,

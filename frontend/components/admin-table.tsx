@@ -144,8 +144,8 @@ export const columns: ColumnDef<User>[] = [
       );
     },
     filterFn: (row, columnId, filterValue) => {
-      const site = row.getValue(columnId) as { String: string; Valid: boolean };
-      return site.String.toLowerCase().includes(filterValue.toLowerCase());
+      const company = row.getValue(columnId) as { String: string; Valid: boolean };
+      return company.String.toLowerCase().includes(filterValue.toLowerCase());
     },
   },
   {
@@ -188,10 +188,10 @@ export const columns: ColumnDef<User>[] = [
       );
     },
     cell: ({ row }) => {
-      const site = row.getValue("role") as { String: string; Valid: boolean };
+      const role = row.getValue("role") as { String: string; Valid: boolean };
       return (
-        <div className="capitalize">
-          {site.String}
+        <div className="">
+          {role.String}
         </div>
       );
     },

@@ -178,6 +178,52 @@
                 }
             }
         },
+        "/company/create": {
+            "post": {
+                "description": "Adds company to the database and assigns the user as a company admin",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "companies"
+                ],
+                "summary": "post company to database",
+                "parameters": [
+                    {
+                        "description": "Format of add company request",
+                        "name": "company",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/userdb.AddCompanyParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "company",
+                        "schema": {
+                            "$ref": "#/definitions/userdb.Company"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to create company",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/material/add": {
             "post": {
                 "description": "Adds materials to the database using valid json structure",
@@ -640,7 +686,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/materialdb.AddJobSiteParams"
+                            "$ref": "#/definitions/userdb.AddJobSiteParams"
                         }
                     }
                 ],
@@ -648,7 +694,7 @@
                     "200": {
                         "description": "jobsite",
                         "schema": {
-                            "$ref": "#/definitions/materialdb.JobSite"
+                            "$ref": "#/definitions/userdb.JobSite"
                         }
                     },
                     "400": {
@@ -682,7 +728,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/materialdb.JobSite"
+                                "$ref": "#/definitions/userdb.JobSite"
                             }
                         }
                     },
@@ -718,50 +764,7 @@
                     "200": {
                         "description": "job site",
                         "schema": {
-                            "$ref": "#/definitions/materialdb.JobSite"
-                        }
-                    },
-                    "400": {
-                        "description": "bad request",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/user/add": {
-            "post": {
-                "description": "The use defined in the material database is only the bear essentials for logging",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "adds user to the material database",
-                "parameters": [
-                    {
-                        "description": "Format of add user request",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/materialdb.AddUserParams"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "user",
-                        "schema": {
-                            "$ref": "#/definitions/materialdb.User"
+                            "$ref": "#/definitions/userdb.JobSite"
                         }
                     },
                     "400": {
@@ -807,6 +810,11 @@
         },
         "/user/create": {
             "post": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Adds user to the database using valid json structure",
                 "consumes": [
                     "application/json"
@@ -844,6 +852,49 @@
                     },
                     "500": {
                         "description": "Failed to create user",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/decrypt": {
+            "post": {
+                "description": "Decrypt user login token",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Decrypts token",
+                "parameters": [
+                    {
+                        "description": "Format of login user request",
+                        "name": "users",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.Token"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User login data token",
+                        "schema": {
+                            "$ref": "#/definitions/auth.Identity"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
                         "schema": {
                             "type": "string"
                         }
@@ -917,7 +968,7 @@
         },
         "/user/login": {
             "post": {
-                "description": "Pulls user login information and authenticates the user",
+                "description": "Pulls user login information and authenticates the user\nThe id can be left blank",
                 "consumes": [
                     "application/json"
                 ],
@@ -932,13 +983,13 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/auth.UserAndPass"
+                            "$ref": "#/definitions/auth.UnEncrypted"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Success",
+                        "description": "User login token",
                         "schema": {
                             "type": "string"
                         }
@@ -960,7 +1011,7 @@
         },
         "/user/search": {
             "get": {
-                "description": "Gets user using id(may add more parameters later)",
+                "description": "Gets user using username",
                 "produces": [
                     "application/json"
                 ],
@@ -970,9 +1021,9 @@
                 "summary": "fetches user based on given paremeters",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "user's identification number",
-                        "name": "id",
+                        "name": "username",
                         "in": "query",
                         "required": true
                     }
@@ -985,7 +1036,7 @@
                         }
                     },
                     "400": {
-                        "description": "Invalid id",
+                        "description": "Invalid username",
                         "schema": {
                             "type": "string"
                         }
@@ -1025,9 +1076,9 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "users",
+                        "description": "User login token",
                         "schema": {
-                            "$ref": "#/definitions/userdb.User"
+                            "$ref": "#/definitions/auth.Token"
                         }
                     },
                     "400": {
@@ -1062,8 +1113,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/userdb.UpdateUserParams"
                         }
                     }
                 ],
@@ -1088,51 +1138,40 @@
                     }
                 }
             }
-        },
-        "/user/{id}": {
-            "get": {
-                "description": "gets user from db",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "get user from the material database",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "name": "id",
-                        "in": "path"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "user",
-                        "schema": {
-                            "$ref": "#/definitions/materialdb.User"
-                        }
-                    },
-                    "400": {
-                        "description": "bad request",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {
-        "auth.UserAndPass": {
+        "auth.Identity": {
             "type": "object",
             "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "role": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "auth.Token": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "auth.UnEncrypted": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
                 "password": {
                     "type": "string"
                 },
@@ -1149,23 +1188,6 @@
                 },
                 "user_id": {
                     "type": "integer"
-                }
-            }
-        },
-        "materialdb.AddJobSiteParams": {
-            "type": "object",
-            "properties": {
-                "addr": {
-                    "$ref": "#/definitions/sql.NullString"
-                },
-                "location_lat": {
-                    "$ref": "#/definitions/sql.NullFloat64"
-                },
-                "location_lng": {
-                    "$ref": "#/definitions/sql.NullFloat64"
-                },
-                "name": {
-                    "type": "string"
                 }
             }
         },
@@ -1215,17 +1237,6 @@
                 }
             }
         },
-        "materialdb.AddUserParams": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "site_id": {
-                    "$ref": "#/definitions/sql.NullInt64"
-                }
-            }
-        },
         "materialdb.ChangeMaterialNoteParams": {
             "type": "object",
             "properties": {
@@ -1265,26 +1276,6 @@
                 },
                 "user_id": {
                     "type": "integer"
-                }
-            }
-        },
-        "materialdb.JobSite": {
-            "type": "object",
-            "properties": {
-                "addr": {
-                    "$ref": "#/definitions/sql.NullString"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "location_lat": {
-                    "$ref": "#/definitions/sql.NullFloat64"
-                },
-                "location_lng": {
-                    "$ref": "#/definitions/sql.NullFloat64"
-                },
-                "name": {
-                    "type": "string"
                 }
             }
         },
@@ -1344,17 +1335,6 @@
                 }
             }
         },
-        "materialdb.User": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "site_id": {
-                    "$ref": "#/definitions/sql.NullInt64"
-                }
-            }
-        },
         "sql.NullFloat64": {
             "type": "object",
             "properties": {
@@ -1403,17 +1383,57 @@
                 }
             }
         },
+        "userdb.AddCompanyParams": {
+            "type": "object",
+            "properties": {
+                "addr": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "location_lat": {
+                    "$ref": "#/definitions/sql.NullFloat64"
+                },
+                "location_lng": {
+                    "$ref": "#/definitions/sql.NullFloat64"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "userdb.AddJobSiteParams": {
+            "type": "object",
+            "properties": {
+                "addr": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "company_id": {
+                    "$ref": "#/definitions/sql.NullInt64"
+                },
+                "location_lat": {
+                    "$ref": "#/definitions/sql.NullFloat64"
+                },
+                "location_lng": {
+                    "$ref": "#/definitions/sql.NullFloat64"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "userdb.AddUserParams": {
             "type": "object",
             "properties": {
-                "company": {
-                    "$ref": "#/definitions/sql.NullString"
+                "company_id": {
+                    "$ref": "#/definitions/sql.NullInt64"
                 },
                 "email": {
                     "type": "string"
                 },
                 "firstname": {
                     "$ref": "#/definitions/sql.NullString"
+                },
+                "jobsite_id": {
+                    "$ref": "#/definitions/sql.NullInt64"
                 },
                 "lastname": {
                     "$ref": "#/definitions/sql.NullString"
@@ -1430,10 +1450,50 @@
                 "role": {
                     "$ref": "#/definitions/sql.NullString"
                 },
-                "site": {
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "userdb.Company": {
+            "type": "object",
+            "properties": {
+                "addr": {
                     "$ref": "#/definitions/sql.NullString"
                 },
-                "username": {
+                "id": {
+                    "type": "integer"
+                },
+                "location_lat": {
+                    "$ref": "#/definitions/sql.NullFloat64"
+                },
+                "location_lng": {
+                    "$ref": "#/definitions/sql.NullFloat64"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "userdb.JobSite": {
+            "type": "object",
+            "properties": {
+                "addr": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "company_id": {
+                    "$ref": "#/definitions/sql.NullInt64"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "location_lat": {
+                    "$ref": "#/definitions/sql.NullFloat64"
+                },
+                "location_lng": {
+                    "$ref": "#/definitions/sql.NullFloat64"
+                },
+                "name": {
                     "type": "string"
                 }
             }
@@ -1455,11 +1515,49 @@
                 }
             }
         },
+        "userdb.UpdateUserParams": {
+            "type": "object",
+            "properties": {
+                "company_id": {
+                    "$ref": "#/definitions/sql.NullInt64"
+                },
+                "email": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "firstname": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "jobsite_id": {
+                    "$ref": "#/definitions/sql.NullInt64"
+                },
+                "lastname": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "password": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "phone": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "profilepicture": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "role": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "username": {
+                    "$ref": "#/definitions/sql.NullString"
+                }
+            }
+        },
         "userdb.User": {
             "type": "object",
             "properties": {
-                "company": {
-                    "$ref": "#/definitions/sql.NullString"
+                "company_id": {
+                    "$ref": "#/definitions/sql.NullInt64"
                 },
                 "email": {
                     "type": "string"
@@ -1469,6 +1567,9 @@
                 },
                 "id": {
                     "type": "integer"
+                },
+                "jobsite_id": {
+                    "$ref": "#/definitions/sql.NullInt64"
                 },
                 "lastname": {
                     "$ref": "#/definitions/sql.NullString"
@@ -1483,9 +1584,6 @@
                     "$ref": "#/definitions/sql.NullString"
                 },
                 "role": {
-                    "$ref": "#/definitions/sql.NullString"
-                },
-                "site": {
                     "$ref": "#/definitions/sql.NullString"
                 },
                 "username": {

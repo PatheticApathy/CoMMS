@@ -7,20 +7,28 @@ package userdb
 
 import (
 	"context"
+	"database/sql"
 )
 
 const getUserAndPass = `-- name: GetUserAndPass :one
-SELECT password, id FROM Users WHERE username = ?
+SELECT username, password, id, role FROM Users WHERE username = ?
 `
 
 type GetUserAndPassRow struct {
-	Password string `json:"password"`
-	ID       int64  `json:"id"`
+	Username string         `json:"username"`
+	Password string         `json:"password"`
+	ID       int64          `json:"id"`
+	Role     sql.NullString `json:"role"`
 }
 
 func (q *Queries) GetUserAndPass(ctx context.Context, username string) (GetUserAndPassRow, error) {
 	row := q.db.QueryRowContext(ctx, getUserAndPass, username)
 	var i GetUserAndPassRow
-	err := row.Scan(&i.Password, &i.ID)
+	err := row.Scan(
+		&i.Username,
+		&i.Password,
+		&i.ID,
+		&i.Role,
+	)
 	return i, err
 }

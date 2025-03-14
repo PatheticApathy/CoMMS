@@ -186,8 +186,25 @@ func (e *Env) postMaterialHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err := json.NewDecoder(r.Body).Decode(&material); err != nil {
 		log.Printf("Could not parse json obj: %e", err)
-		http.Error(w, "Error parsing json", http.StatusBadRequest)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
+	}
+
+	if material.JobSite.Valid {
+		id := strconv.Itoa(int(material.JobSite.Int64))
+		resp, err := http.Get(e.UserHost + "/sites/search?id=" + id)
+
+		if err != nil {
+			log.Printf("Error occured while trying to connect to user api: %e", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		if !(resp.StatusCode == http.StatusOK) {
+			log.Printf("Invalid Jobsite Id  %s given", id)
+			http.Error(w, "Bad request", http.StatusBadRequest)
+			return
+		}
 	}
 
 	ret, err := e.Queries.AddMaterial(r.Context(), material)
