@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 export default async function JobsitesCore() {
     return (
     <div className="flex flex-col gap-5">
-        <Link href="/jobsite">
+        <Link href="/dashboard/jobsites/jobsite">
             <Button variant="secondary">Jobsite 1</Button>
         </Link>
         <Link href="/jobsites">

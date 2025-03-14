@@ -19,7 +19,7 @@ export default function AddMaterialFormDialouge({ children }: Readonly<{ childre
       <DialogContent className="sm:mx-w-[425px]">
         <DialogHeader>
           <DialogTitle>Add New Material</DialogTitle>
-          <DialogDescription>Add material to be managed. Once your done, everyone in who needs to see it can see it.</DialogDescription>
+          <DialogDescription>Add material to be managed. Once you are done, everyone who needs to see it can see it.</DialogDescription>
         </DialogHeader>
         <div>
           <MaterialForm />
