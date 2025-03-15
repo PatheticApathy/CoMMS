@@ -49,6 +49,7 @@ func TestMain(m *testing.M) {
 	umux.Handle("/material/", http.StripPrefix("/material", middleware.Auth(mat_proxy, []byte(uenv.Secret), &uenv, "")))
 
 	userver = httptest.NewServer(umux)
+	menv.UserHost = userver.URL
 
 	m.Run()
 
@@ -74,8 +75,30 @@ func makePostRequest(jdata []byte, token, route string) (*http.Response, error) 
 	return resp, nil
 }
 
+func makePutRequest(jdata []byte, token, route string) (*http.Response, error) {
+	req, err := http.NewRequest("PUT", userver.URL+route, bytes.NewReader(jdata))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Authorization", token)
+
+	client := http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func TestAdminSuite(t *testing.T) {
+	t.Log("####################################### ADMIN SIGNUP ##################################################")
 	token := testAdminSignup(t)
+	t.Log("####################################### ADMIN Material ADD ############################################")
 	testAdminAddMaterial(t, token)
+	t.Log("####################################### ADMIN CHECK OUT ################################################")
 	testCheckout(t, token)
+	t.Log("####################################### ADMIN CHECK IN ##################################################################")
+	testCheckIn(t, token)
 }

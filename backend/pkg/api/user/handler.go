@@ -19,20 +19,21 @@ import (
 //	@Description	Gets user using id(may add more parameters later)
 //	@Tags			users
 //	@Produce		json
-//	@Param			id	query		int				true	"user's identification number"
+//	@Param			id	query		int				false	"user's identification number"
+//	@Param username query string  false  "user's username"
 //	@Success		200	{object}	userdb.User		"users"
-//	@Failure		400	{string}	string			"Invalid id"
+//	@Failure		400	{string}	string			"Bad request"
 //	@Failure		500	{string}	string			"Internal Server Error"
 //	@Router			/user/search [get]
 func (e *Env) getUser(w http.ResponseWriter, r *http.Request) {
-	log.Println("Handling getUser request")
+	log.Println("Handling search request")
 	query := r.URL.Query()
 	if query.Has("id") {
 		id, err := strconv.Atoi(query.Get("id"))
 		log.Printf("Received request with id: %d", id)
 		if err != nil {
 			log.Printf("Invalid id, reason: %e", err)
-			http.Error(w, "Invalid id", http.StatusBadRequest)
+			http.Error(w, "Bad Request", http.StatusBadRequest)
 			return
 		}
 
@@ -40,7 +41,7 @@ func (e *Env) getUser(w http.ResponseWriter, r *http.Request) {
 		user, err := e.Queries.GetUser(r.Context(), int64(id))
 		if err != nil {
 			log.Printf("Could not find user, reason: %e", err)
-			http.Error(w, "Invalid id", http.StatusBadRequest)
+			http.Error(w, "Bad Request", http.StatusBadRequest)
 			return
 		}
 
@@ -53,22 +54,7 @@ func (e *Env) getUser(w http.ResponseWriter, r *http.Request) {
 
 		log.Println("User response successfully sent")
 	}
-}
 
-// getUserName hanlder returns a user based on given parameters godoc
-//
-//	@Summary		fetches user based on given paremeters
-//	@Description	Gets user using username
-//	@Tags			users
-//	@Produce		json
-//	@Param			username query	string			true	"user's identification number"
-//	@Success		200	{object}	userdb.User		"users"
-//	@Failure		400	{string}	string			"Invalid username"
-//	@Failure		500	{string}	string			"Internal Server Error"
-//	@Router			/user/search [get]
-func (e *Env) getUserName(w http.ResponseWriter, r *http.Request) {
-	log.Println("Handling getUserName request")
-	query := r.URL.Query()
 	if query.Has("username") {
 		username := query.Get("username")
 		log.Printf("Received request with username: %s", username)
@@ -77,7 +63,7 @@ func (e *Env) getUserName(w http.ResponseWriter, r *http.Request) {
 		user, err := e.Queries.GetUserName(r.Context(), string(username))
 		if err != nil {
 			log.Printf("Could not find user, reason: %e", err)
-			http.Error(w, "Invalid username", http.StatusBadRequest)
+			http.Error(w, "Bad request", http.StatusBadRequest)
 			return
 		}
 

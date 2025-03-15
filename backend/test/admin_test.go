@@ -124,43 +124,66 @@ func testCheckout(t *testing.T, token string) {
 		return
 	}
 
-	resp, err := makePostRequest(jdata, token, "/material/check/out")
+	resp, err := makePostRequest(jdata, token, "/material/checkout/out")
 	if err != nil {
 		t.Fatalf("Failed to send checkout request with error %e", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.Status != "200 OK" {
-		t.Fatalf("Error got status code %s from /material/check/out", resp.Status)
+		t.Fatalf("Error got status code %s from /material/checkout/out", resp.Status)
 		return
 	}
 
 	// Checkout Material twice should fail
-	resp, err = makePostRequest(jdata, token, "/material/check/out")
+	resp, err = makePostRequest(jdata, token, "/material/checkout/out")
 	if err != nil {
 		t.Fatalf("Failed to send checkout request with error %e", err)
 	}
 	defer resp.Body.Close()
 
-	if resp.Status != "200 OK" {
-		t.Fatalf("Error got status code %s from /material/check/out", resp.Status)
+	if resp.Status == "200 OK" {
+		t.Fatalf("Error got status code %s from /material/checkout/out(this one should fail)", resp.Status)
 		return
 	}
 
 	// Cannot Checkout Material When empty
-	resp, err = makePostRequest(jdata, token, "/material/check/out")
+	resp, err = makePostRequest(jdata, token, "/material/checkout/out")
 	if err != nil {
 		t.Fatalf("Failed to send checkout request with error %e", err)
 	}
 	defer resp.Body.Close()
 
-	if resp.Status != "200 OK" {
-		t.Fatalf("Error got status code %s from /material/check/out", resp.Status)
+	if resp.Status == "200 OK" {
+		t.Fatalf("Error got code %s from /material/checkout/out when checked out twice", resp.Status)
 		return
 	}
 }
 
 func testCheckIn(t *testing.T, token string) {
 	// Checkin Material
-	// Checkin Material twice should fail
+	identity, err := auth.VerifyToken(token, []byte("M+!4ySj_|RuuQHj2!n<Dhx*5+H&L|A~o"))
+	if err != nil {
+		t.Fatalf("Impossible token error reached: %e", err)
+		return
+	}
+
+	// Checkin Material
+	jdata, err := json.Marshal(materialdb.UpdateCheckinlogParams{ItemID: 2, UserID: identity.ID})
+	if err != nil {
+		t.Fatalf("Could not marshall json: %e", err)
+		return
+	}
+
+	resp, err := makePutRequest(jdata, token, "/material/checkout/in")
+	if err != nil {
+		t.Fatalf("Failed to send checkin request with error %e", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.Status != "200 OK" {
+		t.Fatalf("Error got status code %s from /material/checkout/in", resp.Status)
+		return
+	}
 }
