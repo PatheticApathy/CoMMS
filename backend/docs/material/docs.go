@@ -63,12 +63,12 @@ const docTemplate = `{
                 "summary": "Adds checkin time to existing checkout log",
                 "parameters": [
                     {
-                        "description": "id of checkoutlog",
+                        "description": "item id and user id",
                         "name": "logid",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "$ref": "#/definitions/materialdb.UpdateCheckinlogParams"
                         }
                     }
                 ],
@@ -1017,7 +1017,7 @@ const docTemplate = `{
         },
         "/user/search": {
             "get": {
-                "description": "Gets user using username",
+                "description": "Gets user using id(may add more parameters later)",
                 "produces": [
                     "application/json"
                 ],
@@ -1027,11 +1027,16 @@ const docTemplate = `{
                 "summary": "fetches user based on given paremeters",
                 "parameters": [
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "user's identification number",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "user's username",
                         "name": "username",
-                        "in": "query",
-                        "required": true
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1042,7 +1047,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Invalid username",
+                        "description": "Bad request",
                         "schema": {
                             "type": "string"
                         }
@@ -1338,6 +1343,17 @@ const docTemplate = `{
                 },
                 "timestamp": {
                     "type": "string"
+                }
+            }
+        },
+        "materialdb.UpdateCheckinlogParams": {
+            "type": "object",
+            "properties": {
+                "item_id": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         },

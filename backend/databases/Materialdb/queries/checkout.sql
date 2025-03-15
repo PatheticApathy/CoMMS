@@ -6,7 +6,7 @@ RETURNING *;
 -- name: UpdateCheckinlog :one
 UPDATE CheckoutLogs
 SET checkin_time = date()
-WHERE id = ?
+WHERE item_id = @item_id AND user_id = @user_id
 RETURNING *;
 
 
