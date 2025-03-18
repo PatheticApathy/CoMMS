@@ -14,6 +14,17 @@ export interface User {
     profilepicture: Profilepicture
   }
   
+export interface TokenStr {
+  token: string
+}
+
+  export interface Token {
+    id: number
+    password: string
+    role : {String: string, Valid: boolean}
+    username: string
+  }
+
   export interface CompanyID {
     Int64: number
     Valid: boolean

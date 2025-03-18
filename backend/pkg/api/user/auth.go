@@ -93,14 +93,14 @@ func (e *Env) loggout(w http.ResponseWriter, _ *http.Request) {
 //	  @Failure		500		{string}	string					"Server Error"
 //		@Router			/user/decrypt [post]
 func (e *Env) DecryptHanlder(w http.ResponseWriter, r *http.Request) {
-	var token string
+	var token auth.Token
 	if err := json.NewDecoder(r.Body).Decode(&token); err != nil {
 		log.Printf("Could not decode json token, reason: %s", err)
 		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
 	}
-
-	payload, err := auth.VerifyToken(token, []byte(e.Secret))
+	log.Printf("Recived token %s", token.Token)
+	payload, err := auth.VerifyToken(token.Token, []byte(e.Secret))
 	if err != nil {
 		log.Printf("Error for authorization request: %s", err)
 		http.Error(w, "Invalid request", http.StatusBadRequest)
