@@ -22,13 +22,10 @@ import {
     DropdownMenuItem,
   } from "@/components/ui/dropdown-menu"
 import { redirect } from 'next/navigation'
-import useSWRMutation from 'swr/mutation'
-import Loading from '@/components/loading'
 import { EditProfile } from "./edit-profile-dialog"
 import useSWR, { useSWRConfig } from "swr";
-import { User, Token } from "@/user-api-types";
-import { getCookie } from "./cookie-functions"
-import { getToken } from '@/components/localstorage'
+import { User } from "@/user-api-types";
+import { getToken, delToken } from '@/components/localstorage'
 
 async function getProfileArgs(url: string, arg: {token: string}) {
     return fetch(url, {
@@ -74,7 +71,7 @@ export function Profile() {
     if (!user) return <p>Loading...</p>;        
 
     async function logoutSubmit() {
-        document.cookie = `token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`
+        delToken()
         redirect('/')
     }
 

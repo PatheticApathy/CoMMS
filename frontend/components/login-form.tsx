@@ -16,7 +16,6 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { getCookie, setCookie, checkCookie } from "./cookie-functions"
 import { setToken } from '@/components/localstorage'
 import { LogInUser } from "@/user-api-types"
 
@@ -36,9 +35,6 @@ export default function LoginForm() {
 
   const { data, trigger, error, isMutating } = useSWRMutation('api/user/login', logIn, {throwOnError: false})
 
-  console.log("Data: ", JSON.stringify(data))
-  console.log(document.cookie)
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -50,8 +46,6 @@ export default function LoginForm() {
   if (isMutating) { return (<div className='flex items-center justify-center w-screen h-screen'>Loading <Loading /></div>) }
   if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
   if (data) {
-    //let expireTime = setCookie(7)
-    //document.cookie = `token=${JSON.stringify(data)}; expires=${expireTime}; path=/`
     console.log(`Le Token is gooda ${data}`);
     setToken(data)
     redirect('/dashboard')

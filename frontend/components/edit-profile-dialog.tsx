@@ -25,7 +25,6 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import useSWR from "swr"
 import { User, Firstname, Lastname } from "@/user-api-types"
-import { getCookie } from "./cookie-functions"
 import { getToken } from '@/components/localstorage'
 
 const formSchema = z.object({
