@@ -12,7 +12,6 @@ import {
 
   import {
     SidebarMenuButton,
-  
   } from "@/components/ui/sidebar"
 
   import {
@@ -23,7 +22,7 @@ import {
   } from "@/components/ui/dropdown-menu"
 import { redirect } from 'next/navigation'
 import { EditProfile } from "./edit-profile-dialog"
-import useSWR, { useSWRConfig } from "swr";
+import useSWR from "swr";
 import { User } from "@/user-api-types";
 import { getToken, delToken } from '@/components/localstorage'
 
