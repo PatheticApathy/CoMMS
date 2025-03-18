@@ -62,6 +62,11 @@ export interface SignUpUser {
   username: string
 }
 
+export interface LogInUser {
+  username: string
+  password: string
+}
+
 export interface UpdateUserParams {
   username: {String: string, Valid: boolean}
   password: {String: string, Valid: boolean}

@@ -17,13 +17,15 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { getCookie, setCookie, checkCookie } from "./cookie-functions"
+import { setToken } from '@/components/localstorage'
+import { LogInUser } from "@/user-api-types"
 
 const formSchema = z.object({
   username: z.string(),
   password: z.string(),
 })
 
-async function logIn(url: string, { arg }) {
+async function logIn(url: string, { arg }: { arg: LogInUser }) {
   return fetch(url, {
     method: 'POST',
     body: JSON.stringify(arg)
@@ -48,8 +50,10 @@ export default function LoginForm() {
   if (isMutating) { return (<div className='flex items-center justify-center w-screen h-screen'>Loading <Loading /></div>) }
   if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
   if (data) {
-    let expireTime = setCookie(7)
-    document.cookie = `token=${JSON.stringify(data)}; expires=${expireTime}; path=/`
+    //let expireTime = setCookie(7)
+    //document.cookie = `token=${JSON.stringify(data)}; expires=${expireTime}; path=/`
+    console.log(`Le Token is gooda ${data}`);
+    setToken(data)
     redirect('/dashboard')
   }
 
