@@ -87,7 +87,7 @@ func (e *Env) loggout(w http.ResponseWriter, _ *http.Request) {
 //		@Description	 Decrypt user login token
 //		@Tags			users
 //	  @Accept			json
-//		@Param			users	body		auth.Token	true	"Format of login user request"
+//		@Param			users	body		string		true	"Format of login user request"
 //		@Success		200		{object}	auth.Identity					"User login data token"
 //		@Failure		400		{string}	string					"Invalid request"
 //	  @Failure		500		{string}	string					"Server Error"
@@ -95,7 +95,7 @@ func (e *Env) loggout(w http.ResponseWriter, _ *http.Request) {
 func (e *Env) DecryptHanlder(w http.ResponseWriter, r *http.Request) {
 	var token auth.Token
 	if err := json.NewDecoder(r.Body).Decode(&token); err != nil {
-		log.Printf("Could not decode json token, reason: %e", err)
+		log.Printf("Could not decode json token, reason: %s", err)
 		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
 	}
@@ -108,7 +108,7 @@ func (e *Env) DecryptHanlder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.NewEncoder(w).Encode(&payload); err != nil {
-		log.Printf("Could not encode json user, reason: %e", err)
+		log.Printf("Could not encode json user, reason: %s", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}

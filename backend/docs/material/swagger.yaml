@@ -126,6 +126,13 @@ definitions:
       timestamp:
         type: string
     type: object
+  materialdb.UpdateCheckinlogParams:
+    properties:
+      item_id:
+        type: integer
+      user_id:
+        type: integer
+    type: object
   sql.NullFloat64:
     properties:
       float64:
@@ -333,12 +340,12 @@ paths:
       - application/json
       description: Adds checkin time to existing checkout log
       parameters:
-      - description: id of checkoutlog
+      - description: item id and user id
         in: body
         name: logid
         required: true
         schema:
-          type: integer
+          $ref: '#/definitions/materialdb.UpdateCheckinlogParams'
       produces:
       - application/json
       responses:
@@ -964,12 +971,15 @@ paths:
       - users
   /user/search:
     get:
-      description: Gets user using username
+      description: Gets user using id(may add more parameters later)
       parameters:
       - description: user's identification number
         in: query
+        name: id
+        type: integer
+      - description: user's username
+        in: query
         name: username
-        required: true
         type: string
       produces:
       - application/json
@@ -979,7 +989,7 @@ paths:
           schema:
             $ref: '#/definitions/userdb.User'
         "400":
-          description: Invalid username
+          description: Bad request
           schema:
             type: string
         "500":
@@ -1007,7 +1017,7 @@ paths:
         "200":
           description: User login token
           schema:
-            $ref: '#/definitions/auth.Token'
+            type: string
         "400":
           description: Invalid input
           schema:

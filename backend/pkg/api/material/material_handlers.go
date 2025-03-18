@@ -32,21 +32,21 @@ func (e *Env) getMaterialHandler(w http.ResponseWriter, r *http.Request) {
 	if query.Has("id") {
 		material_id, err := strconv.Atoi(query.Get("id"))
 		if err != nil {
-			log.Printf("Material id is invalid, reason %e", err)
+			log.Printf("Material id is invalid, reason %s", err)
 			http.Error(w, "invalid material id", http.StatusBadRequest)
 			return
 		}
 
 		materials, err := e.Queries.GetMaterialsByID(r.Context(), int64(material_id))
 		if err != nil {
-			log.Printf("Material id is invalid, reason %e", err)
+			log.Printf("Material id is invalid, reason %s", err)
 			http.Error(w, "invalid material id", http.StatusBadRequest)
 			return
 		}
 
 		log.Printf("Material %d found", material_id)
 		if err := json.NewEncoder(w).Encode(&materials); err != nil {
-			log.Printf("Could not encode to json %e", err)
+			log.Printf("Could not encode to json %s", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
@@ -58,7 +58,7 @@ func (e *Env) getMaterialHandler(w http.ResponseWriter, r *http.Request) {
 
 		quantity, err := strconv.Atoi(query.Get("quantity"))
 		if err != nil {
-			log.Printf("Quantity is invalid, reason %e", err)
+			log.Printf("Quantity is invalid, reason %s", err)
 			http.Error(w, "invalid quantity", http.StatusBadRequest)
 			return
 		}
@@ -70,14 +70,14 @@ func (e *Env) getMaterialHandler(w http.ResponseWriter, r *http.Request) {
 
 		materials, err := e.Queries.GetMaterialsByQuantity(r.Context(), args)
 		if err != nil {
-			log.Printf("Quantity or unit is invalid, reason %e", err)
+			log.Printf("Quantity or unit is invalid, reason %s", err)
 			http.Error(w, "invalid quantity or unit", http.StatusBadRequest)
 			return
 		}
 
 		log.Printf("Material(s) found with quantity %d%s", quantity, unit)
 		if err := json.NewEncoder(w).Encode(&materials); err != nil {
-			log.Printf("Could not create json: %e", err)
+			log.Printf("Could not create json: %s", err)
 			http.Error(w, "invalid quantity or unit", http.StatusInternalServerError)
 			return
 		}
@@ -88,7 +88,7 @@ func (e *Env) getMaterialHandler(w http.ResponseWriter, r *http.Request) {
 	if query.Has("site") {
 		site, err := strconv.Atoi(query.Get("site"))
 		if err != nil {
-			log.Printf("Invalid site id, reason %e", err)
+			log.Printf("Invalid site id, reason %s", err)
 			http.Error(w, "invalid id", http.StatusBadRequest)
 			return
 		}
@@ -100,14 +100,14 @@ func (e *Env) getMaterialHandler(w http.ResponseWriter, r *http.Request) {
 
 		materials, err := e.Queries.GetMaterialsBySite(r.Context(), args)
 		if err != nil {
-			log.Printf("Invalid site id, reason %e", err)
+			log.Printf("Invalid site id, reason %s", err)
 			http.Error(w, "invalid id", http.StatusBadRequest)
 			return
 		}
 
 		log.Printf("Material(s) at site %d", site)
 		if err := json.NewEncoder(w).Encode(&materials); err != nil {
-			log.Printf("Could not create json: %e", err)
+			log.Printf("Could not create json: %s", err)
 			http.Error(w, "Error creating json", http.StatusInternalServerError)
 			return
 		}
@@ -125,14 +125,14 @@ func (e *Env) getMaterialHandler(w http.ResponseWriter, r *http.Request) {
 
 		materials, err := e.Queries.GetMaterialsByType(r.Context(), args)
 		if err != nil {
-			log.Printf("Invalid type, reason %e", err)
+			log.Printf("Invalid type, reason %s", err)
 			http.Error(w, "invalid id", http.StatusBadRequest)
 			return
 		}
 
 		log.Printf("Found materials of type %s", typ)
 		if err := json.NewEncoder(w).Encode(&materials); err != nil {
-			log.Printf("Could not create json: %e", err)
+			log.Printf("Could not create json: %s", err)
 			http.Error(w, "Error creating json", http.StatusInternalServerError)
 			return
 		}
@@ -156,14 +156,14 @@ func (e *Env) getMaterialHandler(w http.ResponseWriter, r *http.Request) {
 func (e *Env) getAllMaterial(w http.ResponseWriter, r *http.Request) {
 	materials, err := e.Queries.GetAllMaterials(r.Context())
 	if err != nil {
-		log.Printf(`Invalid Material insertion, reason %e`, err)
+		log.Printf(`Invalid Material insertion, reason %s`, err)
 		http.Error(w, `Internal Server Error`, http.StatusInternalServerError)
 		return
 	}
 
 	log.Println("Fetched all Material")
 	if err := json.NewEncoder(w).Encode(materials); err != nil {
-		log.Printf("Could not create json obj: %e", err)
+		log.Printf("Could not create json obj: %s", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -185,7 +185,7 @@ func (e *Env) postMaterialHandler(w http.ResponseWriter, r *http.Request) {
 	var material materialdb.AddMaterialParams
 
 	if err := json.NewDecoder(r.Body).Decode(&material); err != nil {
-		log.Printf("Could not parse json obj: %e", err)
+		log.Printf("Could not parse json obj: %s", err)
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
 	}
@@ -193,14 +193,13 @@ func (e *Env) postMaterialHandler(w http.ResponseWriter, r *http.Request) {
 	if material.JobSite.Valid {
 		id := strconv.Itoa(int(material.JobSite.Int64))
 		resp, err := http.Get(e.UserHost + "/sites/search?id=" + id)
-
 		if err != nil {
-			log.Printf("Error occured while trying to connect to user api: %e", err)
+			log.Printf("Error occured while trying to connect to user api: %s", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 
-		if !(resp.StatusCode == http.StatusOK) {
+		if resp.StatusCode != http.StatusOK {
 			log.Printf("Invalid Jobsite Id  %s given", id)
 			http.Error(w, "Bad request", http.StatusBadRequest)
 			return
@@ -209,14 +208,14 @@ func (e *Env) postMaterialHandler(w http.ResponseWriter, r *http.Request) {
 
 	ret, err := e.Queries.AddMaterial(r.Context(), material)
 	if err != nil {
-		log.Printf(`Invalid Material insertion, reason %e`, err)
+		log.Printf(`Invalid Material insertion, reason %s`, err)
 		http.Error(w, `Could not add material`, http.StatusBadRequest)
 		return
 	}
 	log.Printf("Material with id %d added", ret.ID)
 
 	if err := json.NewEncoder(w).Encode(ret); err != nil {
-		log.Printf("Could not create json obj: %e", err)
+		log.Printf("Could not create json obj: %s", err)
 		http.Error(w, "Error creating json", http.StatusInternalServerError)
 		return
 	}
@@ -237,14 +236,14 @@ func (e *Env) postMaterialHandler(w http.ResponseWriter, r *http.Request) {
 func (e *Env) changeMaterialQuantity(w http.ResponseWriter, r *http.Request) {
 	var args materialdb.ChangeQuantityParams
 	if err := json.NewDecoder(r.Body).Decode(&args); err != nil {
-		log.Printf("Could not parse json obj: %e", err)
+		log.Printf("Could not parse json obj: %s", err)
 		http.Error(w, "Error parsing json", http.StatusBadRequest)
 		return
 	}
 
 	material, err := e.Queries.ChangeQuantity(r.Context(), args)
 	if err != nil {
-		log.Printf(`Invalid Material change, reason %e`, err)
+		log.Printf(`Invalid Material change, reason %s`, err)
 		http.Error(w, `Could not change material quantity`, http.StatusBadRequest)
 		return
 	}
@@ -259,7 +258,7 @@ func (e *Env) changeMaterialQuantity(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.NewEncoder(w).Encode(&material); err != nil {
-		log.Printf("Could not create json obj: %e", err)
+		log.Printf("Could not create json obj: %s", err)
 		http.Error(w, "Error creating json", http.StatusInternalServerError)
 		return
 	}
@@ -280,7 +279,7 @@ func (e *Env) changeMaterialQuantity(w http.ResponseWriter, r *http.Request) {
 func (e *Env) deleteMaterialHandler(w http.ResponseWriter, r *http.Request) {
 	var id int64
 	if err := json.NewDecoder(r.Body).Decode(&id); err != nil {
-		log.Printf("Could not parse json obj: %e", err)
+		log.Printf("Could not parse json obj: %s", err)
 		http.Error(w, "Error parsing json", http.StatusBadRequest)
 		return
 	}
@@ -288,13 +287,13 @@ func (e *Env) deleteMaterialHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Deleting material with id: %d", id)
 	material, err := e.Queries.DeleteMaterial(r.Context(), id)
 	if err != nil {
-		log.Printf(`Invalid Material change, reason %e`, err)
+		log.Printf(`Invalid Material change, reason %s`, err)
 		http.Error(w, `Could not delete material`, http.StatusBadRequest)
 		return
 	}
 
 	if err := json.NewEncoder(w).Encode(&material); err != nil {
-		log.Printf("Could not create json obj: %e", err)
+		log.Printf("Could not create json obj: %s", err)
 		http.Error(w, "Error creating json", http.StatusInternalServerError)
 		return
 	}
