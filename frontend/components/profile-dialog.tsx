@@ -25,16 +25,17 @@ import { redirect } from 'next/navigation'
 import useSWRMutation from 'swr/mutation'
 import Loading from '@/components/loading'
 import { EditProfile } from "./edit-profile-dialog"
-import useSWR from "swr";
-import { User } from "@/user-api-types";
+import useSWR, { useSWRConfig } from "swr";
+import { User, Token } from "@/user-api-types";
 import { getCookie } from "./cookie-functions"
 
-/*async function getProfileArgs(url: string, arg: {token: string}) {
+async function getProfileArgs(url: string, arg: {token: string}) {
     return fetch(url, {
         method: 'POST',
-        body: JSON.stringify(arg)
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({token: arg})
     }).then(res => res.json())
-}*/
+}
 
 /*async function deleteUsers(url: string) {
     return fetch(url, {
@@ -52,23 +53,23 @@ const fetcher = async  (url: string) => {
 
 export function Profile() {
 
-    //let token = getCookie('token')
+    let token = getCookie('token')
+    console.log("Token: ", token)
 
-    //const  { data: tokenData, mutate, error: error2 } = useSWR('api/user/decrypt', getProfileArgs)
+    const { data: tokenData, error: error2 } = useSWR(['api/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
+    console.log("TokenData: ", tokenData)
 
-    //mutate(token)
-
-    //console.log("ID: ", tokenData.id)
+    console.log("Error: ", error2)
 
     //let id = tokenData.id
 
     /*for (let i = 12; i < 100; i++)
     {
-        const { mutate } = useSWR(`api/user/delete?id=${i}`, deleteUsers)
-        mutate()
+        const { mutate: deleteMutate } = useSWR(`api/user/delete?id=${i}`, deleteUsers)
+        deleteMutate()
     }*/
 
-    const { data: user, error: error3 } = useSWR<User, string>( `api/user/search?id=1`, fetcher);
+    const { data: user, error: error3 } = useSWR<User, string>( `api/user/search?id={tokenData.id}`, fetcher);
 
     if (error3) return <p>Error loading Profile.</p>;
     if (!user) return <p>Loading...</p>;        
@@ -91,7 +92,7 @@ export function Profile() {
                     className="w-[--radix-popper-anchor-width]"
                 >     
                     <DialogTrigger asChild>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick = { profileSubmit }>
                             <span>Profile</span>
                         </DropdownMenuItem>
                     </DialogTrigger>

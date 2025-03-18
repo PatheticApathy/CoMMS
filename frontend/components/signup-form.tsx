@@ -62,7 +62,7 @@ export default function SignupForm() {
   if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
   if (data) {
     let expireTime = setCookie(7)
-    document.cookie = `token=${JSON.stringify(data.token)}; expires=${expireTime}; path=/`
+    document.cookie = `token=${JSON.stringify(data)}; expires=${expireTime}; path=/`
     redirect('/dashboard')
   }
 
