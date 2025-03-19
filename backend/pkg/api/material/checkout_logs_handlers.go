@@ -24,15 +24,15 @@ import (
 func (e *Env) postCheckout(w http.ResponseWriter, r *http.Request) {
 	var args materialdb.AddCheckoutLogParams
 	if err := json.NewDecoder(r.Body).Decode(&args); err != nil {
-		log.Printf("could not decode to json, reason %s", err)
+		log.Printf("could not decode to json, reason %e", err)
 		http.Error(w, "bad request", http.StatusBadRequest)
 		return
 	}
 
 	resp, err := http.Get(e.UserHost + "/user/search?id=" + strconv.Itoa(int(args.UserID)))
 	if err != nil {
-		log.Printf("Error: could not connect to user api, reason %s", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		log.Printf("could not connect to user api, reason %e", err)
+		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
 	}
 	if resp.StatusCode != http.StatusOK {
@@ -43,14 +43,14 @@ func (e *Env) postCheckout(w http.ResponseWriter, r *http.Request) {
 
 	checkout, err := e.Queries.AddCheckoutLog(r.Context(), args)
 	if err != nil {
-		log.Printf("could not add checkout log, reason %s", err)
+		log.Printf("could not add checkout log, reason %e", err)
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 
 	log.Printf("Checkout log %d added, checked out", checkout.ID)
 	if err = json.NewEncoder(w).Encode(&checkout); err != nil {
-		log.Printf("could not encode to json, reason %s", err)
+		log.Printf("could not encode to json, reason %e", err)
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
@@ -63,13 +63,13 @@ func (e *Env) postCheckout(w http.ResponseWriter, r *http.Request) {
 //	@Tags			checkout logs
 //	@Accept			json
 //	@Produce		json
-//	@Param			logid	body		materialdb.UpdateCheckinlogParams					true	"item id and user id"
+//	@Param			logid	body		int64					true	"id of checkoutlog"
 //	@Failure		400		{string}	string "bad request"
 //	@Failure		500		{string} string "Internal Server Error"
 //	@Success		200		{object}	materialdb.CheckoutLog	"checkout log"
 //	@Router			/checkout/in [put]
 func (e *Env) putCheckin(w http.ResponseWriter, r *http.Request) {
-	var arg materialdb.UpdateCheckinlogParams
+	var arg int64
 	if err := json.NewDecoder(r.Body).Decode(&arg); err != nil {
 		log.Printf("could not decode to json, reason %e", err)
 		http.Error(w, "bad request", http.StatusBadRequest)
@@ -83,7 +83,6 @@ func (e *Env) putCheckin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("Material with id %d checked in by user %d", checkout.ItemID, checkout.UserID)
 	log.Printf("Checkout log %d now checked in", checkout.ID)
 	if err = json.NewEncoder(w).Encode(&checkout); err != nil {
 		log.Printf("could not encode to json, reason %e", err)

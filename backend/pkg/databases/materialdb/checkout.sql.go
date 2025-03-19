@@ -107,17 +107,12 @@ func (q *Queries) GetRecentCheckoutLogsForMaterial(ctx context.Context, itemID i
 const updateCheckinlog = `-- name: UpdateCheckinlog :one
 UPDATE CheckoutLogs
 SET checkin_time = date()
-WHERE item_id = ?1 AND user_id = ?2
+WHERE id = ?
 RETURNING id, item_id, user_id, checkin_time, checkout_time
 `
 
-type UpdateCheckinlogParams struct {
-	ItemID int64 `json:"item_id"`
-	UserID int64 `json:"user_id"`
-}
-
-func (q *Queries) UpdateCheckinlog(ctx context.Context, arg UpdateCheckinlogParams) (CheckoutLog, error) {
-	row := q.db.QueryRowContext(ctx, updateCheckinlog, arg.ItemID, arg.UserID)
+func (q *Queries) UpdateCheckinlog(ctx context.Context, id int64) (CheckoutLog, error) {
+	row := q.db.QueryRowContext(ctx, updateCheckinlog, id)
 	var i CheckoutLog
 	err := row.Scan(
 		&i.ID,

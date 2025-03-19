@@ -33,7 +33,7 @@ func (e *Env) getJobSiteHandler(w http.ResponseWriter, r *http.Request) {
 
 		jobsite, err := e.Queries.GetJobSite(r.Context(), int64(id))
 		if err != nil {
-			log.Printf("Could not find job site, reason: %s", err)
+			log.Printf("Could not find job site, reason: %e", err)
 			http.Error(w, "Invalid id", http.StatusBadRequest)
 			return
 		}
