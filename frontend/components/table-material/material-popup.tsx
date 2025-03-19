@@ -214,7 +214,7 @@ export default function MaterialSheet({ material, route, children, token }: Read
                     <br />
                     {`${material.status} with ${material.quantity} ${material.unit}`}
                     <br />
-                    {material.last_checked_out ? `last checked out on ${material.last_checked_out}` : "Never checked out"}
+                    {material.last_checked_out.Valid ? `last checked out on ${new Date(material.last_checked_out.Time).toLocaleString()}` : "Never checked out"}
                     <hr />
                     <div className="place-content-center">
                       {
