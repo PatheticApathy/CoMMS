@@ -6,3 +6,5 @@ export function getToken() {
 export function setToken(token: string) {
   localStorage.setItem('token', token)
 }
+
+//Use the decrypt route to decrypt token

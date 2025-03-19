@@ -18,6 +18,7 @@ import useSWRMutation from 'swr/mutation'
 import Loading from '@/components/loading'
 import { setToken } from '@/components/localstorage'
 import { SignUpUser } from "@/user-api-types"
+import { toast } from "sonner"
 
 const formSchema = z.object({
   username: z.string().nonempty(),
@@ -40,7 +41,7 @@ async function signUp(url: string, { arg }: { arg: SignUpUser }) {
   return fetch(url, {
     method: 'POST',
     body: JSON.stringify(arg)
-  }).then(res => res.text())
+  }).then(res => { if (res.ok) { return res.text() } else { toast.error(res.text()); return undefined } })
 }
 
 

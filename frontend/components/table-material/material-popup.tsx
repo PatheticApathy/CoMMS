@@ -22,6 +22,7 @@ import { Token } from "@/user-api-types";
 const MaterialLogFetcher: Fetcher<MaterialLog[], string> = async (...args) => fetch(...args, { cache: 'default' }).then(res => res.json())
 const CheckoutLogFetcher: Fetcher<CheckoutLog[], string> = async (...args) => fetch(...args, { cache: 'default' }).then(res => res.json())
 const CheckOut = async (url: string, { arg }: { arg: { user_id: number, item_id: number } }) => await fetch(url, { method: 'POST', body: JSON.stringify(arg) })
+const CheckIn = async (url: string, { arg }: { arg: { user_id: number, item_id: number } }) => await fetch(url, { method: 'PUT', body: JSON.stringify(arg) })
 const DeleteMaterial = async (url: string, { arg }: { arg: number }) => await fetch(url, { method: 'DELETE', body: String(arg) })
 
 const DisplayMaterialLogs = (material_logs: MaterialLog[] | undefined, error: boolean, isLoading: boolean,) => {
@@ -78,7 +79,7 @@ const DisplayCheckouts = (checkout_logs: CheckoutLog[] | undefined, error: boole
           checkout_logs.map((log) => {
             return (
               <div key={log.id}>
-                <h3>Chekout pertains to {log.user_id}</h3>
+                <h3>Chekout pertains to user id: {log.user_id}</h3>
                 <br />
                 {(() => {
                   const checkout = new Date(log.checkout_time);
@@ -143,7 +144,7 @@ export default function MaterialSheet({ material, route, children, token }: Read
     },
 
   })
-  const { trigger: t2, isMutating: checking_in } = useSWRMutation('/api/material/checkout/out', CheckOut, {
+  const { trigger: checkout, isMutating: checking_out } = useSWRMutation('/api/material/checkout/out', CheckOut, {
     onError(err) {
       console.error(err)
       toast.error(err.message || "Error has occured");
@@ -159,6 +160,25 @@ export default function MaterialSheet({ material, route, children, token }: Read
         mutate(`/api/material/checkout/recent?id=${material.id}`)
         mutate(`/api/material/mlogs/recent?id=${material.id}`)
         toast.success(`Checked Out!`);
+      })
+    },
+  })
+  const { trigger: checkin, isMutating: checking_in } = useSWRMutation('/api/material/checkout/in', CheckIn, {
+    onError(err) {
+      console.error(err)
+      toast.error(err.message || "Error has occured");
+
+    },
+    onSuccess(resp) {
+      if (!resp.ok) {
+        toast.error(resp.text() || "Error has occured");
+        return
+      }
+      resp.json().then((_: Material) => {
+        console.log("Checked In")
+        mutate(`/api/material/checkout/recent?id=${material.id}`)
+        mutate(`/api/material/mlogs/recent?id=${material.id}`)
+        toast.success(`Checked In!`);
       })
     },
   })
@@ -204,10 +224,10 @@ export default function MaterialSheet({ material, route, children, token }: Read
                     <hr />
                     <div className="flex flex-col content-center gap-4">
                       {(() => {
-                        if (checking_in) {
+                        if (checking_out || checking_in) {
                           return <Loading />
                         } else {
-                          return <Button onClick={check ? undefined : () => (t2({ user_id: token.id, item_id: material.id }))} variant={check ? "default" : "secondary"} className="justify-center " >{check ? "Checkin" : "Checkout"}</Button>
+                          return <Button onClick={check ? () => (checkin({ user_id: token.id, item_id: material.id })) : () => (checkout({ user_id: token.id, item_id: material.id }))} variant={check ? "default" : "secondary"} className="justify-center " >{check ? "Checkin" : "Checkout"}</Button>
                         }
                       })()
                       }
@@ -231,7 +251,12 @@ export default function MaterialSheet({ material, route, children, token }: Read
               )
             }
             else {
-              return (<p className='flex items-center justify-center h-screen'>No additional data for material or invalid credentials. Try logging in again</p>)
+              return (
+                <>
+                  <SheetTitle className="text-2xl">{material.name.Valid ? material.name.String : "No Name Found"}</SheetTitle>
+                  <p className='flex items-center justify-center h-screen'>No additional data for material or invalid credentials. Try logging in again</p>
+                </>
+              )
             }
           }
           )()}

@@ -29,8 +29,9 @@ export default function MTable({ materials, route }: { materials: Material[], ro
   })
 
   if (token_error) {
-    toast.error('Invalid credentials')
+    toast.error('Invalid session')
   }
+  //TODO: dont change time if checkin time already exist
   return (
     <div className="mx-auto py-10">
       <DataTable columns={MaterialTableColumns(route, token)} data={rows} />
