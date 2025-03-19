@@ -15,6 +15,6 @@ export default function JobSiteMaterialPage() {
   if (isLoading) { return (<div className='flex items-center justify-center w-screen h-screen'>Loading <Loading /></div>) }
   if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
   return (
-    <FilterAndTable header={`Jobsite ${id} Material`} materials={materials} />
+    <FilterAndTable header={`Jobsite ${id} Material`} materials={materials} route={`/api/material/materialsearch?site=${id}`} />
   );
 }
