@@ -410,7 +410,7 @@ const docTemplate = `{
         },
         "/user/search": {
             "get": {
-                "description": "Gets user using username",
+                "description": "Gets user using id(may add more parameters later)",
                 "produces": [
                     "application/json"
                 ],
@@ -420,11 +420,16 @@ const docTemplate = `{
                 "summary": "fetches user based on given paremeters",
                 "parameters": [
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "user's identification number",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "user's username",
                         "name": "username",
-                        "in": "query",
-                        "required": true
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -435,7 +440,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Invalid username",
+                        "description": "Bad request",
                         "schema": {
                             "type": "string"
                         }
@@ -477,7 +482,7 @@ const docTemplate = `{
                     "200": {
                         "description": "User login token",
                         "schema": {
-                            "$ref": "#/definitions/auth.Token"
+                            "type": "string"
                         }
                     },
                     "400": {

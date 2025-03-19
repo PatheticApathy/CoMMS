@@ -453,12 +453,15 @@ paths:
       - users
   /user/search:
     get:
-      description: Gets user using username
+      description: Gets user using id(may add more parameters later)
       parameters:
       - description: user's identification number
         in: query
+        name: id
+        type: integer
+      - description: user's username
+        in: query
         name: username
-        required: true
         type: string
       produces:
       - application/json
@@ -468,7 +471,7 @@ paths:
           schema:
             $ref: '#/definitions/userdb.User'
         "400":
-          description: Invalid username
+          description: Bad request
           schema:
             type: string
         "500":
@@ -496,7 +499,7 @@ paths:
         "200":
           description: User login token
           schema:
-            $ref: '#/definitions/auth.Token'
+            type: string
         "400":
           description: Invalid input
           schema:
