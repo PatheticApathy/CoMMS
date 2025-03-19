@@ -3,6 +3,7 @@ import { Material } from "@/material-api-types"
 import MaterialSheet from "./material-popup"
 import { Button } from "../ui/button"
 import { ArrowUpDown } from "lucide-react"
+import { Token } from "@/user-api-types"
 
 export type MaterialRow = {
   id: number
@@ -18,8 +19,7 @@ export type MaterialRow = {
 
 }
 
-export const MaterialTableColumns: ((route: string) => ColumnDef<MaterialRow>[]) = (route) => ([
-
+export const MaterialTableColumns: ((route: string, token: Token | undefined) => ColumnDef<MaterialRow>[]) = (route, token) => ([
   {
     accessorKey: "id",
     header: ({ column }) => {
@@ -110,7 +110,7 @@ export const MaterialTableColumns: ((route: string) => ColumnDef<MaterialRow>[])
 
       return (
         <div className="justify-end">
-          <MaterialSheet material={material} route={route}>
+          <MaterialSheet material={material} route={route} token={token}>
             <Button variant={'ghost'}>More details</Button>
           </MaterialSheet>
         </div>

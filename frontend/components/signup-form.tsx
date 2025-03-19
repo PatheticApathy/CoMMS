@@ -64,7 +64,6 @@ export default function SignupForm() {
   if (data) {
     //let expireTime = setCookie(7)
     //document.cookie = `token=${JSON.stringify(data.token)}; expires=${expireTime}; path=/`
-    console.log(`Le Token is gooda ${data}`);
     setToken(data)
     redirect('/dashboard')
   }

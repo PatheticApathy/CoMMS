@@ -120,6 +120,6 @@ export interface LocationLng {
 }
 
 export interface CheckinTime {
-  time: string
+  Time: string
   Valid: boolean
 }

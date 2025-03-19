@@ -15,11 +15,13 @@ import useSWRMutation from "swr/mutation";
 import Loading from "@/components/loading";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
+import { useEffect, useState } from "react";
+import { Token } from "@/user-api-types";
 
 //fetchers
-const MaterialLogFetcher: Fetcher<MaterialLog[], string> = async (...args) => fetch(...args, { cache: 'force-cache' }).then(res => res.json())
-const CheckoutLogFetcher: Fetcher<CheckoutLog[], string> = async (...args) => fetch(...args, { cache: 'force-cache' }).then(res => res.json())
-const CheckOut = async (url: string, { arg }: { arg: { user: number, item: number } }) => await fetch(url, { method: 'POST', body: String(arg) })
+const MaterialLogFetcher: Fetcher<MaterialLog[], string> = async (...args) => fetch(...args, { cache: 'default' }).then(res => res.json())
+const CheckoutLogFetcher: Fetcher<CheckoutLog[], string> = async (...args) => fetch(...args, { cache: 'default' }).then(res => res.json())
+const CheckOut = async (url: string, { arg }: { arg: { user_id: number, item_id: number } }) => await fetch(url, { method: 'POST', body: JSON.stringify(arg) })
 const DeleteMaterial = async (url: string, { arg }: { arg: number }) => await fetch(url, { method: 'DELETE', body: String(arg) })
 
 const DisplayMaterialLogs = (material_logs: MaterialLog[] | undefined, error: boolean, isLoading: boolean,) => {
@@ -75,7 +77,7 @@ const DisplayCheckouts = (checkout_logs: CheckoutLog[] | undefined, error: boole
         {
           checkout_logs.map((log) => {
             return (
-              <div key={log.user_id}>
+              <div key={log.id}>
                 <h3>Chekout pertains to {log.user_id}</h3>
                 <br />
                 {(() => {
@@ -90,7 +92,7 @@ const DisplayCheckouts = (checkout_logs: CheckoutLog[] | undefined, error: boole
                   (() => {
 
                     if (log.checkin_time.Valid) {
-                      const checkin = new Date(log.checkin_time.time);
+                      const checkin = new Date(log.checkin_time.Time);
                       return (
                         `Checked in on : ${checkin.toLocaleDateString()} ${checkin.toLocaleTimeString()}`
                       );
@@ -111,23 +113,29 @@ const DisplayCheckouts = (checkout_logs: CheckoutLog[] | undefined, error: boole
   }
 
 }
-export default function MaterialSheet({ material, route, children }: Readonly<{
+export default function MaterialSheet({ material, route, children, token }: Readonly<{
   material: Material,
   route: string,
   children: React.ReactNode;
+  token: Token | undefined
 }>) {
 
+  const [check, setCheck] = useState(false)
   const { data: checkout_logs, isLoading: checkout_loading, error: checkout_error } = useSWR(`/api/material/checkout/recent?id=${material.id}`, CheckoutLogFetcher)
   const { data: material_logs, isLoading: material_loading, error: material_error } = useSWR(`/api/material/mlogs/recent?id=${material.id}`, MaterialLogFetcher)
 
-  const { trigger, isMutating } = useSWRMutation('/api/material/material/delete', DeleteMaterial, {
+  const { trigger } = useSWRMutation('/api/material/material/delete', DeleteMaterial, {
     onError(err) {
-      console.log(err)
+      console.error(err)
       toast.error(err.message || "Error has occured");
 
     },
-    onSuccess(data) {
-      data.json().then((resp: Material) => {
+    onSuccess(resp) {
+      if (!resp.ok) {
+        toast.error(resp.text() || "Error has occured");
+        return
+      }
+      resp.json().then((resp: Material) => {
         mutate(route)
         console.log("Successfully deleted")
         toast.success(`Material ${resp.name.String} Deleted!`);
@@ -135,23 +143,34 @@ export default function MaterialSheet({ material, route, children }: Readonly<{
     },
 
   })
-  const { trigger: t2, isMutating: _ } = useSWRMutation('/api/material/checkout/out', CheckOut, {
+  const { trigger: t2, isMutating: checking_in } = useSWRMutation('/api/material/checkout/out', CheckOut, {
     onError(err) {
-      console.log(err)
+      console.error(err)
       toast.error(err.message || "Error has occured");
 
     },
-    onSuccess(data) {
-      data.json().then((_: Material) => {
+    onSuccess(resp) {
+      if (!resp.ok) {
+        toast.error(resp.text() || "Error has occured");
+        return
+      }
+      resp.json().then((_: Material) => {
         console.log("Checked Out")
+        mutate(`/api/material/checkout/recent?id=${material.id}`)
+        mutate(`/api/material/mlogs/recent?id=${material.id}`)
         toast.success(`Checked Out!`);
       })
     },
+  })
 
+  useEffect(() => {
+    //TODO: Add amount to checkin/out
+    if (checkout_logs && token) {
+      setCheck(Boolean(checkout_logs?.find((log) => !log.checkin_time.Valid && log.user_id == token.id)))
+    }
   })
 
 
-  //TODO: make it switch to a check in for  function 
 
   return (
     <Sheet>
@@ -159,7 +178,7 @@ export default function MaterialSheet({ material, route, children }: Readonly<{
       <SheetContent side="right" className="flex flex-col">
         <div className="overflow-auto">
           {(() => {
-            if (material) {
+            if (material && token) {
               return (
                 <>
                   <SheetHeader className="flex-none border-b text-left">
@@ -184,7 +203,14 @@ export default function MaterialSheet({ material, route, children }: Readonly<{
                     </div>
                     <hr />
                     <div className="flex flex-col content-center gap-4">
-                      <Button variant="secondary" className="justify-center " >Checkout</Button>
+                      {(() => {
+                        if (checking_in) {
+                          return <Loading />
+                        } else {
+                          return <Button onClick={check ? undefined : () => (t2({ user_id: token.id, item_id: material.id }))} variant={check ? "default" : "secondary"} className="justify-center " >{check ? "Checkin" : "Checkout"}</Button>
+                        }
+                      })()
+                      }
                       <div>
                         {
                           DisplayCheckouts(checkout_logs, checkout_error, checkout_loading)
@@ -205,7 +231,7 @@ export default function MaterialSheet({ material, route, children }: Readonly<{
               )
             }
             else {
-              return (<p className='flex items-center justify-center h-screen'>No additional data for material</p>)
+              return (<p className='flex items-center justify-center h-screen'>No additional data for material or invalid credentials. Try logging in again</p>)
             }
           }
           )()}

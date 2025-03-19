@@ -7,7 +7,6 @@ import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import useSWRMutation from "swr/mutation"
-import { Input } from "@/components/ui/input"
 import { ComboboxFormField } from "@/components/form-maker/form-combobox"
 import { Material, AddMaterial } from "@/material-api-types"
 import FormInput from "../form-maker/form-input"
@@ -24,7 +23,7 @@ const AddMaterialSchema = z.object({
 })
 
 //fetcher
-const PostAddMaterial = async (url: string, { arg }: { arg: AddMaterial }) => await fetch(url, { method: 'POST', body: JSON.stringify(arg) })
+const PostAddMaterial = async (url: string, { arg }: { arg: AddMaterial }) => await fetch(url, { method: 'POST', body: JSON.stringify(arg) }).then((resp) => resp.ok ? resp.json() : resp.text())
 
 export default function MaterialForm() {
 
@@ -57,9 +56,12 @@ export default function MaterialForm() {
     onError(err) {
       console.log(err)
       toast.error(err.message || "Error has occured");
-
     },
     onSuccess(data) {
+      if (!data.ok) {
+        toast.error(data || "Error has occured");
+        return
+      }
       data.json().then((resp: Material) => {
         console.log("success")
         toast.success(`Material ${resp.name.String} Added!`);

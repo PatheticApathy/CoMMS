@@ -11,5 +11,5 @@ const JobsiteMap = dynamic(() => import("@/components/jobsite-map"), {
 });
 
 export default function JobsiteMapWrapper({ jobsite }: { jobsite: Jobsite }) {
-  return <JobsiteMap jobsite={jobsite}/>;
+  return <JobsiteMap jobsite={jobsite} />;
 }
