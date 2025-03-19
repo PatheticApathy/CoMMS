@@ -2,7 +2,9 @@
 
 import L, { LatLngBoundsExpression } from "leaflet"
 import { MapContainer, TileLayer, Marker, Popup, Polygon, Rectangle  } from "react-leaflet";
+import useSWR from 'swr'
 import { Jobsite } from '@/material-api-types';
+import Loading from '@/components/loading';
 import "leaflet/dist/leaflet.css";
 import Link from "next/link";
 
@@ -13,12 +15,27 @@ const defaultIcon = new L.Icon({
     popupAnchor: [1, -34], // Position of the popup relative to the icon
 });
 
+const fetcher = async (url:string): Promise<Jobsite[]> => {
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error("Failed to fetch data");
+  }
+  return res.json();
+}
+
 const bounds : LatLngBoundsExpression = [
   [32.5260072, -92.6440465],
   [32.5266895, -92.6427248]
 ]
 
 export default function JobsiteMapClient({ jobsite }: { jobsite: Jobsite}) {
+
+  const { data: sites, error, isLoading } = useSWR('/api/sites/all', fetcher)
+  console.log(sites)
+
+  if (isLoading) { return (<div className='flex items-center justify-center w-screen h-screen'>Loading <Loading /></div>) }
+  if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
+
   return (
     <MapContainer
       style={{ height: "100%", width: "100%" }}
