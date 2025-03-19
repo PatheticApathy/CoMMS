@@ -15,3 +15,8 @@ DELETE FROM Users WHERE id = ?;
 
 -- name: SignUp :one
 INSERT INTO Users(username, password, email, phone) VALUES (?,?,?,?) RETURNING *;
+
+-- name: GetUsersWithCompanyAndJobsite :many
+SELECT u.id, u.username, u.password, u.firstname, u.lastname, u.company_id, u.jobsite_id, u.role, u.email, u.phone, u.profilepicture, 
+c.name as company_name, j.name as jobsite_name
+FROM Users u JOIN Companies c ON u.company_id = c.id JOIN JobSites j ON u.jobsite_id = j.id;

@@ -39,7 +39,7 @@ import {
 import useSWR from "swr";
 import { Material } from "@/material-api-types";
 import Loading from "@/components/loading";
-import InitAddFormDialouge from "@/components/add-material-form/material-add-form-button";
+import InitAddFormDialougeAdmin from "@/components/add-material-form/material-add-admin";
 
 const fetcher = async (url: string): Promise<Material[]> => {
   const res = await fetch(url);
@@ -55,7 +55,7 @@ const deleteMaterial = async (id: number) => {
     body: String(id),
   });
   if (!res.ok) {
-    throw new Error("Failed to delete user");
+    throw new Error("Failed to delete material");
   }
   return res.json();
 };
@@ -287,7 +287,7 @@ export function MaterialTable() {
           }
           className="max-w-sm"
         />
-        <InitAddFormDialouge />
+        <InitAddFormDialougeAdmin/>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
