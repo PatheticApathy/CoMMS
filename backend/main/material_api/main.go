@@ -29,7 +29,6 @@ import (
 // @externalDocs.description	OpenAPI
 // @externalDocs.url			https://app.swaggerhub.com/apis/CJW041/material-tracker_api/1.0
 func main() {
-	//TODO: Integration test for adding materials and checkoutlogs for a jobsite/user
 	if err := godotenv.Load(); err != nil {
 		log.Fatalf("No .env file found LOL: %e", err)
 	}
