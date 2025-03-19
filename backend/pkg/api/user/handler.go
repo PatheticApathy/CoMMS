@@ -55,7 +55,7 @@ func (e *Env) getUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// getUserName hanlder returns a user based on given parameters godoc
+// getUserbyUsername hanlder returns a user based on given parameters godoc
 //
 //	@Summary		fetches user based on given paremeters
 //	@Description	Gets user using username
@@ -65,9 +65,9 @@ func (e *Env) getUser(w http.ResponseWriter, r *http.Request) {
 //	@Success		200	{object}	userdb.User		"users"
 //	@Failure		400	{string}	string			"Invalid username"
 //	@Failure		500	{string}	string			"Internal Server Error"
-//	@Router			/user/search [get]
-func (e *Env) getUserName(w http.ResponseWriter, r *http.Request) {
-	log.Println("Handling getUserName request")
+//	@Router			/user/username [get]
+func (e *Env) getUserByUsername(w http.ResponseWriter, r *http.Request) {
+	log.Println("Handling getUserByUsername request")
 	query := r.URL.Query()
 	if query.Has("username") {
 		username := query.Get("username")
@@ -297,4 +297,32 @@ func (e *Env) deleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Printf("User with ID: %d successfully deleted", userID)
+}
+
+// getUsersWithCompanyAndJobsite handler returns all users with their associated company and jobsite names godoc
+//
+//	@Summary		fetches all users with their associated company and jobsite names
+//	@Description	Gets users with company and jobsite names
+//	@Tags			users
+//	@Produce		json
+//	@Success		200	{object}	[]userdb.GetUsersWithCompanyAndJobsiteRow	"users with company and jobsite names"
+//	@Failure		500	{string}	string								"Failed to get users"
+//	@Router			/user/join [get]
+func (e *Env) joinTables(w http.ResponseWriter, r *http.Request) {
+	log.Println("Handling getUsersWithCompanyAndJobsite request")
+	log.Println("Fetching all users with company and jobsite names from the database")
+	users, err := e.Queries.GetUsersWithCompanyAndJobsite(r.Context())
+	if err != nil {
+		log.Printf("Failed to get users with company and jobsite names, reason: %v", err)
+		http.Error(w, "Failed to get users", http.StatusInternalServerError)
+		return
+	}
+	log.Printf("Successfully retrieved %d users with company and jobsite names", len(users))
+	if err := json.NewEncoder(w).Encode(&users); err != nil {
+		log.Printf("Failed to encode users response, reason: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	log.Println("Users with company and jobsite names response successfully sent")
 }

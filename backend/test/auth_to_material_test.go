@@ -41,7 +41,7 @@ func TestMain(m *testing.M) {
 	defer udb.Close()
 	uenv := handler.NewEnv(udb, "M+!4ySj_|RuuQHj2!n<Dhx*5+H&L|A~o")
 	umux := http.NewServeMux()
-	umux.Handle("/", uenv.Handler())
+	umux.Handle("/", uenv.Handlers())
 
 	m_url, err := url.Parse(mserver.URL)
 	if err != nil {

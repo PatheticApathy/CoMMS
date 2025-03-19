@@ -10,9 +10,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import useSWR from "swr";
-import { User } from "@/user-api-types";
+import { UserJoin } from "@/user-api-types";
 
-const fetcher = async (url: string): Promise<User[]> => {
+const fetcher = async (url: string): Promise<UserJoin[]> => {
   const res = await fetch(url);
   if (!res.ok) {
     throw new Error("Failed to fetch data");
@@ -21,26 +21,30 @@ const fetcher = async (url: string): Promise<User[]> => {
 };
 
 export default function ContactsTable({ searchQuery }: { searchQuery: string }) {
-  const { data, error } = useSWR<User[]>("/api/user/all", fetcher);
+  const { data, error } = useSWR<UserJoin[]>("/api/user/join", fetcher);
+  //const { data: data1, error: error1 } = useSWR<User[]>("/api/user/all", fetcher1);
+  //const { data: data2, error: error2 } = useSWR<Company[]>("/api/company/all", fetcher2);
+  //const { data: data3, error: error3 } = useSWR<JobSite[]>("/api/sites/all", fetcher3);
+  
+  console.log(data);
 
   if (error) return <p>Error loading contacts.</p>;
   if (!data) return <p>Loading...</p>;
 
-  const filteredData = (data ?? []).filter((user: User) => {
+  const filteredData = (data ?? []).filter((user: UserJoin) => {
     const searchLower = searchQuery.toLowerCase();
-  
+
     return (
       user.username.toLowerCase().includes(searchLower) ||
       user.email.toLowerCase().includes(searchLower) ||
       user.phone.toLowerCase().includes(searchLower) ||
       (user.firstname.Valid && user.firstname.String.toLowerCase().includes(searchLower)) ||
       (user.lastname.Valid && user.lastname.String.toLowerCase().includes(searchLower)) ||
-      (user.company.Valid && user.company.String.toLowerCase().includes(searchLower)) ||
-      (user.site.Valid && user.site.String.toLowerCase().includes(searchLower)) ||
+      (user.company_name.toLowerCase().includes(searchLower)) ||
+      (user.jobsite_name.toLowerCase().includes(searchLower)) ||
       (user.role.Valid && user.role.String.toLowerCase().includes(searchLower))
     );
   });
-  
 
   return (
     <Table>
@@ -51,25 +55,27 @@ export default function ContactsTable({ searchQuery }: { searchQuery: string }) 
           <TableHead>First Name</TableHead>
           <TableHead>Last Name</TableHead>
           <TableHead>Company</TableHead>
-          <TableHead>Site</TableHead>
+          <TableHead>Jobsite</TableHead>
           <TableHead>Role</TableHead>
           <TableHead>Email</TableHead>
           <TableHead>Phone</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {filteredData.map((user: User) => (
-          <TableRow key={user.username}>
-            <TableCell>{user.username}</TableCell>
-            <TableCell>{user.firstname?.Valid ? user.firstname.String : "N/A"}</TableCell>
-            <TableCell>{user.lastname?.Valid ? user.lastname.String : "N/A"}</TableCell>
-            <TableCell>{user.company?.Valid ? user.company.String : "N/A"}</TableCell>
-            <TableCell>{user.site?.Valid ? user.site.String : "N/A"}</TableCell>
-            <TableCell>{user.role?.Valid ? user.role.String : "N/A"}</TableCell>
-            <TableCell>{user.email}</TableCell>
-            <TableCell>{user.phone}</TableCell>
-          </TableRow>
-        ))}
+        {filteredData.map((user: UserJoin) => {
+          return (
+            <TableRow key={user.username}>
+              <TableCell>{user.username}</TableCell>
+              <TableCell>{user.firstname?.Valid ? user.firstname.String : "N/A"}</TableCell>
+              <TableCell>{user.lastname?.Valid ? user.lastname.String : "N/A"}</TableCell>
+              <TableCell>{user.company_name}</TableCell>
+              <TableCell>{user.jobsite_name}</TableCell>
+              <TableCell>{user.role?.Valid ? user.role.String : "N/A"}</TableCell>
+              <TableCell>{user.email}</TableCell>
+              <TableCell>{user.phone}</TableCell>
+            </TableRow>
+          );
+        })}
       </TableBody>
     </Table>
   );
