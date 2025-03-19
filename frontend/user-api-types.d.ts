@@ -39,6 +39,38 @@ export interface JobSiteID {
   Valid: boolean
 }
 
+export interface Token {
+  id: number
+  password: string
+  role: { String: string, Valid: boolean }
+  username: string
+}
+
+export interface CompanyID {
+  Int64: number
+  Valid: boolean
+}
+
+export interface Firstname {
+  String: string
+  Valid: boolean
+}
+
+export interface Lastname {
+  String: string
+  Valid: boolean
+}
+
+export interface Role {
+  String: string
+  Valid: boolean
+}
+
+export interface JobSiteID {
+  Int64: number
+  Valid: boolean
+}
+
 export interface Profilepicture {
   String: string
   Valid: boolean

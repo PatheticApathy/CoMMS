@@ -34,6 +34,9 @@ export default function LoginForm() {
 
   const { data, trigger, error, isMutating } = useSWRMutation('api/user/login', logIn, {throwOnError: false})
 
+  console.log("Data: ", JSON.stringify(data))
+  console.log(document.cookie)
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -46,7 +49,7 @@ export default function LoginForm() {
   if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
   if (data) {
     let expireTime = setCookie(7)
-    document.cookie = `token=${JSON.stringify(data.token)}; expires=${expireTime}; path=/`
+    document.cookie = `token=${JSON.stringify(data)}; expires=${expireTime}; path=/`
     redirect('/dashboard')
   }
 
