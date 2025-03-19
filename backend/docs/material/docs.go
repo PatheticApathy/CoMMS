@@ -63,12 +63,12 @@ const docTemplate = `{
                 "summary": "Adds checkin time to existing checkout log",
                 "parameters": [
                     {
-                        "description": "item id and user id",
+                        "description": "id of checkoutlog",
                         "name": "logid",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/materialdb.UpdateCheckinlogParams"
+                            "type": "integer"
                         }
                     }
                 ],
@@ -1017,7 +1017,7 @@ const docTemplate = `{
         },
         "/user/search": {
             "get": {
-                "description": "Gets user using id(may add more parameters later)",
+                "description": "Gets user using username",
                 "produces": [
                     "application/json"
                 ],
@@ -1027,16 +1027,11 @@ const docTemplate = `{
                 "summary": "fetches user based on given paremeters",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "user's identification number",
-                        "name": "id",
-                        "in": "query"
-                    },
-                    {
                         "type": "string",
-                        "description": "user's username",
+                        "description": "user's identification number",
                         "name": "username",
-                        "in": "query"
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -1047,7 +1042,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad request",
+                        "description": "Invalid username",
                         "schema": {
                             "type": "string"
                         }
@@ -1089,7 +1084,7 @@ const docTemplate = `{
                     "200": {
                         "description": "User login token",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/auth.Token"
                         }
                     },
                     "400": {
@@ -1343,17 +1338,6 @@ const docTemplate = `{
                 },
                 "timestamp": {
                     "type": "string"
-                }
-            }
-        },
-        "materialdb.UpdateCheckinlogParams": {
-            "type": "object",
-            "properties": {
-                "item_id": {
-                    "type": "integer"
-                },
-                "user_id": {
-                    "type": "integer"
                 }
             }
         },
