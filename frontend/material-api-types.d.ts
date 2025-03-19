@@ -28,7 +28,7 @@ export interface AddMaterial {
 export interface Material {
   id: number
   job_site: JobSite
-  last_checked_out: string
+  last_checked_out: { Valid: bool, Time: string }
   location_lat: LocationLat
   location_lng: LocationLng
   name: Name
