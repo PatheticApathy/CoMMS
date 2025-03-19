@@ -153,14 +153,14 @@ func (e *Env) SignUp(w http.ResponseWriter, r *http.Request) {
 
 	token, err := auth.CreateToken(identity, []byte(e.Secret))
 	if err != nil {
-		log.Printf("Could not create id token: %e", err)
+		log.Printf("Could not create id token: %s", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 
 	// send to client
 	if err := json.NewEncoder(w).Encode(&token); err != nil {
-		log.Printf("Could not encode json token, reason: %e", err)
+		log.Printf("Could not encode json token, reason: %s", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
