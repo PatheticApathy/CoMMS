@@ -11,7 +11,7 @@ import (
 
 const addCheckoutLog = `-- name: AddCheckoutLog :one
 INSERT INTO CheckoutLogs(item_id,user_id,checkout_time)
-VALUES (?,?,date())
+VALUES (?,?,datetime('now'))
 RETURNING id, item_id, user_id, checkin_time, checkout_time
 `
 
@@ -71,7 +71,7 @@ const getRecentCheckoutLogsForMaterial = `-- name: GetRecentCheckoutLogsForMater
 SELECT id, item_id, user_id, checkin_time, checkout_time 
 FROM  CheckoutLogs
 WHERE item_id = ?
-ORDER BY checkout_time
+ORDER BY checkout_time DESC
 LIMIT 10
 `
 
@@ -106,7 +106,7 @@ func (q *Queries) GetRecentCheckoutLogsForMaterial(ctx context.Context, itemID i
 
 const updateCheckinlog = `-- name: UpdateCheckinlog :one
 UPDATE CheckoutLogs
-SET checkin_time = date()
+SET checkin_time = datetime('now')
 WHERE item_id = ?1 AND user_id = ?2
 RETURNING id, item_id, user_id, checkin_time, checkout_time
 `

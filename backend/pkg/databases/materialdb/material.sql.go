@@ -152,7 +152,7 @@ type GetAllMaterialsRow struct {
 	LocationLat    sql.NullFloat64 `json:"location_lat"`
 	LocationLng    sql.NullFloat64 `json:"location_lng"`
 	JobSite        sql.NullInt64   `json:"job_site"`
-	LastCheckedOut interface{}     `json:"last_checked_out"`
+	LastCheckedOut sql.NullTime    `json:"last_checked_out"`
 }
 
 func (q *Queries) GetAllMaterials(ctx context.Context) ([]GetAllMaterialsRow, error) {
@@ -203,7 +203,7 @@ type GetMaterialsByIDRow struct {
 	LocationLat    sql.NullFloat64 `json:"location_lat"`
 	LocationLng    sql.NullFloat64 `json:"location_lng"`
 	JobSite        sql.NullInt64   `json:"job_site"`
-	LastCheckedOut interface{}     `json:"last_checked_out"`
+	LastCheckedOut sql.NullTime    `json:"last_checked_out"`
 }
 
 func (q *Queries) GetMaterialsByID(ctx context.Context, id int64) ([]GetMaterialsByIDRow, error) {
@@ -261,7 +261,7 @@ type GetMaterialsByQuantityRow struct {
 	LocationLat    sql.NullFloat64 `json:"location_lat"`
 	LocationLng    sql.NullFloat64 `json:"location_lng"`
 	JobSite        sql.NullInt64   `json:"job_site"`
-	LastCheckedOut interface{}     `json:"last_checked_out"`
+	LastCheckedOut sql.NullTime    `json:"last_checked_out"`
 }
 
 func (q *Queries) GetMaterialsByQuantity(ctx context.Context, arg GetMaterialsByQuantityParams) ([]GetMaterialsByQuantityRow, error) {
@@ -312,7 +312,7 @@ type GetMaterialsBySiteRow struct {
 	LocationLat    sql.NullFloat64 `json:"location_lat"`
 	LocationLng    sql.NullFloat64 `json:"location_lng"`
 	JobSite        sql.NullInt64   `json:"job_site"`
-	LastCheckedOut interface{}     `json:"last_checked_out"`
+	LastCheckedOut sql.NullTime    `json:"last_checked_out"`
 }
 
 func (q *Queries) GetMaterialsBySite(ctx context.Context, jobSite sql.NullInt64) ([]GetMaterialsBySiteRow, error) {
@@ -363,7 +363,7 @@ type GetMaterialsByTypeRow struct {
 	LocationLat    sql.NullFloat64 `json:"location_lat"`
 	LocationLng    sql.NullFloat64 `json:"location_lng"`
 	JobSite        sql.NullInt64   `json:"job_site"`
-	LastCheckedOut interface{}     `json:"last_checked_out"`
+	LastCheckedOut sql.NullTime    `json:"last_checked_out"`
 }
 
 func (q *Queries) GetMaterialsByType(ctx context.Context, type_ sql.NullString) ([]GetMaterialsByTypeRow, error) {

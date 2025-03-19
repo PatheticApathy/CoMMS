@@ -26,7 +26,7 @@ type Material struct {
 	Status         string          `json:"status"`
 	LocationLat    sql.NullFloat64 `json:"location_lat"`
 	LocationLng    sql.NullFloat64 `json:"location_lng"`
-	LastCheckedOut interface{}     `json:"last_checked_out"`
+	LastCheckedOut sql.NullTime    `json:"last_checked_out"`
 	JobSite        sql.NullInt64   `json:"job_site"`
 }
 
