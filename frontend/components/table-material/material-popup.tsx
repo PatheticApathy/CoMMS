@@ -40,7 +40,7 @@ const DisplayMaterialLogs = (material_logs: MaterialLog[] | undefined, error: Bo
         {
           material_logs.map((log) => {
             return (
-              <>
+              <div key={log.id}>
                 <br />
                 {(() => {
                   const timestamp = new Date(log.timestamp)
@@ -53,7 +53,7 @@ const DisplayMaterialLogs = (material_logs: MaterialLog[] | undefined, error: Bo
                 {`${log.status} with ${Math.abs(log.quantity_change)} ${log.quantity_change > 0 ? "Added" : "Removed"}`}
                 <br />
                 {log.note.Valid ? log.note.String : "Not Additional Notes"}
-              </>
+              </div>
             )
           }
           )
@@ -232,7 +232,6 @@ export default function MaterialSheet({ material, route, children, token }: Read
         <div className="overflow-auto">
           {(() => {
             if (material && token) {
-              console.log(material)
               return (
                 <>
                   <SheetHeader className="flex-none border-b text-left">
