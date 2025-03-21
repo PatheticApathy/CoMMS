@@ -2,53 +2,27 @@ import { Material } from "@/material-api-types"
 import { DataTable } from "../table-maker/data-table";
 import { MaterialRow } from "./material-columns";
 import { MaterialTableColumns } from "./material-columns";
+import useSWR, { Fetcher } from "swr"
+import { Token } from "@/user-api-types";
+import { getToken } from "../localstorage";
 import { toast } from "sonner";
-import { TriggerWithArgs } from "swr/mutation";
-import useSWRMutation from "swr/mutation";
-import { number } from "zod";
 
 
 //fetcher
+const TokenFetcher: Fetcher<Token, string> = async (...args) => fetch(...args, { method: 'POST', body: getToken(), cache: 'force-cache' },).then(res => res.json())
 const DeleteMaterial = async (url: string, { arg }: { arg: number }) => await fetch(url, { method: 'DELETE', body: String(arg) })
 const CheckOut = async (url: string, { arg }: { arg: { user: number, item: number } }) => await fetch(url, { method: 'POST', body: String(arg) })
 
-export default function MTable({ materials }: { materials: Material[] }) {
+export default function MTable({ materials, route }: { materials: Material[], route: string }) {
 
-  const { trigger, isMutating } = useSWRMutation('/api/material/material/delete', DeleteMaterial, {
-    onError(err) {
-      console.log(err)
-      toast.error(err.message || "Error has occured");
 
-    },
-    onSuccess(data) {
-      data.json().then((resp: Material) => {
-        console.log("Successfully deleted")
-        toast.success(`Material ${resp.name.String} Deleted!`);
-      })
-    },
-
-  })
-  const { trigger: t2, isMutating: m2 } = useSWRMutation('/api/material/checkout/out', CheckOut, {
-    onError(err) {
-      console.log(err)
-      toast.error(err.message || "Error has occured");
-
-    },
-    onSuccess(data) {
-      data.json().then((resp: Material) => {
-        console.log("Checked Out")
-        toast.success(`Checked Out!`);
-      })
-    },
-
-  })
-
+  const { data: token, error: token_error } = useSWR('/api/user/decrypt', TokenFetcher,)
 
   const rows = materials.map((material): MaterialRow => {
     return {
       id: material.id,
       job_site: material.job_site.Valid ? material.job_site.Int64 : undefined,
-      last_checked_out: material.last_checked_out,
+      last_checked_out: material.last_checked_out.Valid ? material.last_checked_out.Time : undefined,
       location_lat: material.location_lat.Valid ? material.location_lat.Float64 : undefined,
       location_lng: material.location_lng.Valid ? material.location_lng.Float64 : undefined,
       name: material.name.Valid ? material.name.String : undefined,
@@ -59,17 +33,12 @@ export default function MTable({ materials }: { materials: Material[] }) {
     }
   })
 
-  const DeleteMat = (id: number) => {
-    trigger(id)
-  }
-
-  //TODO: make it switch to a check in for  function 
-  const CheckOutMaterial = (user: number, item: number) => {
-    t2({ user, item })
+  if (token_error) {
+    toast.error('Invalid session')
   }
   return (
     <div className="mx-auto py-10">
-      <DataTable columns={MaterialTableColumns(DeleteMat, CheckOutMaterial)} data={rows} />
+      <DataTable columns={MaterialTableColumns(route, token)} data={rows} />
     </div>
   )
 }

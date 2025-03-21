@@ -1,17 +1,18 @@
-"use client";
-import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import useSWR from "swr";
-import useSWRMutation from "swr/mutation";
-import { Input } from "@/components/ui/input";
-import { ComboboxFormField } from "@/components/form-maker/form-combobox";
-import { Material, AddMaterial } from "@/material-api-types";
-import FormInput from "../form-maker/form-input";
-import { toast } from "sonner";
-import { JobSite } from "@/user-api-types";
+"use client"
+import { Button } from "@/components//ui/button"
+import {
+  Form,
+} from "@/components/ui/form"
+import { z } from "zod"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import useSWRMutation from "swr/mutation"
+import useSWR from "swr"
+import { ComboboxFormField } from "@/components/form-maker/form-combobox"
+import { Material, AddMaterial } from "@/material-api-types"
+import FormInput from "../form-maker/form-input"
+import { JobSite } from "@/material-api-types"
+import { toast } from "sonner"
 
 // Schema for form
 const AddMaterialSchema = z.object({
@@ -25,7 +26,6 @@ const AddMaterialSchema = z.object({
 
 // Fetcher
 const PostAddMaterial = async (url: string, { arg }: { arg: AddMaterial }) => await fetch(url, { method: 'POST', body: JSON.stringify(arg) });
-
 const fetchJobsites = async (url: string): Promise<JobSite[]> => {
   const res = await fetch(url);
   if (!res.ok) {
@@ -62,6 +62,10 @@ export default function MaterialForm() {
       toast.error(err.message || "Error has occurred");
     },
     onSuccess(data) {
+      if (!data.ok) {
+        toast.error(data.text() || "Error has occured");
+        return
+      }
       data.json().then((resp: Material) => {
         console.log("success");
         toast.success(`Material ${resp.name.String} Added!`);

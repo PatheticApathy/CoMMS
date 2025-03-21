@@ -3,21 +3,12 @@ import { Material } from "@/material-api-types"
 import MaterialSheet from "./material-popup"
 import { Button } from "../ui/button"
 import { ArrowUpDown } from "lucide-react"
-import { Checkbox } from "@/components/ui/check-box"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { TriggerWithArgs } from "swr/mutation"
+import { Token } from "@/user-api-types"
 
 export type MaterialRow = {
   id: number
   job_site: number | undefined
-  last_checked_out: string
+  last_checked_out: string | undefined
   location_lat: number | undefined
   location_lng: number | undefined
   name: string | undefined
@@ -28,8 +19,7 @@ export type MaterialRow = {
 
 }
 
-export const MaterialTableColumns: ((DeleteAction: (id: number) => void, CheckAction: (user_id: number, check: number) => void) => ColumnDef<MaterialRow>[]) = (DeleteAction, CheckAction) => ([
-
+export const MaterialTableColumns: ((route: string, token: Token | undefined) => ColumnDef<MaterialRow>[]) = (route, token) => ([
   {
     accessorKey: "id",
     header: ({ column }) => {
@@ -82,7 +72,13 @@ export const MaterialTableColumns: ((DeleteAction: (id: number) => void, CheckAc
           Int64: 0,
           Valid: false
         },
-        last_checked_out: material_row.last_checked_out,
+        last_checked_out: material_row.last_checked_out ? {
+          Time: material_row.last_checked_out,
+          Valid: true
+        } : {
+          Time: "N/A",
+          Valid: false
+        },
         location_lat: material_row.location_lat ? {
           Float64: material_row.location_lat,
           Valid: true
@@ -119,49 +115,13 @@ export const MaterialTableColumns: ((DeleteAction: (id: number) => void, CheckAc
 
 
       return (
-        <MaterialSheet material={material}>
-          <Button variant={'ghost'}>More details</Button>
-        </MaterialSheet>
+        <div className="justify-end">
+          <MaterialSheet material={material} route={route} token={token}>
+            <Button variant={'ghost'}>More details</Button>
+          </MaterialSheet>
+        </div>
 
       )
     }
   },
-  {
-    id: "actions",
-    cell: ({ row }) => {
-      const material = row.original
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              ...
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(String(material.id))}
-            >
-              Copy Material ID
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => DeleteAction(material.id)}
-            >
-              Delete
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => CheckAction(material.id, 0)}
-            >
-              Checkout
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-            </DropdownMenuItem>
-            <DropdownMenuItem></DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu >
-      )
-    }
-  },
-
 ])
