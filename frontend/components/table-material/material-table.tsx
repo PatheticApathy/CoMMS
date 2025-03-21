@@ -7,17 +7,18 @@ import { Token } from "@/user-api-types";
 import { getToken } from "../localstorage";
 import { toast } from "sonner";
 
-const TokenFetcher: Fetcher<Token, string> = async (...args) => fetch(...args, { method: 'POST', body: getToken(), cache: 'force-cache' }).then(res => res.json())
+const TokenFetcher: Fetcher<Token, string> = async (...args) => fetch(...args, { method: 'POST', body: getToken(), cache: 'force-cache' },).then(res => res.json())
 
 export default function MTable({ materials, route }: { materials: Material[], route: string }) {
 
-  const { data: token, error: token_error } = useSWR('/api/user/decrypt', TokenFetcher)
+  //TODO: Batch the log fetching
+  const { data: token, error: token_error } = useSWR('/api/user/decrypt', TokenFetcher,)
 
   const rows = materials.map((material): MaterialRow => {
     return {
       id: material.id,
       job_site: material.job_site.Valid ? material.job_site.Int64 : undefined,
-      last_checked_out: material.last_checked_out,
+      last_checked_out: material.last_checked_out.Valid ? material.last_checked_out.Time : undefined,
       location_lat: material.location_lat.Valid ? material.location_lat.Float64 : undefined,
       location_lng: material.location_lng.Valid ? material.location_lng.Float64 : undefined,
       name: material.name.Valid ? material.name.String : undefined,

@@ -6,6 +6,7 @@ export interface CheckoutLog {
   id: number
   item_id: number
   user_id: number
+  amount: number
 }
 
 export interface AddCheckoutLog {

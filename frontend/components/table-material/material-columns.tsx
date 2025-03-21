@@ -8,7 +8,7 @@ import { Token } from "@/user-api-types"
 export type MaterialRow = {
   id: number
   job_site: number | undefined
-  last_checked_out: string
+  last_checked_out: string | undefined
   location_lat: number | undefined
   location_lng: number | undefined
   name: string | undefined
@@ -72,7 +72,13 @@ export const MaterialTableColumns: ((route: string, token: Token | undefined) =>
           Int64: 0,
           Valid: false
         },
-        last_checked_out: material_row.last_checked_out,
+        last_checked_out: material_row.last_checked_out ? {
+          Time: material_row.last_checked_out,
+          Valid: true
+        } : {
+          Time: "N/A",
+          Valid: false
+        },
         location_lat: material_row.location_lat ? {
           Float64: material_row.location_lat,
           Valid: true

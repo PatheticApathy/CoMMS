@@ -1,6 +1,6 @@
 -- name: AddCheckoutLog :one
-INSERT INTO CheckoutLogs(item_id,user_id,checkout_time)
-VALUES (?,?,datetime('now'))
+INSERT INTO CheckoutLogs(item_id,user_id,checkout_time,amount)
+VALUES (?,?,datetime('now'),?)
 RETURNING *;
 
 -- name: UpdateCheckinlog :one

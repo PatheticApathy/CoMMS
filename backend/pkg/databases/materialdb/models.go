@@ -15,6 +15,7 @@ type CheckoutLog struct {
 	UserID       int64        `json:"user_id"`
 	CheckinTime  sql.NullTime `json:"checkin_time"`
 	CheckoutTime time.Time    `json:"checkout_time"`
+	Amount       interface{}  `json:"amount"`
 }
 
 type Material struct {

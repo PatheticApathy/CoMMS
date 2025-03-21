@@ -15,65 +15,71 @@ import (
 //	@Description	Can get material using it's id, or the material it relates to
 //	@Tags			material logs
 //	@Produce		json
-//	@Param			id			query		int						false	"id of material log"
-//	@Param			material	query		int						false	"id of material"
+//	@Param			id			query		[]int						false	"id of material log"
+//	@Param			material	query		[]int						false	"id of material"
 //	@Success		200			{array}	materialdb.MaterialLog	"material log"
 //	@Failure		400			{string} string	"bad request"
 //	@Failure		500			{string} string	"Internal Server Error"
 //	@Router			/mlogs/search [get]
 func (e *Env) getMaterialLogsHandler(w http.ResponseWriter, r *http.Request) {
+	logs := make([]materialdb.MaterialLog, 5)
+
 	query := r.URL.Query()
 
 	if query.Has("id") {
 
-		id, err := strconv.Atoi(query.Get("id"))
-		if err != nil {
-			log.Printf("Invalid material log id, reason %e", err)
-			http.Error(w, "bad request", http.StatusBadRequest)
-			return
+		ids := query["id"]
+
+		for _, id := range ids {
+
+			id, err := strconv.Atoi(id)
+			if err != nil {
+				log.Printf("Invalid material log id, reason %e", err)
+				http.Error(w, "bad request", http.StatusBadRequest)
+				return
+			}
+
+			material_log, err := e.Queries.GetMaterialLogsByID(r.Context(), int64(id))
+			if err != nil {
+				log.Printf("Invalid material log id, reason %e", err)
+				http.Error(w, "bad request", http.StatusBadRequest)
+				return
+			}
+
+			logs = append(logs, material_log)
+
+			log.Printf("Found material log %d", id)
 		}
 
-		material_log, err := e.Queries.GetMaterialLogsByID(r.Context(), int64(id))
-		if err != nil {
-			log.Printf("Invalid material log id, reason %e", err)
-			http.Error(w, "bad request", http.StatusBadRequest)
-			return
-		}
-
-		log.Printf("Found material log %d", id)
-
-		if err := json.NewEncoder(w).Encode(&material_log); err != nil {
-			log.Printf("could not encode to json, reason %e", err)
-			http.Error(w, "internal server error", http.StatusInternalServerError)
-			return
-		}
-		return
 	}
+
 	if query.Has("material") {
-		id, err := strconv.Atoi(query.Get("material"))
-		if err != nil {
-			log.Printf("Invalid material id, reason %e", err)
-			http.Error(w, "bad request", http.StatusBadRequest)
-			return
-		}
+		materials := query["material"]
+		for _, material := range materials {
+			id, err := strconv.Atoi(material)
+			if err != nil {
+				log.Printf("Invalid material id, reason %e", err)
+				http.Error(w, "bad request", http.StatusBadRequest)
+				return
+			}
 
-		material_log, err := e.Queries.GetMaterialLogsByMaterial(r.Context(), int64(id))
-		if err != nil {
-			log.Printf("Invalid material id, reason %e", err)
-			http.Error(w, "bad request", http.StatusBadRequest)
-			return
-		}
+			material_log, err := e.Queries.GetMaterialLogsByMaterial(r.Context(), int64(id))
+			if err != nil {
+				log.Printf("Invalid material id, reason %e", err)
+				http.Error(w, "bad request", http.StatusBadRequest)
+				return
+			}
 
-		log.Printf("Found material logs for material id %d", id)
-		if err := json.NewEncoder(w).Encode(&material_log); err != nil {
-			log.Printf("could not encode to json, reason %e", err)
-			http.Error(w, "internal server error", http.StatusInternalServerError)
-			return
+			log.Printf("Found material logs for material id %d", id)
+			logs = append(logs, material_log...)
 		}
+	}
+
+	if err := json.NewEncoder(w).Encode(&logs); err != nil {
+		log.Printf("could not encode to json, reason %e", err)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
-	log.Printf("No valid paramerters given")
-	http.Error(w, "bad request", http.StatusBadRequest)
 }
 
 // getAllMaterialLogsHandler gets all material logs
