@@ -11,7 +11,6 @@ const TokenFetcher: Fetcher<Token, string> = async (...args) => fetch(...args, {
 
 export default function MTable({ materials, route }: { materials: Material[], route: string }) {
 
-  //TODO: Batch the log fetching
   const { data: token, error: token_error } = useSWR('/api/user/decrypt', TokenFetcher,)
 
   const rows = materials.map((material): MaterialRow => {
