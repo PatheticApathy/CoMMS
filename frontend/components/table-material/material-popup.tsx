@@ -8,7 +8,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { CheckoutLog, Material, MaterialLog } from "@/material-api-types";
+import { ChangeQuantity, CheckoutLog, Material, MaterialLog } from "@/material-api-types";
 import Image from "next/image";
 import useSWR, { Fetcher, mutate } from "swr"
 import useSWRMutation from "swr/mutation";
@@ -23,6 +23,7 @@ const MaterialLogFetcher: Fetcher<MaterialLog[], string> = async (...args) => fe
 const CheckoutLogFetcher: Fetcher<CheckoutLog[], string> = async (...args) => fetch(...args, { cache: 'default' }).then(res => res.json())
 const CheckOut = async (url: string, { arg }: { arg: { user_id: number, item_id: number } }) => await fetch(url, { method: 'POST', body: JSON.stringify(arg) })
 const CheckIn = async (url: string, { arg }: { arg: { user_id: number, item_id: number } }) => await fetch(url, { method: 'PUT', body: JSON.stringify(arg) })
+const QuantityChange = async (url: string, { arg }: { arg: ChangeQuantity }) => await fetch(url, { method: 'PUT', body: JSON.stringify(arg) })
 const DeleteMaterial = async (url: string, { arg }: { arg: number }) => await fetch(url, { method: 'DELETE', body: String(arg) })
 
 const DisplayMaterialLogs = (material_logs: MaterialLog[] | undefined, error: boolean, isLoading: boolean,) => {
@@ -49,7 +50,7 @@ const DisplayMaterialLogs = (material_logs: MaterialLog[] | undefined, error: bo
                 })()
                 }
                 <br />
-                {`${log.status} with ${log.quantity_change} ${log.quantity_change > 0 ? "Added" : "Removed"}`}
+                {`${log.status} with ${log.quantity_change} ${Math.abs(log.quantity_change) > 0 ? "Added" : "Removed"}`}
                 <br />
                 {log.note.Valid ? log.note.String : "Not Additional Notes"}
               </div>
@@ -89,6 +90,8 @@ const DisplayCheckouts = (checkout_logs: CheckoutLog[] | undefined, error: boole
                 })()
                 }
                 <br />
+                {`Amount checked out ${log.amount}`}
+                <br />
                 {
                   (() => {
 
@@ -121,7 +124,9 @@ export default function MaterialSheet({ material, route, children, token }: Read
   token: Token | undefined
 }>) {
 
+
   const [check, setCheck] = useState(false)
+  const [counter, setcount] = useState(0)
   const { data: checkout_logs, isLoading: checkout_loading, error: checkout_error } = useSWR(`/api/material/checkout/recent?id=${material.id}`, CheckoutLogFetcher)
   const { data: material_logs, isLoading: material_loading, error: material_error } = useSWR(`/api/material/mlogs/recent?id=${material.id}`, MaterialLogFetcher)
 
@@ -183,8 +188,8 @@ export default function MaterialSheet({ material, route, children, token }: Read
     },
   })
 
+  //TODO: Add amount to checkin/out
   useEffect(() => {
-    //TODO: Add amount to checkin/out
     if (checkout_logs && token) {
       setCheck(Boolean(checkout_logs?.find((log) => !log.checkin_time.Valid && log.user_id == token.id)))
     }
@@ -227,30 +232,29 @@ export default function MaterialSheet({ material, route, children, token }: Read
                         if (checking_out || checking_in) {
                           return <Loading />
                         } else {
-                          return <Button onClick={check ? () => (checkin({ user_id: token.id, item_id: material.id })) : () => (checkout({ user_id: token.id, item_id: material.id }))} variant={check ? "default" : "secondary"} className="justify-center " >{check ? "Checkin" : "Checkout"}</Button>
+                          return (
+                            <div className="flex flex-row flex-auto">
+                              <Button onClick={() => { send_amount({ quantity: counter, id: material.id }) }} variant={check ? "default" : "secondary"} className="w-2/3" >{check ? "Checkin" : "Checkout"}</Button>
+                              <div className="flex flex-row text-center w-1/3 ">
+                                <div className="w-1/4"><Button onClick={() => setcount(counter + 1)}>+</Button></div>
+                                <div className="w-2/4 text content-center"><h1 className="text-slate-300 text-center ml-3">{counter}</h1></div>
+                                <div><Button className="w-1/4" onClick={() => setcount(counter - 1)}>-</Button></div>
+                              </div>
+                            </div>
+                          )
                         }
                       })()
                       }
-                      <div>
+                      < div className="place-content-center">
                         {
                           DisplayCheckouts(checkout_logs, checkout_error, checkout_loading)
                         }
                       </div>
                     </div>
-                  </div>
-                  <SheetFooter className="flex flex-col place-content-center">
-                    <SheetClose asChild>
-                      <Button variant={'destructive'} onClick={async () => {
-                        trigger(material.id)
-                      }
-                      }>
-                        Delete</Button>
-                    </SheetClose>
-                  </SheetFooter>
+                  </div >
                 </>
               )
-            }
-            else {
+            } else {
               return (
                 <>
                   <SheetTitle className="text-2xl">{material.name.Valid ? material.name.String : "No Name Found"}</SheetTitle>
@@ -258,9 +262,8 @@ export default function MaterialSheet({ material, route, children, token }: Read
                 </>
               )
             }
-          }
-          )()}
+          })()}
         </div>
-      </SheetContent>
+      </SheetContent >
     </Sheet >)
 }
