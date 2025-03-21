@@ -63,12 +63,12 @@ const docTemplate = `{
                 "summary": "Adds checkin time to existing checkout log",
                 "parameters": [
                     {
-                        "description": "item id and user id",
+                        "description": "id of checkoutlog",
                         "name": "logid",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/materialdb.UpdateCheckinlogParams"
+                            "type": "integer"
                         }
                     }
                 ],
@@ -184,6 +184,32 @@ const docTemplate = `{
                 }
             }
         },
+        "/company/all": {
+            "get": {
+                "description": "Gets companies",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "companies"
+                ],
+                "summary": "fetches all companies",
+                "responses": {
+                    "200": {
+                        "description": "company",
+                        "schema": {
+                            "$ref": "#/definitions/userdb.Company"
+                        }
+                    },
+                    "500": {
+                        "description": "Faliled to get companies",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/company/create": {
             "post": {
                 "description": "Adds company to the database and assigns the user as a company admin",
@@ -223,6 +249,47 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Failed to create company",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/company/search": {
+            "get": {
+                "description": "Gets company using id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "companies"
+                ],
+                "summary": "fetches company based on given paremeters",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "company's identification number",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "company",
+                        "schema": {
+                            "$ref": "#/definitions/userdb.Company"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid id",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "string"
                         }
@@ -949,6 +1016,35 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/join": {
+            "get": {
+                "description": "Gets users with company and jobsite names",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "fetches all users with their associated company and jobsite names",
+                "responses": {
+                    "200": {
+                        "description": "users with company and jobsite names",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/userdb.GetUsersWithCompanyAndJobsiteRow"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to get users",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/user/loggout": {
             "post": {
                 "description": "Replaces login cookie with an empty one that deletes itself instantly",
@@ -1030,13 +1126,8 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "user's identification number",
                         "name": "id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "user's username",
-                        "name": "username",
-                        "in": "query"
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -1047,7 +1138,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad request",
+                        "description": "Invalid id",
                         "schema": {
                             "type": "string"
                         }
@@ -1089,7 +1180,7 @@ const docTemplate = `{
                     "200": {
                         "description": "User login token",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/auth.Token"
                         }
                     },
                     "400": {
@@ -1143,6 +1234,47 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Failed to update user",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/username": {
+            "get": {
+                "description": "Gets user using username",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "fetches user based on given paremeters",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "user's identification number",
+                        "name": "username",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "users",
+                        "schema": {
+                            "$ref": "#/definitions/userdb.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid username",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "string"
                         }
@@ -1340,17 +1472,6 @@ const docTemplate = `{
                 }
             }
         },
-        "materialdb.UpdateCheckinlogParams": {
-            "type": "object",
-            "properties": {
-                "item_id": {
-                    "type": "integer"
-                },
-                "user_id": {
-                    "type": "integer"
-                }
-            }
-        },
         "sql.NullFloat64": {
             "type": "object",
             "properties": {
@@ -1487,6 +1608,50 @@ const docTemplate = `{
                     "$ref": "#/definitions/sql.NullFloat64"
                 },
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "userdb.GetUsersWithCompanyAndJobsiteRow": {
+            "type": "object",
+            "properties": {
+                "company_id": {
+                    "$ref": "#/definitions/sql.NullInt64"
+                },
+                "company_name": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "firstname": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "jobsite_id": {
+                    "$ref": "#/definitions/sql.NullInt64"
+                },
+                "jobsite_name": {
+                    "type": "string"
+                },
+                "lastname": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "profilepicture": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "role": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "username": {
                     "type": "string"
                 }
             }

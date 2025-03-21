@@ -151,6 +151,65 @@ func (q *Queries) GetUserName(ctx context.Context, username string) (User, error
 	return i, err
 }
 
+const getUsersWithCompanyAndJobsite = `-- name: GetUsersWithCompanyAndJobsite :many
+SELECT u.id, u.username, u.password, u.firstname, u.lastname, u.company_id, u.jobsite_id, u.role, u.email, u.phone, u.profilepicture, 
+c.name as company_name, j.name as jobsite_name
+FROM Users u JOIN Companies c ON u.company_id = c.id JOIN JobSites j ON u.jobsite_id = j.id
+`
+
+type GetUsersWithCompanyAndJobsiteRow struct {
+	ID             int64          `json:"id"`
+	Username       string         `json:"username"`
+	Password       string         `json:"password"`
+	Firstname      sql.NullString `json:"firstname"`
+	Lastname       sql.NullString `json:"lastname"`
+	CompanyID      sql.NullInt64  `json:"company_id"`
+	JobsiteID      sql.NullInt64  `json:"jobsite_id"`
+	Role           sql.NullString `json:"role"`
+	Email          string         `json:"email"`
+	Phone          string         `json:"phone"`
+	Profilepicture sql.NullString `json:"profilepicture"`
+	CompanyName    string         `json:"company_name"`
+	JobsiteName    string         `json:"jobsite_name"`
+}
+
+func (q *Queries) GetUsersWithCompanyAndJobsite(ctx context.Context) ([]GetUsersWithCompanyAndJobsiteRow, error) {
+	rows, err := q.db.QueryContext(ctx, getUsersWithCompanyAndJobsite)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetUsersWithCompanyAndJobsiteRow
+	for rows.Next() {
+		var i GetUsersWithCompanyAndJobsiteRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Username,
+			&i.Password,
+			&i.Firstname,
+			&i.Lastname,
+			&i.CompanyID,
+			&i.JobsiteID,
+			&i.Role,
+			&i.Email,
+			&i.Phone,
+			&i.Profilepicture,
+			&i.CompanyName,
+			&i.JobsiteName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const signUp = `-- name: SignUp :one
 INSERT INTO Users(username, password, email, phone) VALUES (?,?,?,?) RETURNING id, username, password, firstname, lastname, company_id, jobsite_id, role, email, phone, profilepicture
 `

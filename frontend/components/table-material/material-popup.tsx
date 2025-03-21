@@ -26,7 +26,7 @@ const CheckIn = async (url: string, { arg }: { arg: { user_id: number, item_id: 
 const QuantityChange = async (url: string, { arg }: { arg: ChangeQuantity }) => await fetch(url, { method: 'PUT', body: JSON.stringify(arg) })
 const DeleteMaterial = async (url: string, { arg }: { arg: number }) => await fetch(url, { method: 'DELETE', body: String(arg) })
 
-const DisplayMaterialLogs = (material_logs: MaterialLog[] | undefined, error: boolean, isLoading: boolean,) => {
+const DisplayMaterialLogs = (material_logs: MaterialLog[] | undefined, error: Boolean, isLoading: Boolean,) => {
   if (isLoading) {
     return <div>Loading<Loading /></div>;
   }
@@ -40,7 +40,7 @@ const DisplayMaterialLogs = (material_logs: MaterialLog[] | undefined, error: bo
         {
           material_logs.map((log) => {
             return (
-              <div key={log.id}>
+              <>
                 <br />
                 {(() => {
                   const timestamp = new Date(log.timestamp)
@@ -53,7 +53,7 @@ const DisplayMaterialLogs = (material_logs: MaterialLog[] | undefined, error: bo
                 {`${log.status} with ${Math.abs(log.quantity_change)} ${log.quantity_change > 0 ? "Added" : "Removed"}`}
                 <br />
                 {log.note.Valid ? log.note.String : "Not Additional Notes"}
-              </div>
+              </>
             )
           }
           )
@@ -65,7 +65,7 @@ const DisplayMaterialLogs = (material_logs: MaterialLog[] | undefined, error: bo
   }
 }
 
-const DisplayCheckouts = (checkout_logs: CheckoutLog[] | undefined, error: boolean, isLoading: boolean,) => {
+const DisplayCheckouts = (checkout_logs: CheckoutLog[] | undefined, error: Boolean, isLoading: Boolean,) => {
   if (isLoading) {
     return <div>Loading<Loading /></div>;
   }
@@ -115,12 +115,12 @@ const DisplayCheckouts = (checkout_logs: CheckoutLog[] | undefined, error: boole
   } else {
     return <div className="text-center">Never Checked out</div>;
   }
-
 }
+
 export default function MaterialSheet({ material, route, children, token }: Readonly<{
   material: Material,
-  route: string,
   children: React.ReactNode;
+  route: string
   token: Token | undefined
 }>) {
 
@@ -223,8 +223,8 @@ export default function MaterialSheet({ material, route, children, token }: Read
     if (checkout_logs && token) {
       setCheck(Boolean(checkout_logs?.find((log) => !log.checkin_time.Valid && log.user_id == token.id)))
     }
-  })
 
+  })
   return (
     <Sheet>
       <SheetTrigger asChild>{children}</SheetTrigger>

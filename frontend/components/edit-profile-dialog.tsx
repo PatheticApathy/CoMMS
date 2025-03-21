@@ -24,7 +24,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import useSWR from "swr"
-import { User, Firstname, Lastname, Username } from "@/user-api-types"
+import { User, Firstname, Lastname } from "@/user-api-types"
 import { getCookie } from "./cookie-functions"
 
 const formSchema = z.object({
@@ -71,8 +71,7 @@ export function EditProfile() {
 
     //let id = tokenData.id
 
-    const { data: user, error: error3, mutate: userMutate } = useSWR<User, string>(`api/user/search?id=1`, fetcher)
-    userMutate()
+    const { data: user, error: error3 } = useSWR<User, string>(`api/user/search?id=1`, fetcher)
 
     if (error3) return <p>Error loading Profile.</p>;
     if (!user) return <p>Loading...</p>;  
@@ -91,14 +90,8 @@ export function EditProfile() {
     if (isMutating) { return (<div className='flex items-center justify-center w-screen h-screen'>Loading <Loading /></div>) }
     if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
 
-    console.log("Data: ", data)
-    console.log("Error: ", error)
-
     async function profileSubmit(values: z.infer<typeof formSchema>) {
-        const username: Firstname = {
-            String: values.username,
-            Valid: Boolean(values.username)
-        }
+        const username = values.username
         const firstname: Firstname = {
             String: values.firstname,
             Valid: Boolean(values.firstname)
@@ -107,14 +100,8 @@ export function EditProfile() {
             String: values.lastname,
             Valid: Boolean(values.lastname)
         }
-        const email: Firstname = {
-            String: values.email,
-            Valid: Boolean(values.email)
-        }
-        const phone: Firstname = {
-            String: values.phone,
-            Valid: Boolean(values.phone)
-        }
+        const email = values.email
+        const phone = values.phone
         //const intID = Number(id)
         const values2 = {
             username,

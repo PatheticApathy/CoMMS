@@ -25,8 +25,8 @@ import { redirect } from 'next/navigation'
 import useSWRMutation from 'swr/mutation'
 import Loading from '@/components/loading'
 import { EditProfile } from "./edit-profile-dialog"
-import useSWR, { useSWRConfig } from "swr";
-import { User, Token } from "@/user-api-types";
+import useSWR from "swr";
+import { User } from "@/user-api-types";
 import { getCookie } from "./cookie-functions"
 
 async function getProfileArgs(url: string, arg: { token: string }) {
@@ -53,18 +53,14 @@ const fetcher = async (url: string) => {
 
 export function Profile() {
 
-  let token = getCookie('token')
+  //let token = getCookie('token')
 
-  const { data: tokenData, error: error2 } = useSWR(['api/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
-  //let id = tokenData.id
+  //const  { data: tokenData, mutate, error: error2 } = useSWR('api/user/decrypt', getProfileArgs)
 
-  /*for (let i = 12; i < 100; i++)
-  {
-      const { mutate: deleteMutate } = useSWR(`api/user/delete?id=${i}`, deleteUsers)
-      deleteMutate()
-  }*/
+  //mutate(token)
 
-  const { data: user, error: error3 } = useSWR<User, string>(`api/user/search?id={tokenData.id}`, fetcher);
+  //console.log("ID: ", tokenData.id)
+  const { data: user, error: error3 } = useSWR<User, string>(`api/user/search?id=1`, fetcher);
 
   if (error3) return <p>Error loading Profile.</p>;
   if (!user) return <p>Loading...</p>;
@@ -87,7 +83,7 @@ export function Profile() {
           className="w-[--radix-popper-anchor-width]"
         >
           <DialogTrigger asChild>
-            <DropdownMenuItem onClick={profileSubmit}>
+            <DropdownMenuItem>
               <span>Profile</span>
             </DropdownMenuItem>
           </DialogTrigger>

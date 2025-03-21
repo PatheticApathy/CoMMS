@@ -7,9 +7,14 @@ import { Token } from "@/user-api-types";
 import { getToken } from "../localstorage";
 import { toast } from "sonner";
 
+
+//fetcher
 const TokenFetcher: Fetcher<Token, string> = async (...args) => fetch(...args, { method: 'POST', body: getToken(), cache: 'force-cache' },).then(res => res.json())
+const DeleteMaterial = async (url: string, { arg }: { arg: number }) => await fetch(url, { method: 'DELETE', body: String(arg) })
+const CheckOut = async (url: string, { arg }: { arg: { user: number, item: number } }) => await fetch(url, { method: 'POST', body: String(arg) })
 
 export default function MTable({ materials, route }: { materials: Material[], route: string }) {
+
 
   const { data: token, error: token_error } = useSWR('/api/user/decrypt', TokenFetcher,)
 
@@ -31,7 +36,6 @@ export default function MTable({ materials, route }: { materials: Material[], ro
   if (token_error) {
     toast.error('Invalid session')
   }
-  //TODO: dont change time if checkin time already exist
   return (
     <div className="mx-auto py-10">
       <DataTable columns={MaterialTableColumns(route, token)} data={rows} />

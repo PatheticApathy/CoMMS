@@ -1,5 +1,3 @@
-import { Token } from "@/user-api-types"
-
 export function getToken() {
   return localStorage.getItem('token')
 }

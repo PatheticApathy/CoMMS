@@ -97,8 +97,8 @@ export const MaterialTableColumns: ((route: string, token: Token | undefined) =>
           String: material_row.name,
           Valid: true
         } : {
-          String: "",
-          Valid: false
+          String: "No name provided",
+          Valid: true
         },
 
         quantity: material_row.quantity,
@@ -107,8 +107,8 @@ export const MaterialTableColumns: ((route: string, token: Token | undefined) =>
           String: material_row.name,
           Valid: true
         } : {
-          String: "",
-          Valid: false
+          String: "No name provided",
+          Valid: true
         },
         unit: material_row.unit
       }

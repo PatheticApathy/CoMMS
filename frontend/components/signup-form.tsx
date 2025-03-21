@@ -63,8 +63,6 @@ export default function SignupForm() {
   if (isMutating) { return (<div className='flex items-center justify-center w-screen h-screen'>Loading <Loading /></div>) }
   if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
   if (data) {
-    //let expireTime = setCookie(7)
-    //document.cookie = `token=${JSON.stringify(data.token)}; expires=${expireTime}; path=/`
     setToken(data)
     redirect('/dashboard')
   }

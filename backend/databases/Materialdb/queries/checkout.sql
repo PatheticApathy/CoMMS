@@ -9,7 +9,6 @@ SET checkin_time = datetime('now')
 WHERE item_id = @item_id AND user_id = @user_id
 RETURNING *;
 
-
 -- name: GetAllCheckoutLogs :many
 SELECT * 
 FROM  CheckoutLogs;

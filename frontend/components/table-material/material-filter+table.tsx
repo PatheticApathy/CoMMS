@@ -1,5 +1,4 @@
 'use client'
-import { KeyedMutator } from "swr";
 import MTable from "./material-table";
 import { Material } from '@/material-api-types';
 

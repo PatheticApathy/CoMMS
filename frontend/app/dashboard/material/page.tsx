@@ -1,4 +1,5 @@
 'use client'
+import { useState } from 'react'
 import { Material } from '@/material-api-types';
 import useSWR, { Fetcher } from 'swr'
 import Loading from '@/components/loading';
@@ -14,7 +15,7 @@ export default function AllMaterialPage() {
   if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
   return (
     <div>
-      <FilterAndTable header="Materials" materials={materials} route={'/api/material/material/all'} />
+      <FilterAndTable route='/api/material/material/all' header="Materials" materials={materials} />
       <InitAddFormDialouge />
     </div>
   );
