@@ -90,11 +90,19 @@ export interface LocationLng {
   Valid: boolean
 }
 
+export interface Company {
+  id: number
+  name: string
+  addr: {String: string, Valid: boolean}
+  location_lat: LocationLat
+  location_lng: LocationLng
+}
+
 export interface AddCompanyParams {
-  Name: string
-  Addr: string
-  LocationLat: LocationLat
-  LocationLng: LocationLng
+  name: string
+  addr: {String: string, Valid: boolean}
+  location_lat: LocationLat
+  location_lng: LocationLng
 }
 
 export interface JobSite {
