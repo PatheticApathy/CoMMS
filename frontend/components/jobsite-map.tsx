@@ -15,7 +15,15 @@ const defaultIcon = new L.Icon({
     popupAnchor: [1, -34], // Position of the popup relative to the icon
 });
 
-const fetcher = async (url:string): Promise<JobSite[]> => {
+const jobSiteFetcher = async (url:string): Promise<JobSite[]> => {
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error("Failed to fetch data");
+  }
+  return res.json();
+}
+
+const userFetcher = async (url:string): Promise<JobSite[]> => {
   const res = await fetch(url);
   if (!res.ok) {
     throw new Error("Failed to fetch data");
@@ -28,9 +36,9 @@ const bounds : LatLngBoundsExpression = [
   [32.5266895, -92.6427248]
 ]
 
-export default function JobsiteMapClient({ jobsite }: { jobsite: JobSite}) {
+export default function JobsiteMapClient() {
 
-  const { data: sites } = useSWR<JobSite[]>("/api/sites/all", fetcher)
+  const { data: sites } = useSWR<JobSite[]>("/api/sites/all", jobSiteFetcher)
   //if (isLoading) { return (<div className='flex items-center justify-center w-screen h-screen'>Loading <Loading /></div>) }
   //if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
   if (!sites){
@@ -38,7 +46,7 @@ export default function JobsiteMapClient({ jobsite }: { jobsite: JobSite}) {
   }
   if (sites){
     console.log(sites)
-    const site = sites[8] 
+    const site = sites[0]
     console.log(site)
     const siteName = site.name
     console.log(siteName)
@@ -54,7 +62,7 @@ export default function JobsiteMapClient({ jobsite }: { jobsite: JobSite}) {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; OpenStreetMap contributors'
         />
-        <Marker position={[jobsite.location_lat.Valid ? jobsite.location_lat.Float64 : 0.0, jobsite.location_lng.Valid ? jobsite.location_lng.Float64 : 0.0]} icon={defaultIcon}>
+        <Marker position={[site.location_lat.Valid ? site.location_lat.Float64 : 0.0, site.location_lng.Valid ? site.location_lng.Float64 : 0.0]} icon={defaultIcon}>
           <Popup>
             <Link href="https://coes.latech.edu">The IESB</Link>
           </Popup>
