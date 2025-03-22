@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { setToken } from '@/components/localstorage'
 import Link from "next/link"
 import { redirect } from 'next/navigation'
 import useSWRMutation from 'swr/mutation'
@@ -17,22 +16,24 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { setToken } from '@/components/localstorage'
+import { LogInUser } from "@/user-api-types"
 
 const formSchema = z.object({
   username: z.string(),
   password: z.string(),
 })
 
-async function logIn(url: string, { arg }) {
+async function logIn(url: string, { arg }: { arg: LogInUser }) {
   return fetch(url, {
     method: 'POST',
     body: JSON.stringify(arg)
-  }).then(res => res.text())
+  }).then(res => res.json())
 }
 
 export default function LoginForm() {
 
-  const { data, trigger, error, isMutating } = useSWRMutation('api/user/login', logIn, { throwOnError: false })
+  const { data, trigger, error, isMutating } = useSWRMutation('api/user/login', logIn, {throwOnError: false})
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -45,12 +46,13 @@ export default function LoginForm() {
   if (isMutating) { return (<div className='flex items-center justify-center w-screen h-screen'>Loading <Loading /></div>) }
   if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
   if (data) {
+    console.log(`Le Token is gooda ${data}`);
     setToken(data)
     redirect('/dashboard')
   }
 
   //validate form data(data is safe at this point)
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {    
     trigger(values)
   }
 
