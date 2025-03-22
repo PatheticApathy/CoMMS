@@ -889,6 +889,64 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/coworkers": {
+            "get": {
+                "description": "Adds user to the database using valid json structure",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "post user to database",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "user id",
+                        "name": "user",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "company id",
+                        "name": "company",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "jobsite id",
+                        "name": "site",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User login token",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/userdb.GetUsersByJobsiteAndCompanyRow"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/user/create": {
             "post": {
                 "security": [
@@ -1594,6 +1652,44 @@ const docTemplate = `{
                 }
             }
         },
+        "userdb.GetUsersByJobsiteAndCompanyRow": {
+            "type": "object",
+            "properties": {
+                "company_id": {
+                    "$ref": "#/definitions/sql.NullInt64"
+                },
+                "company_name": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "firstname": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "jobsite_id": {
+                    "$ref": "#/definitions/sql.NullInt64"
+                },
+                "jobsite_name": {
+                    "type": "string"
+                },
+                "lastname": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "profilepicture": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "role": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "userdb.GetUsersWithCompanyAndJobsiteRow": {
             "type": "object",
             "properties": {
@@ -1620,9 +1716,6 @@ const docTemplate = `{
                 },
                 "lastname": {
                     "$ref": "#/definitions/sql.NullString"
-                },
-                "password": {
-                    "type": "string"
                 },
                 "phone": {
                     "type": "string"
