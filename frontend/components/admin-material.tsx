@@ -143,18 +143,7 @@ export const columns: ColumnDef<Material>[] = [
   {
     accessorKey: "job_site",
     header: "Job Site",
-    cell: ({ row }) => {
-      const jobSite = row.getValue("job_site") as { Int64: number; Valid: boolean };
-      return (
-        <div className="">
-          {jobSite.Int64}
-        </div>
-      );
-    },
-    filterFn: (row, columnId, filterValue) => {
-      const jobSite = row.getValue(columnId) as { String: string; Valid: boolean };
-      return jobSite.String.toLowerCase().includes(filterValue.toLowerCase());
-    },
+    cell: ({ row }) => <div className="">{row.getValue("job_site")}</div>,
   },
   {
     id: "actions",

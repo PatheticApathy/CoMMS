@@ -76,9 +76,9 @@ export default function ContactsTable({ searchQuery }: { searchQuery: string }) 
       </TableHeader>
       <TableBody>
         {filteredData.map((user: UserJoin) => (
-          <Dialog>
+          <Dialog key={user.id}>
             <DialogTrigger asChild>
-              <TableRow key={user.id}>
+              <TableRow>
                 <TableCell>{user.username}</TableCell>
                 <TableCell>{user.firstname?.Valid ? user.firstname.String : "N/A"}</TableCell>
                 <TableCell>{user.lastname?.Valid ? user.lastname.String : "N/A"}</TableCell>
