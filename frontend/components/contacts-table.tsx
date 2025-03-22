@@ -44,7 +44,7 @@ export default function ContactsTable({ searchQuery }: { searchQuery: string }) 
   if (error) return <p>Error loading contacts.</p>;
   if (!data) return <p>Loading...</p>;  
 
-  const filteredData = (data ?? []).filter((user: User) => {
+  const filteredData = (data ?? []).filter((user: UserJoin) => {
     const searchLower = searchQuery.toLowerCase();
   
     return (
