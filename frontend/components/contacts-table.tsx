@@ -18,7 +18,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import useSWR from "swr";
-import { UserJoin } from "@/user-api-types";
+import { User, UserJoin } from "@/user-api-types";
 
 const fetcher = async (url: string): Promise<UserJoin[]> => {
   const res = await fetch(url);
@@ -53,8 +53,8 @@ export default function ContactsTable({ searchQuery }: { searchQuery: string }) 
       user.phone.toLowerCase().includes(searchLower) ||
       (user.firstname.Valid && user.firstname.String.toLowerCase().includes(searchLower)) ||
       (user.lastname.Valid && user.lastname.String.toLowerCase().includes(searchLower)) ||
-      (user.company.Valid && user.company.String.toLowerCase().includes(searchLower)) ||
-      (user.site.Valid && user.site.String.toLowerCase().includes(searchLower)) ||
+      (user.company_name.toLowerCase().includes(searchLower)) ||
+      (user.jobsite_name.toLowerCase().includes(searchLower)) ||
       (user.role.Valid && user.role.String.toLowerCase().includes(searchLower))
     );
   });
@@ -78,7 +78,7 @@ export default function ContactsTable({ searchQuery }: { searchQuery: string }) 
         {filteredData.map((user: UserJoin) => (
           <Dialog>
             <DialogTrigger asChild>
-              <TableRow key={user.username}>
+              <TableRow key={user.id}>
                 <TableCell>{user.username}</TableCell>
                 <TableCell>{user.firstname?.Valid ? user.firstname.String : "N/A"}</TableCell>
                 <TableCell>{user.lastname?.Valid ? user.lastname.String : "N/A"}</TableCell>

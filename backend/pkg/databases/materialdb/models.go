@@ -28,7 +28,7 @@ type Material struct {
 	LocationLat    sql.NullFloat64 `json:"location_lat"`
 	LocationLng    sql.NullFloat64 `json:"location_lng"`
 	LastCheckedOut sql.NullTime    `json:"last_checked_out"`
-	JobSite        sql.NullInt64   `json:"job_site"`
+	JobSite        int64           `json:"job_site"`
 }
 
 type MaterialLog struct {

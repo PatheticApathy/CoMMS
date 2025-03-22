@@ -21,7 +21,7 @@ export default function MTable({ materials, route }: { materials: Material[], ro
   const rows = materials.map((material): MaterialRow => {
     return {
       id: material.id,
-      job_site: material.job_site.Valid ? material.job_site.Int64 : undefined,
+      job_site: material.job_site,
       last_checked_out: material.last_checked_out.Valid ? material.last_checked_out.Time : undefined,
       location_lat: material.location_lat.Valid ? material.location_lat.Float64 : undefined,
       location_lng: material.location_lng.Valid ? material.location_lng.Float64 : undefined,
