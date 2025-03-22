@@ -11,6 +11,11 @@ definitions:
       username:
         type: string
     type: object
+  auth.Token:
+    properties:
+      token:
+        type: string
+    type: object
   auth.UnEncrypted:
     properties:
       id:
@@ -22,6 +27,7 @@ definitions:
     type: object
   materialdb.AddCheckoutLogParams:
     properties:
+      amount: {}
       item_id:
         type: integer
       user_id:
@@ -73,6 +79,7 @@ definitions:
     type: object
   materialdb.CheckoutLog:
     properties:
+      amount: {}
       checkin_time:
         $ref: '#/definitions/sql.NullTime'
       checkout_time:
@@ -778,14 +785,20 @@ paths:
     get:
       description: Can get material using it's id, or the material it relates to
       parameters:
-      - description: id of material log
+      - collectionFormat: csv
+        description: id of material log
         in: query
+        items:
+          type: integer
         name: id
-        type: integer
-      - description: id of material
+        type: array
+      - collectionFormat: csv
+        description: id of material
         in: query
+        items:
+          type: integer
         name: material
-        type: integer
+        type: array
       produces:
       - application/json
       responses:
@@ -942,7 +955,7 @@ paths:
         name: users
         required: true
         schema:
-          type: string
+          $ref: '#/definitions/auth.Token'
       responses:
         "200":
           description: User login data token

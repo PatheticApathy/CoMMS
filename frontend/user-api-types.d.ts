@@ -87,16 +87,16 @@ export interface LocationLng {
 export interface Company {
   id: number
   name: string
-  addr: string
-  locationLat: LocationLat
-  locationLng: LocationLng
+  addr: {String: string, Valid: boolean}
+  location_lat: LocationLat
+  location_lng: LocationLng
 }
 
 export interface AddCompanyParams {
   name: string
-  addr: string
-  locationLat: LocationLat
-  locationLng: LocationLng
+  addr: {String: string, Valid: boolean}
+  location_lat: LocationLat
+  location_lng: LocationLng
 }
 
 export interface JobSite {

@@ -11,6 +11,11 @@ definitions:
       username:
         type: string
     type: object
+  auth.Token:
+    properties:
+      token:
+        type: string
+    type: object
   auth.UnEncrypted:
     properties:
       id:
@@ -430,7 +435,7 @@ paths:
         name: users
         required: true
         schema:
-          type: string
+          $ref: '#/definitions/auth.Token'
       responses:
         "200":
           description: User login data token

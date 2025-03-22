@@ -702,13 +702,21 @@ const docTemplate = `{
                 "summary": "fetches material logs based on given query parameters",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "collectionFormat": "csv",
                         "description": "id of material log",
                         "name": "id",
                         "in": "query"
                     },
                     {
-                        "type": "integer",
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "collectionFormat": "csv",
                         "description": "id of material",
                         "name": "material",
                         "in": "query"
@@ -949,7 +957,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/auth.Token"
                         }
                     }
                 ],
@@ -1301,6 +1309,14 @@ const docTemplate = `{
                 }
             }
         },
+        "auth.Token": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
         "auth.UnEncrypted": {
             "type": "object",
             "properties": {
@@ -1318,6 +1334,7 @@ const docTemplate = `{
         "materialdb.AddCheckoutLogParams": {
             "type": "object",
             "properties": {
+                "amount": {},
                 "item_id": {
                     "type": "integer"
                 },
@@ -1397,6 +1414,7 @@ const docTemplate = `{
         "materialdb.CheckoutLog": {
             "type": "object",
             "properties": {
+                "amount": {},
                 "checkin_time": {
                     "$ref": "#/definitions/sql.NullTime"
                 },
