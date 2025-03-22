@@ -20,19 +20,19 @@ const AddCompanySchema = z.object({
 // Fetcher
 const PostAddCompany = async (url: string, { arg }: { arg: AddCompanyParams }) => await fetch(url, { method: 'POST', body: JSON.stringify(arg) });
 
-export default function JobsiteForm() {
+export default function CompanyForm() {
   // Form controller
   const form = useForm<z.infer<typeof AddCompanySchema>>({
     resolver: zodResolver(AddCompanySchema),
     defaultValues: {
       name: "",
       addr: "",
-      location_lat: 0.0,
-      location_lng: 0.0,
+      location_lat: undefined,
+      location_lng: undefined,
     }
   });
 
-  const { trigger, isMutating } = useSWRMutation('/api/company/add', PostAddCompany, {
+  const { trigger, isMutating } = useSWRMutation('/api/company/create', PostAddCompany, {
     onError(err) {
       console.log(err);
       toast.error(err.message || "Error has occurred");
@@ -46,7 +46,7 @@ export default function JobsiteForm() {
       }
       resp.json().then((data: Company) => {
         console.log("success");
-        toast.success(`Jobsite ${data.name.toString()} Added!`);
+        toast.success(`Company ${data.name.toString()} Added!`);
       });
     },
   });

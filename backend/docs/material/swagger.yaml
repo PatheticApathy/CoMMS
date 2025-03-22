@@ -1070,8 +1070,11 @@ paths:
       - description: user's identification number
         in: query
         name: id
-        required: true
         type: integer
+      - description: user's username
+        in: query
+        name: username
+        type: string
       produces:
       - application/json
       responses:
@@ -1146,33 +1149,6 @@ paths:
           schema:
             type: string
       summary: updates user based on given parameters
-      tags:
-      - users
-  /user/username:
-    get:
-      description: Gets user using username
-      parameters:
-      - description: user's identification number
-        in: query
-        name: username
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: users
-          schema:
-            $ref: '#/definitions/userdb.User'
-        "400":
-          description: Invalid username
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            type: string
-      summary: fetches user based on given paremeters
       tags:
       - users
 swagger: "2.0"

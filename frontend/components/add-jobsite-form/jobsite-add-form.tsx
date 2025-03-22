@@ -38,9 +38,9 @@ export default function JobsiteForm() {
     defaultValues: {
       name: "",
       addr: "",
-      location_lat: 0.0,
-      location_lng: 0.0,
-      company_id: 0.0
+      location_lat: undefined,
+      location_lng: undefined,
+      company_id: 0
     }
   });
 
