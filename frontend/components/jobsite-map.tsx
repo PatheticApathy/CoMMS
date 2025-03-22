@@ -3,10 +3,12 @@
 import L, { LatLngBoundsExpression } from "leaflet"
 import { MapContainer, TileLayer, Marker, Popup, Polygon, Rectangle  } from "react-leaflet";
 import useSWR from 'swr'
-import { JobSite } from '@/user-api-types';
+import { JobSite, User } from '@/user-api-types';
 import Loading from '@/components/loading';
 import "leaflet/dist/leaflet.css";
 import Link from "next/link";
+import { getToken } from '@/components/localstorage'
+import { Token } from '@/user-api-types';
 
 const defaultIcon = new L.Icon({
     iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
@@ -23,13 +25,25 @@ const jobSiteFetcher = async (url:string): Promise<JobSite[]> => {
   return res.json();
 }
 
-const userFetcher = async (url:string): Promise<JobSite[]> => {
+const userFetcher = async (url:string): Promise<User[]> => {
   const res = await fetch(url);
   if (!res.ok) {
     throw new Error("Failed to fetch data");
   }
   return res.json();
 }
+
+async function getProfileArgs(url: string, arg: string) {
+  return fetch(url, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: arg
+  }).then(res => res.json() as Promise<Token>)
+}
+
+const token = getToken()
+console.log("Token: ")
+console.log(token)
 
 const bounds : LatLngBoundsExpression = [
   [32.5260072, -92.6440465],
@@ -39,17 +53,26 @@ const bounds : LatLngBoundsExpression = [
 export default function JobsiteMapClient() {
 
   const { data: sites } = useSWR<JobSite[]>("/api/sites/all", jobSiteFetcher)
-  //if (isLoading) { return (<div className='flex items-center justify-center w-screen h-screen'>Loading <Loading /></div>) }
-  //if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
-  if (!sites){
+  const { data: users } = useSWR<User[]>("/api/user/all", userFetcher)
+
+  if (!token) { return (<p className='flex items-center justify-center w-screen h-screen'>Invalid Token</p>) }
+
+  const { data: tokenData, error: error2 } = useSWR(['/api/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
+
+  if (error2) { return (<p className='flex items-center justify-center w-screen h-screen'>{error2.message}</p>) }
+
+  const userID = tokenData?.id
+
+  if (!sites || !users || !userID){
     return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>)
   }
-  if (sites){
-    console.log(sites)
-    const site = sites[0]
-    console.log(site)
+
+  if (sites && users && userID){
+    const user = users[userID-1]
+    if (!user.jobsite_id) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
+    const userJobsite = user.jobsite_id.Int64
+    const site = sites[userJobsite-1]
     const siteName = site.name
-    console.log(siteName)
 
     return (
       <MapContainer
@@ -64,7 +87,7 @@ export default function JobsiteMapClient() {
         />
         <Marker position={[site.location_lat.Valid ? site.location_lat.Float64 : 0.0, site.location_lng.Valid ? site.location_lng.Float64 : 0.0]} icon={defaultIcon}>
           <Popup>
-            <Link href="https://coes.latech.edu">The IESB</Link>
+            {siteName}
           </Popup>
         </Marker>
         <Rectangle pathOptions={{color: "purple"}} bounds={bounds}/>      
