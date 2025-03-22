@@ -96,3 +96,36 @@ export interface AddCompanyParams {
   LocationLat: LocationLat
   LocationLng: LocationLng
 }
+
+export interface JobSite {
+  id: number
+  name: string
+  addr: {String: string, Valid: boolean}
+  location_lat: LocationLat
+  location_lng: LocationLng
+  company_id: CompanyID
+}
+
+export interface AddJobSiteParams {
+  name: string
+  addr: {String: string, Valid: boolean}
+  location_lat: LocationLat
+  location_lng: LocationLng
+  company_id: CompanyID
+}
+
+export interface UserJoin {
+  company_id: CompanyID
+  email: string
+  firstname: Firstname
+  id: number
+  lastname: Lastname
+  password: string
+  phone: string
+  role: Role
+  jobsite_id: JobSiteID
+  username: string
+  profilepicture: Profilepicture
+  company_name: string
+  jobsite_name: string
+}
