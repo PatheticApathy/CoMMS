@@ -92,10 +92,10 @@ export interface AddCompanyParams {
 export interface JobSite {
   id: number
   name: string
-  addr: string
-  locationLat: LocationLat
-  locationLng: LocationLng
-  companyID: CompanyID
+  addr: {String: string, Valid: boolean}
+  location_lat: LocationLat
+  location_lng: LocationLng
+  company_id: CompanyID
 }
 
 export interface UserJoin {
