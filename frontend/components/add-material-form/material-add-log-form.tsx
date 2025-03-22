@@ -29,9 +29,7 @@ const AddMaterialLogSchema = z.object({
 const PostAddMaterialLog = async (url: string, { arg }: { arg: AddMaterialLog }) => await fetch(url, { method: 'POST', body: JSON.stringify(arg) })
 const GetMaterials: Fetcher<Material[], string> = async (...args) => fetch(...args, { method: 'GET', cache: 'force-cache' },).then(res => res.json())
 
-export default function AddMaterialLogForm() {
-
-  const { data: materials, error: material_error, isLoading: material_loading } = useSWR("/api/material/material/all", GetMaterials)
+export default function AddMaterialLogForm({ materials }: { materials: Material[] }) {
 
   //form controller
   const form = useForm<z.infer<typeof AddMaterialLogSchema>>({
@@ -81,21 +79,12 @@ export default function AddMaterialLogForm() {
 
   //material logs combobox
   const MatetrialLogComboBox = () => {
-    if (material_loading) {
-      return <div className="flex flex-row" >Loading materials<Loading /></div>;
-    }
-    if (material_error) {
-      return <div className="text-red-500">Error loading materials</div>;
-    }
-    if (materials) {
-      const options = materials.map(log => ({
-        label: log.name.Valid ? log.name.String : String(log.id),
-        value: log.id,
-      }));
+    const options = materials.map(log => ({
+      label: log.name.Valid ? log.name.String : String(log.id),
+      value: log.id,
+    }));
 
-      return <ComboboxFormField form_attr={{ name: "materials", description: "Material to add log to", form: form }} default_label="Choose material to add log to" options={options} />
-    }
-    return <div className="text-red-500">No Materials</div>
+    return <ComboboxFormField form_attr={{ name: "materials", description: "Material to add log to", form: form }} default_label="Choose material to add log to" options={options} />
   }
   return (
     <Form {...form}>

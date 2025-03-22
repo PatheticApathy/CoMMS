@@ -83,9 +83,7 @@ func main() {
 			LocationLng: sql.NullFloat64{
 				Valid: false,
 			},
-			JobSite: sql.NullInt64{
-				Valid: false,
-			},
+			JobSite: 1,
 		}
 
 		material_queries.AddMaterial(ctxt, material)
