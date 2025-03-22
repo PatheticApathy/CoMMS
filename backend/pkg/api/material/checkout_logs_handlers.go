@@ -69,7 +69,7 @@ func (e *Env) postCheckout(w http.ResponseWriter, r *http.Request) {
 //	@Success		200		{object}	materialdb.CheckoutLog	"checkout log"
 //	@Router			/checkout/in [put]
 func (e *Env) putCheckin(w http.ResponseWriter, r *http.Request) {
-	var arg int64
+	var arg materialdb.UpdateCheckinlogParams
 	if err := json.NewDecoder(r.Body).Decode(&arg); err != nil {
 		log.Printf("could not decode to json, reason %e", err)
 		http.Error(w, "bad request", http.StatusBadRequest)

@@ -240,6 +240,59 @@ func (q *Queries) GetMaterialsByID(ctx context.Context, id int64) ([]GetMaterial
 	return items, nil
 }
 
+const getMaterialsByJobsiteID = `-- name: GetMaterialsByJobsiteID :many
+SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site, last_checked_out
+FROM Materials
+WHERE job_site=?
+`
+
+type GetMaterialsByJobsiteIDRow struct {
+	ID             int64           `json:"id"`
+	Name           sql.NullString  `json:"name"`
+	Type           sql.NullString  `json:"type"`
+	Quantity       int64           `json:"quantity"`
+	Unit           string          `json:"unit"`
+	Status         string          `json:"status"`
+	LocationLat    sql.NullFloat64 `json:"location_lat"`
+	LocationLng    sql.NullFloat64 `json:"location_lng"`
+	JobSite        sql.NullInt64   `json:"job_site"`
+	LastCheckedOut sql.NullTime    `json:"last_checked_out"`
+}
+
+func (q *Queries) GetMaterialsByJobsiteID(ctx context.Context, jobSite sql.NullInt64) ([]GetMaterialsByJobsiteIDRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMaterialsByJobsiteID, jobSite)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetMaterialsByJobsiteIDRow
+	for rows.Next() {
+		var i GetMaterialsByJobsiteIDRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Type,
+			&i.Quantity,
+			&i.Unit,
+			&i.Status,
+			&i.LocationLat,
+			&i.LocationLng,
+			&i.JobSite,
+			&i.LastCheckedOut,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getMaterialsByQuantity = `-- name: GetMaterialsByQuantity :many
 SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site, last_checked_out
 FROM Materials 
