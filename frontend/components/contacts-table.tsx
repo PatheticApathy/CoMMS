@@ -22,9 +22,6 @@ const fetcher = async (url: string): Promise<UserJoin[]> => {
 
 export default function ContactsTable({ searchQuery }: { searchQuery: string }) {
   const { data, error } = useSWR<UserJoin[]>("/api/user/join", fetcher);
-  //const { data: data1, error: error1 } = useSWR<User[]>("/api/user/all", fetcher1);
-  //const { data: data2, error: error2 } = useSWR<Company[]>("/api/company/all", fetcher2);
-  //const { data: data3, error: error3 } = useSWR<JobSite[]>("/api/sites/all", fetcher3);
   
   console.log(data);
 
