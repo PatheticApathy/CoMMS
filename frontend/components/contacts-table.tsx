@@ -18,9 +18,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import useSWR from "swr";
-import { User } from "@/user-api-types";
+import { UserJoin } from "@/user-api-types";
 
-const fetcher = async (url: string): Promise<User[]> => {
+const fetcher = async (url: string): Promise<UserJoin[]> => {
   const res = await fetch(url);
   if (!res.ok) {
     throw new Error("Failed to fetch data");
@@ -37,7 +37,7 @@ const fetcher2 = async  (url: string) => {
 };
 
 export default function ContactsTable({ searchQuery }: { searchQuery: string }) {
-  const { data, error } = useSWR<User[]>("/api/user/all", fetcher);
+  const { data, error } = useSWR<UserJoin[]>("/api/user/join", fetcher);
 
   const { data: user, error: error3 } = useSWR<User, string>( `api/user/username?username={user.username}`, fetcher2);
 
@@ -75,15 +75,15 @@ export default function ContactsTable({ searchQuery }: { searchQuery: string }) 
         </TableRow>
       </TableHeader>
       <TableBody>
-        {filteredData.map((user: User) => (
+        {filteredData.map((user: UserJoin) => (
           <Dialog>
             <DialogTrigger asChild>
               <TableRow key={user.username}>
                 <TableCell>{user.username}</TableCell>
                 <TableCell>{user.firstname?.Valid ? user.firstname.String : "N/A"}</TableCell>
                 <TableCell>{user.lastname?.Valid ? user.lastname.String : "N/A"}</TableCell>
-                <TableCell>{user.company?.Valid ? user.company.String : "N/A"}</TableCell>
-                <TableCell>{user.site?.Valid ? user.site.String : "N/A"}</TableCell>
+                <TableCell>{user.company_name}</TableCell>
+                <TableCell>{user.jobsite_name}</TableCell>
                 <TableCell>{user.role?.Valid ? user.role.String : "N/A"}</TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>{user.phone}</TableCell>
