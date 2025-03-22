@@ -26,11 +26,11 @@ import useSWR from "swr";
 import { User } from "@/user-api-types";
 import { getToken, delToken } from '@/components/localstorage'
 
-async function getProfileArgs(url: string, arg: {token: string}) {
+async function getProfileArgs(url: string, arg: string) {
     return fetch(url, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({token: arg})
+        body: arg
     }).then(res => res.json())
 }
 
@@ -53,7 +53,7 @@ export function Profile() {
     let token = getToken()
     let id = 1
 
-    const { data: tokenData, error: error2 } = useSWR(['api/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
+    const { data: tokenData, error: error2 } = useSWR(['/api/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
     if (tokenData)
         id = tokenData.id
 
@@ -64,7 +64,7 @@ export function Profile() {
     }*/
 
 
-    const { data: user, error: error3 } = useSWR<User, string>( `api/user/search?id=${id}`, fetcher);
+    const { data: user, error: error3 } = useSWR<User, string>( `/api/user/search?id=${id}`, fetcher);
 
     if (error3) return <p>Error loading Profile.</p>;
     if (!user) return <p>Loading...</p>;        
