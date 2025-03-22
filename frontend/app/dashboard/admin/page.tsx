@@ -5,7 +5,7 @@ import { UserTable } from '@/components/admin-table';
 import { MaterialTable } from '@/components/admin-material';
 import { Button } from '@/components/ui/button';
 import useSWR from 'swr'
-import { getToken } from '@components/localStorage'
+import { getToken } from '@/components/localstorage'
 
 async function getProfileArgs(url: string, arg: {token: string}) {
   return fetch(url, {
@@ -15,15 +15,15 @@ async function getProfileArgs(url: string, arg: {token: string}) {
   }).then(res => res.json())
 }
 
+let token = getToken()
+let id = 1
+
+const { data: tokenData, error: error2 } = useSWR(['api/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
+if (tokenData)
+      id = tokenData.id
+
 export default function AdminPage() {
   const [showFirstTable, setShowFirstTable] = useState(true);
-
-  let token = getToken()
-  let id = 1
-
-  const { data: tokenData, error: error2 } = useSWR(['api/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
-  if (tokenData)
-      id = tokenData.id
 
   return (
     <div className="flex flex-col justify-center items-center w-screen">
