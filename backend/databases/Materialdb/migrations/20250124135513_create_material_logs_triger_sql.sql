@@ -4,7 +4,7 @@ CREATE TRIGGER material_creation_log AFTER INSERT ON Materials
 BEGIN
   INSERT 
   INTO MaterialLogs(material_id, note, status, quantity_change,timestamp)
-  VALUES (new.id,'Created',new.status,new.quantity,date()); 
+  VALUES (new.id,'Created',new.status,new.quantity,datetime('now')); 
 END;
 -- +goose StatementEnd
 

@@ -342,7 +342,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/auth.Token"
+                            "type": "string"
                         }
                     }
                 ],
@@ -690,14 +690,6 @@ const docTemplate = `{
                     "$ref": "#/definitions/sql.NullString"
                 },
                 "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "auth.Token": {
-            "type": "object",
-            "properties": {
-                "token": {
                     "type": "string"
                 }
             }

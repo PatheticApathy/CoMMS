@@ -949,7 +949,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/auth.Token"
+                            "type": "string"
                         }
                     }
                 ],
@@ -1301,14 +1301,6 @@ const docTemplate = `{
                 }
             }
         },
-        "auth.Token": {
-            "type": "object",
-            "properties": {
-                "token": {
-                    "type": "string"
-                }
-            }
-        },
         "auth.UnEncrypted": {
             "type": "object",
             "properties": {
@@ -1431,7 +1423,9 @@ const docTemplate = `{
                 "job_site": {
                     "$ref": "#/definitions/sql.NullInt64"
                 },
-                "last_checked_out": {},
+                "last_checked_out": {
+                    "$ref": "#/definitions/sql.NullTime"
+                },
                 "location_lat": {
                     "$ref": "#/definitions/sql.NullFloat64"
                 },
