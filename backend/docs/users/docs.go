@@ -342,7 +342,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/auth.Token"
                         }
                     }
                 ],
@@ -519,8 +519,13 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "user's identification number",
                         "name": "id",
-                        "in": "query",
-                        "required": true
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "user's username",
+                        "name": "username",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -633,47 +638,6 @@ const docTemplate = `{
                     }
                 }
             }
-        },
-        "/user/username": {
-            "get": {
-                "description": "Gets user using username",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "users"
-                ],
-                "summary": "fetches user based on given paremeters",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "user's identification number",
-                        "name": "username",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "users",
-                        "schema": {
-                            "$ref": "#/definitions/userdb.User"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid username",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {
@@ -690,6 +654,14 @@ const docTemplate = `{
                     "$ref": "#/definitions/sql.NullString"
                 },
                 "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "auth.Token": {
+            "type": "object",
+            "properties": {
+                "token": {
                     "type": "string"
                 }
             }
