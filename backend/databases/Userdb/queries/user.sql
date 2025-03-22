@@ -2,7 +2,7 @@
 SELECT id, username, password, firstname, lastname, company_id, jobsite_id, role, email, phone, profilepicture FROM Users;
 
 -- name: GetUser :one
-SELECT id, username, password, firstname, lastname, company_id, jobsite_id, role, email, phone, profilepicture FROM Users WHERE id = ?;
+SELECT id, username,firstname, lastname, company_id, jobsite_id, role, email, phone, profilepicture FROM Users WHERE id = ?;
 
 -- name: GetUserName :one
 SELECT id, username, password, firstname, lastname, company_id, jobsite_id, role, email, phone, profilepicture FROM Users WHERE username = ?;
