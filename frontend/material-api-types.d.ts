@@ -49,12 +49,6 @@ export enum MaterialStatus {
   LowStock = "Low Stock"
 }
 
-export interface JobSite {
-  Int64: number
-  Valid: boolean
-}
-
-
 export interface Name {
   String: string
   Valid: boolean
@@ -90,20 +84,6 @@ export interface AddNoteToMaterialLog {
 }
 
 export interface Note {
-  String: string
-  Valid: boolean
-}
-
-//**************************** Jobsite related types ***************************
-
-export interface Jobsite {
-  addr: Addr
-  location_lat: LocationLat
-  location_lng: LocationLng
-  name: string
-}
-
-export interface Addr {
   String: string
   Valid: boolean
 }
