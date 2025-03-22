@@ -18,7 +18,6 @@ import useSWRMutation from 'swr/mutation'
 import Loading from '@/components/loading'
 import { setToken } from '@/components/localstorage'
 import { SignUpUser } from "@/user-api-types"
-import { toast } from "sonner"
 
 const formSchema = z.object({
   username: z.string().nonempty(),
@@ -41,7 +40,7 @@ async function signUp(url: string, { arg }: { arg: SignUpUser }) {
   return fetch(url, {
     method: 'POST',
     body: JSON.stringify(arg)
-  }).then(res => { if (res.ok) { return res.text() } else { toast.error(res.text()); return undefined } })
+  }).then(res => res.text())
 }
 
 
@@ -63,6 +62,7 @@ export default function SignupForm() {
   if (isMutating) { return (<div className='flex items-center justify-center w-screen h-screen'>Loading <Loading /></div>) }
   if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
   if (data) {
+    console.log(`Le Token is gooda ${data}`);
     setToken(data)
     redirect('/dashboard')
   }

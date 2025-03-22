@@ -25,7 +25,7 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import useSWR from "swr"
 import { User, Firstname, Lastname } from "@/user-api-types"
-import { getCookie } from "./cookie-functions"
+import { getToken } from '@/components/localstorage'
 
 const formSchema = z.object({
     username: z.string(),
@@ -35,12 +35,12 @@ const formSchema = z.object({
     phone: z.string(),
   })
 
-/*async function getProfileArgs(url: string, arg: {token: string}) {
+async function getProfileArgs(url: string, arg: {token: string}) {
     return fetch(url, {
         method: 'POST',
         body: JSON.stringify(arg)
     }).then(res => res.json())
-}*/
+}
 
 async function changeProfile(url: string, { arg }) {
     return fetch(url, {
@@ -59,19 +59,17 @@ const fetcher = async  (url: string) => {
 
 export function EditProfile() {
 
-    //let token = getCookie('token')
-
     const { data, trigger, error, isMutating } = useSWRMutation('api/user/update', changeProfile, {throwOnError: false})
 
-    //const  { data: tokenData, mutate, error: error2 } = useSWR('api/user/decrypt', getProfileArgs)
+    let token = getToken()
+    let id = 1
 
-    //mutate(token)
+    const { data: tokenData, error: error2 } = useSWR(['api/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
+    if (tokenData)
+        id = tokenData.id
 
-    //console.log(tokenData.id)
-
-    //let id = tokenData.id
-
-    const { data: user, error: error3 } = useSWR<User, string>(`api/user/search?id=1`, fetcher)
+    const { data: user, error: error3, mutate: userMutate } = useSWR<User, string>(`api/user/search?id=${id}`, fetcher)
+    userMutate()
 
     if (error3) return <p>Error loading Profile.</p>;
     if (!user) return <p>Loading...</p>;  
@@ -91,7 +89,10 @@ export function EditProfile() {
     if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
 
     async function profileSubmit(values: z.infer<typeof formSchema>) {
-        const username = values.username
+        const username: Firstname = {
+            String: values.username,
+            Valid: Boolean(values.username)
+        }
         const firstname: Firstname = {
             String: values.firstname,
             Valid: Boolean(values.firstname)
@@ -100,8 +101,14 @@ export function EditProfile() {
             String: values.lastname,
             Valid: Boolean(values.lastname)
         }
-        const email = values.email
-        const phone = values.phone
+        const email: Firstname = {
+            String: values.email,
+            Valid: Boolean(values.email)
+        }
+        const phone: Firstname = {
+            String: values.phone,
+            Valid: Boolean(values.phone)
+        }
         //const intID = Number(id)
         const values2 = {
             username,
@@ -109,7 +116,7 @@ export function EditProfile() {
             lastname,
             email,
             phone,
-            ID: 1,
+            ID: id,
         }
         trigger(values2)
     }
