@@ -104,7 +104,7 @@ func (e *Env) DecryptHanlder(w http.ResponseWriter, r *http.Request) {
 
 	payload, err := auth.VerifyToken(token, []byte(e.Secret))
 	if err != nil {
-		log.Printf("Error for authorization request: %e", err)
+		log.Printf("Error for authorization request: %s", err)
 		http.Error(w, "Invalid request", http.StatusBadRequest)
 		return
 	}

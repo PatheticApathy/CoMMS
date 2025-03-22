@@ -30,7 +30,7 @@ async function getProfileArgs(url: string, arg: string) {
     return fetch(url, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: arg ? arg : null
+        body: arg
     }).then(res => res.json())
 }
 

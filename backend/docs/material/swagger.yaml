@@ -221,6 +221,31 @@ definitions:
       name:
         type: string
     type: object
+  userdb.GetUsersByJobsiteAndCompanyRow:
+    properties:
+      company_id:
+        $ref: '#/definitions/sql.NullInt64'
+      company_name:
+        type: string
+      email:
+        type: string
+      firstname:
+        $ref: '#/definitions/sql.NullString'
+      jobsite_id:
+        $ref: '#/definitions/sql.NullInt64'
+      jobsite_name:
+        type: string
+      lastname:
+        $ref: '#/definitions/sql.NullString'
+      phone:
+        type: string
+      profilepicture:
+        $ref: '#/definitions/sql.NullString'
+      role:
+        $ref: '#/definitions/sql.NullString'
+      username:
+        type: string
+    type: object
   userdb.GetUsersWithCompanyAndJobsiteRow:
     properties:
       company_id:
@@ -239,8 +264,6 @@ definitions:
         type: string
       lastname:
         $ref: '#/definitions/sql.NullString'
-      password:
-        type: string
       phone:
         type: string
       profilepicture:
@@ -910,6 +933,45 @@ paths:
           schema:
             type: string
       summary: fetches all users
+      tags:
+      - users
+  /user/coworkers:
+    get:
+      description: Adds user to the database using valid json structure
+      parameters:
+      - description: user id
+        in: query
+        name: user
+        required: true
+        type: integer
+      - description: company id
+        in: query
+        name: company
+        required: true
+        type: integer
+      - description: jobsite id
+        in: query
+        name: site
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User login token
+          schema:
+            items:
+              $ref: '#/definitions/userdb.GetUsersByJobsiteAndCompanyRow'
+            type: array
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: post user to database
       tags:
       - users
   /user/create:

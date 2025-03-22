@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"database/sql"
 	"strconv"
 	"time"
 
@@ -25,6 +26,9 @@ func CreateToken(data Identity, secret []byte) (string, error) {
 	token_payload.Set("username", data.Username)
 	token_payload.Set("password", data.Password)
 	token_payload.Set("id", strconv.Itoa(int(data.ID)))
+	if data.Role.Valid {
+		token_payload.Set("role", data.Role.String)
+	}
 
 	token, err := pasetov2.Encrypt(secret, token_payload, "Comms, The Material Managaer you can trust")
 	if err != nil {
@@ -56,6 +60,7 @@ func VerifyToken(token string, secret []byte) (Identity, error) {
 		Username: payload.Get("username"),
 		Password: payload.Get("password"),
 		ID:       int64(id),
+		Role:     sql.NullString{Valid: true, String: payload.Get("role")},
 	}
 
 	return identity, nil

@@ -39,6 +39,7 @@ func (e *Env) userHandlers() http.Handler {
 	mux.HandleFunc("POST /logout", e.loggout)
 	mux.HandleFunc("POST /decrypt", e.DecryptHanlder)
 	mux.HandleFunc("GET /join", e.joinTables)
+	mux.HandleFunc("GET /coworkers", e.getCoworkers)
 	return mux
 }
 
