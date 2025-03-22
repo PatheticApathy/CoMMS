@@ -1,7 +1,8 @@
 import { FormField, FormItem, FormDescription, FormMessage, FormControl } from "@/components/ui/form"
 import { UseFormReturn } from "react-hook-form"
 import { Input } from "../ui/input"
-export default function FormInput({ name, placeholder, description, form }: { name: string, placeholder: string, description: string, form: UseFormReturn<any> }) {
+import { Textarea } from "../ui/textarea"
+export default function FormTextInput({ name, placeholder, description, form }: { name: string, placeholder: string, description: string, form: UseFormReturn<any> }) {
   return (
     <FormField
       control={form.control}
@@ -9,7 +10,7 @@ export default function FormInput({ name, placeholder, description, form }: { na
       render={({ field }) => (
         <FormItem>
           <FormControl>
-            <Input placeholder={placeholder} {...field} />
+            <Textarea placeholder={placeholder} className="resize-none" {...field} />
           </FormControl>
           <FormDescription>{description}</FormDescription>
           <FormMessage />

@@ -59,12 +59,12 @@ export function ComboboxFormField({ form_attr, default_label, options }: { form_
               </Button>
             </FormControl>
           </PopoverTrigger>
-          <PopoverContent className="bg-stone-600  p-0">
+          <PopoverContent className="w-[200px] p-0">
             <Command>
               <CommandInput placeholder="Search..." />
               <CommandList>
                 <CommandEmpty>No options found.</CommandEmpty>
-                <CommandGroup>
+                <CommandGroup >
                   {options.map((option) => (
                     <CommandItem
                       value={option.label}
@@ -72,16 +72,19 @@ export function ComboboxFormField({ form_attr, default_label, options }: { form_
                       onSelect={() => {
                         form.setValue(name, option.value)
                       }}
+                      className="outline outline-slate-700 rounded-sm bg-gray-500"
                     >
                       {option.label}
-                      <Check
-                        className={cn(
-                          "ml-auto",
-                          option.value === field.value
-                            ? "opacity-100"
-                            : "opacity-0"
-                        )}
-                      />
+                      <div>
+                        <Check
+                          className={cn(
+                            "ml-auto justify-end",
+                            option.value === field.value
+                              ? "opacity-100"
+                              : "opacity-0"
+                          )}
+                        />
+                      </div>
                     </CommandItem>
                   ))}
                 </CommandGroup>

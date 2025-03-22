@@ -3,7 +3,7 @@
 CREATE TRIGGER materials_status_change AFTER UPDATE ON Materials
 FOR EACH ROW
 BEGIN
-  UPDATE Materials 
+  UPDATE Materials
   SET status = CASE
     WHEN quantity <= 0 THEN 'Out of Stock'
     WHEN quantity < 30 THEN 'Low Stock'

@@ -19,7 +19,8 @@ import (
 //	@Description	Gets user using id(may add more parameters later)
 //	@Tags			users
 //	@Produce		json
-//	@Param			id	query		int				true	"user's identification number"
+//	@Param			id	query		int				false	"user's identification number"
+//	@Param			username	query		string				false	"user's username"
 //	@Success		200	{object}	userdb.User		"users"
 //	@Failure		400	{string}	string			"Invalid id"
 //	@Failure		500	{string}	string			"Internal Server Error"
@@ -50,25 +51,8 @@ func (e *Env) getUser(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
-
-		log.Println("User response successfully sent")
 	}
-}
 
-// getUserbyUsername hanlder returns a user based on given parameters godoc
-//
-//	@Summary		fetches user based on given paremeters
-//	@Description	Gets user using username
-//	@Tags			users
-//	@Produce		json
-//	@Param			username query	string			true	"user's identification number"
-//	@Success		200	{object}	userdb.User		"users"
-//	@Failure		400	{string}	string			"Invalid username"
-//	@Failure		500	{string}	string			"Internal Server Error"
-//	@Router			/user/username [get]
-func (e *Env) getUserByUsername(w http.ResponseWriter, r *http.Request) {
-	log.Println("Handling getUserByUsername request")
-	query := r.URL.Query()
 	if query.Has("username") {
 		username := query.Get("username")
 		log.Printf("Received request with username: %s", username)
@@ -88,8 +72,8 @@ func (e *Env) getUserByUsername(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		log.Println("User response successfully sent")
 	}
+	log.Println("User response successfully sent")
 }
 
 // getUsers hanlder returns all users godoc
@@ -167,14 +151,14 @@ func (e *Env) SignUp(w http.ResponseWriter, r *http.Request) {
 
 	token, err := auth.CreateToken(identity, []byte(e.Secret))
 	if err != nil {
-		log.Printf("Could not create id token: %e", err)
+		log.Printf("Could not create id token: %s", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 
 	// send to client
 	if err := json.NewEncoder(w).Encode(&token); err != nil {
-		log.Printf("Could not encode json token, reason: %e", err)
+		log.Printf("Could not encode json token, reason: %s", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}

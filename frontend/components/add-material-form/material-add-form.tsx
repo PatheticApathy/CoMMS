@@ -1,17 +1,19 @@
-"use client";
-import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import useSWR from "swr";
-import useSWRMutation from "swr/mutation";
-import { Input } from "@/components/ui/input";
-import { ComboboxFormField } from "@/components/form-maker/form-combobox";
-import { Material, AddMaterial } from "@/material-api-types";
-import FormInput from "../form-maker/form-input";
-import { toast } from "sonner";
-import { JobSite } from "@/user-api-types";
+"use client"
+import { Button } from "@/components//ui/button"
+import Loading from "@/components/loading"
+import {
+  Form,
+} from "@/components/ui/form"
+import { z } from "zod"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import useSWRMutation from "swr/mutation"
+import useSWR from "swr"
+import { ComboboxFormField } from "@/components/form-maker/form-combobox"
+import { Material, AddMaterial } from "@/material-api-types"
+import FormInput from "../form-maker/form-input"
+import { JobSite } from "@/user-api-types"
+import { toast } from "sonner"
 
 // Schema for form
 const AddMaterialSchema = z.object({
@@ -25,7 +27,6 @@ const AddMaterialSchema = z.object({
 
 // Fetcher
 const PostAddMaterial = async (url: string, { arg }: { arg: AddMaterial }) => await fetch(url, { method: 'POST', body: JSON.stringify(arg) });
-
 const fetchJobsites = async (url: string): Promise<JobSite[]> => {
   const res = await fetch(url);
   if (!res.ok) {
@@ -48,7 +49,7 @@ export default function MaterialForm() {
     }
   });
 
-  const { data: jobsites, error: jobsitesError } = useSWR<JobSite[]>("/api/sites/all", fetchJobsites);
+  const { data: jobsites, error: jobsitesError, isLoading: loading_jobs } = useSWR<JobSite[]>("/api/sites/all", fetchJobsites);
 
   const status = [
     { label: "In Stock", value: "In Stock" },
@@ -62,6 +63,10 @@ export default function MaterialForm() {
       toast.error(err.message || "Error has occurred");
     },
     onSuccess(data) {
+      if (!data.ok) {
+        toast.error(data.text() || "Error has occured");
+        return
+      }
       data.json().then((resp: Material) => {
         console.log("success");
         toast.success(`Material ${resp.name.String} Added!`);
@@ -99,23 +104,31 @@ export default function MaterialForm() {
     trigger(payload);
   };
 
-  if (jobsitesError) {
-    return <div>Error loading jobsites</div>;
-  }
+  const DisplayJobSites = () => {
 
-  if (!jobsites) {
-    return <div>Loading jobsites...</div>;
-  }
+    if (jobsitesError) {
+      return <div className="text-red-500">Error loading jobsites</div>;
+    }
 
-  const jobsiteOptions = jobsites.map(jobsite => ({
-    label: jobsite.name,
-    value: jobsite.id
-  }));
+    if (loading_jobs) {
+      return <div>Loading jobsites...<Loading /></div>;
+    }
+
+    if (jobsites) {
+      const jobsiteOptions = jobsites.map(jobsite => ({
+        label: jobsite.name,
+        value: jobsite.id
+      }));
+      return <ComboboxFormField form_attr={{ name: "job_site", description: "All known jobsites for this location", form: form }} default_label="Choose a jobsite" options={jobsiteOptions} />
+    }
+
+    return <div className="text-red-500">No Jobites</div>
+  }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(SendAddMaterialRequest)}>
-        <ComboboxFormField form_attr={{ name: "job_site", description: "All known jobsites for this location", form: form }} default_label="Choose a jobsite" options={jobsiteOptions} />
+        <DisplayJobSites />
         <FormInput name="name" placeholder="Name" description="Name of Item" form={form} />
         <FormInput name="quantity" placeholder="Quantity" description="Quantity of item" form={form} />
         <ComboboxFormField form_attr={{ name: "status", description: "Initial status of item", form: form }} default_label={"In Stock"} options={status} />

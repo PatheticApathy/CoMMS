@@ -15,6 +15,11 @@ SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_s
 FROM Materials 
 WHERE quantity=? AND unit=?;
 
+-- name: GetMaterialsByJobsiteID :many
+SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site, last_checked_out
+FROM Materials
+WHERE job_site=?;
+
 -- name: AddMaterial :one
 INSERT INTO Materials(name,type,quantity,unit,status,location_lat,location_lng,job_site)
 VALUES (?,?,?,?,?,?,?,?)
