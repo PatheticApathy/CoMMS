@@ -47,7 +47,7 @@ definitions:
   materialdb.AddMaterialParams:
     properties:
       job_site:
-        $ref: '#/definitions/sql.NullInt64'
+        type: integer
       location_lat:
         $ref: '#/definitions/sql.NullFloat64'
       location_lng:
@@ -96,7 +96,7 @@ definitions:
       id:
         type: integer
       job_site:
-        $ref: '#/definitions/sql.NullInt64'
+        type: integer
       last_checked_out:
         $ref: '#/definitions/sql.NullTime'
       location_lat:

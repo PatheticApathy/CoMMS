@@ -111,21 +111,6 @@ export const columns: ColumnDef<Material>[] = [
     },
   },
   {
-    accessorKey: "last_checked_out",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Last Checked Out
-          <ArrowUpDown />
-        </Button>
-      );
-    },
-    cell: ({ row }) => <div className="">{row.getValue("last_checked_out")}</div>,
-  },
-  {
     accessorKey: "quantity",
     header: "Quantity",
     cell: ({ row }) => <div className="">{row.getValue("quantity")}</div>,
@@ -252,14 +237,6 @@ export function MaterialTable() {
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("name")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-        <Input
-          placeholder="Filter last checked out..."
-          value={(table.getColumn("last_checked_out")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("last_checked_out")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />

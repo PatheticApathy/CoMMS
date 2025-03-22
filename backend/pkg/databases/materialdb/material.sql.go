@@ -24,7 +24,7 @@ type AddMaterialParams struct {
 	Status      string          `json:"status"`
 	LocationLat sql.NullFloat64 `json:"location_lat"`
 	LocationLng sql.NullFloat64 `json:"location_lng"`
-	JobSite     sql.NullInt64   `json:"job_site"`
+	JobSite     int64           `json:"job_site"`
 }
 
 func (q *Queries) AddMaterial(ctx context.Context, arg AddMaterialParams) (Material, error) {
@@ -151,7 +151,7 @@ type GetAllMaterialsRow struct {
 	Status         string          `json:"status"`
 	LocationLat    sql.NullFloat64 `json:"location_lat"`
 	LocationLng    sql.NullFloat64 `json:"location_lng"`
-	JobSite        sql.NullInt64   `json:"job_site"`
+	JobSite        int64           `json:"job_site"`
 	LastCheckedOut sql.NullTime    `json:"last_checked_out"`
 }
 
@@ -202,7 +202,7 @@ type GetMaterialsByIDRow struct {
 	Status         string          `json:"status"`
 	LocationLat    sql.NullFloat64 `json:"location_lat"`
 	LocationLng    sql.NullFloat64 `json:"location_lng"`
-	JobSite        sql.NullInt64   `json:"job_site"`
+	JobSite        int64           `json:"job_site"`
 	LastCheckedOut sql.NullTime    `json:"last_checked_out"`
 }
 
@@ -255,11 +255,11 @@ type GetMaterialsByJobsiteIDRow struct {
 	Status         string          `json:"status"`
 	LocationLat    sql.NullFloat64 `json:"location_lat"`
 	LocationLng    sql.NullFloat64 `json:"location_lng"`
-	JobSite        sql.NullInt64   `json:"job_site"`
+	JobSite        int64           `json:"job_site"`
 	LastCheckedOut sql.NullTime    `json:"last_checked_out"`
 }
 
-func (q *Queries) GetMaterialsByJobsiteID(ctx context.Context, jobSite sql.NullInt64) ([]GetMaterialsByJobsiteIDRow, error) {
+func (q *Queries) GetMaterialsByJobsiteID(ctx context.Context, jobSite int64) ([]GetMaterialsByJobsiteIDRow, error) {
 	rows, err := q.db.QueryContext(ctx, getMaterialsByJobsiteID, jobSite)
 	if err != nil {
 		return nil, err
@@ -313,7 +313,7 @@ type GetMaterialsByQuantityRow struct {
 	Status         string          `json:"status"`
 	LocationLat    sql.NullFloat64 `json:"location_lat"`
 	LocationLng    sql.NullFloat64 `json:"location_lng"`
-	JobSite        sql.NullInt64   `json:"job_site"`
+	JobSite        int64           `json:"job_site"`
 	LastCheckedOut sql.NullTime    `json:"last_checked_out"`
 }
 
@@ -364,11 +364,11 @@ type GetMaterialsBySiteRow struct {
 	Status         string          `json:"status"`
 	LocationLat    sql.NullFloat64 `json:"location_lat"`
 	LocationLng    sql.NullFloat64 `json:"location_lng"`
-	JobSite        sql.NullInt64   `json:"job_site"`
+	JobSite        int64           `json:"job_site"`
 	LastCheckedOut sql.NullTime    `json:"last_checked_out"`
 }
 
-func (q *Queries) GetMaterialsBySite(ctx context.Context, jobSite sql.NullInt64) ([]GetMaterialsBySiteRow, error) {
+func (q *Queries) GetMaterialsBySite(ctx context.Context, jobSite int64) ([]GetMaterialsBySiteRow, error) {
 	rows, err := q.db.QueryContext(ctx, getMaterialsBySite, jobSite)
 	if err != nil {
 		return nil, err
@@ -415,7 +415,7 @@ type GetMaterialsByTypeRow struct {
 	Status         string          `json:"status"`
 	LocationLat    sql.NullFloat64 `json:"location_lat"`
 	LocationLng    sql.NullFloat64 `json:"location_lng"`
-	JobSite        sql.NullInt64   `json:"job_site"`
+	JobSite        int64           `json:"job_site"`
 	LastCheckedOut sql.NullTime    `json:"last_checked_out"`
 }
 

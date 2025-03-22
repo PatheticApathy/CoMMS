@@ -65,6 +65,11 @@ func main() {
 			fmt.Println(err)
 		}
 
+		jobsite, err := strconv.Atoi(row[5])
+		if err != nil {
+			fmt.Println(err)
+		}
+
 		material := material_db.AddMaterialParams{
 			Name: sql.NullString{
 				String: row[0],
@@ -77,13 +82,11 @@ func main() {
 			Quantity: int64(quantity),
 			Unit:     row[3],
 			Status:   row[4],
+			JobSite:  int64(jobsite),
 			LocationLat: sql.NullFloat64{
 				Valid: false,
 			},
 			LocationLng: sql.NullFloat64{
-				Valid: false,
-			},
-			JobSite: sql.NullInt64{
 				Valid: false,
 			},
 		}

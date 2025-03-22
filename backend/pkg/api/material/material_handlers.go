@@ -93,12 +93,7 @@ func (e *Env) getMaterialHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		args := sql.NullInt64{
-			Int64: int64(site),
-			Valid: true,
-		}
-
-		materials, err := e.Queries.GetMaterialsBySite(r.Context(), args)
+		materials, err := e.Queries.GetMaterialsBySite(r.Context(), int64(site))
 		if err != nil {
 			log.Printf("Invalid site id, reason %e", err)
 			http.Error(w, "invalid id", http.StatusBadRequest)
@@ -190,20 +185,18 @@ func (e *Env) postMaterialHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if material.JobSite.Valid {
-		id := strconv.Itoa(int(material.JobSite.Int64))
-		resp, err := http.Get(e.UserHost + "/sites/search?id=" + id)
-		if err != nil {
-			log.Printf("Error occured while trying to connect to user api: %e", err)
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
+	id := strconv.Itoa(int(material.JobSite))
+	resp, err := http.Get(e.UserHost + "/sites/search?id=" + id)
+	if err != nil {
+		log.Printf("Error occured while trying to connect to user api: %e", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 
-		if resp.StatusCode != http.StatusOK {
-			log.Printf("Invalid Jobsite Id  %s given", id)
-			http.Error(w, "Bad request", http.StatusBadRequest)
-			return
-		}
+	if resp.StatusCode != http.StatusOK {
+		log.Printf("Invalid Jobsite Id  %s given", id)
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
 	}
 
 	ret, err := e.Queries.AddMaterial(r.Context(), material)

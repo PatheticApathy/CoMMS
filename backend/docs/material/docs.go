@@ -1328,7 +1328,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "job_site": {
-                    "$ref": "#/definitions/sql.NullInt64"
+                    "type": "integer"
                 },
                 "location_lat": {
                     "$ref": "#/definitions/sql.NullFloat64"
@@ -1403,7 +1403,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "job_site": {
-                    "$ref": "#/definitions/sql.NullInt64"
+                    "type": "integer"
                 },
                 "last_checked_out": {
                     "$ref": "#/definitions/sql.NullTime"
