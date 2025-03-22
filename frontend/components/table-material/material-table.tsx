@@ -10,10 +10,8 @@ import { toast } from "sonner";
 
 //fetcher
 const TokenFetcher: Fetcher<Token, string> = async (...args) => fetch(...args, { method: 'POST', body: getToken(), cache: 'force-cache' },).then(res => res.json())
-const DeleteMaterial = async (url: string, { arg }: { arg: number }) => await fetch(url, { method: 'DELETE', body: String(arg) })
-const CheckOut = async (url: string, { arg }: { arg: { user: number, item: number } }) => await fetch(url, { method: 'POST', body: String(arg) })
 
-export default function MTable({ materials, route }: { materials: Material[], route: string }) {
+export default function MTable({ materials, route }: { materials: Material[], route: string | undefined }) {
 
 
   const { data: token, error: token_error } = useSWR('/api/user/decrypt', TokenFetcher,)

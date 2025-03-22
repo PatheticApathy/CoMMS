@@ -11,9 +11,10 @@ import MaterialForm from "./material-add-form";
 import { Tabs, TabsTrigger } from "../ui/tabs";
 import { TabsContent, TabsList } from "@radix-ui/react-tabs";
 import AddMaterialLogForm from "./material-add-log-form";
+import { Material } from "@/material-api-types";
 
 
-export default function AddMaterialFormDialouge({ children }: Readonly<{ children: React.ReactNode; }>) {
+export default function AddMaterialFormDialouge({ materials, children }: Readonly<{ materials: Material[] | undefined, children: React.ReactNode; }>) {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -36,11 +37,19 @@ export default function AddMaterialFormDialouge({ children }: Readonly<{ childre
             </div>
           </TabsContent>
           <TabsContent value="Add Material Log">
-            <DialogDescription>Add a log for an existing material</DialogDescription>
+            <DialogDescription >Add a log for an existing material</DialogDescription>
             <br />
-            <div>
-              <AddMaterialLogForm />
-            </div>
+            {(() => {
+              if (!materials) {
+                return
+              }
+              return (
+                <div>
+                  <AddMaterialLogForm materials={materials} />
+                </div>
+              )
+            })()
+            }
           </TabsContent>
         </Tabs>
       </DialogContent>

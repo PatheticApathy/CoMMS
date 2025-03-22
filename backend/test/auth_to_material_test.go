@@ -129,7 +129,7 @@ func TestAdminSignupToAddMaterial(t *testing.T) {
 		Unit:        "blocks",
 		LocationLat: sql.NullFloat64{Float64: 0, Valid: false},
 		LocationLng: sql.NullFloat64{Float64: 0, Valid: false},
-		JobSite:     sql.NullInt64{Int64: 0, Valid: false},
+		JobSite:     1,
 	}
 
 	jdata, err = json.Marshal(add)

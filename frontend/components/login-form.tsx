@@ -28,7 +28,12 @@ async function logIn(url: string, { arg }: { arg: LogInUser }) {
   return fetch(url, {
     method: 'POST',
     body: JSON.stringify(arg)
-  }).then(res => res.json())
+  }).then((res) => {
+    if (!res.ok) {
+      throw new Error('Invalid login')
+    }
+    return res.text()
+  })
 }
 
 export default function LoginForm() {

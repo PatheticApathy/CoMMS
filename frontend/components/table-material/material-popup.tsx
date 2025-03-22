@@ -120,7 +120,7 @@ const DisplayCheckouts = (checkout_logs: CheckoutLog[] | undefined, error: Boole
 export default function MaterialSheet({ material, route, children, token }: Readonly<{
   material: Material,
   children: React.ReactNode;
-  route: string
+  route: string | undefined
   token: Token | undefined
 }>) {
 

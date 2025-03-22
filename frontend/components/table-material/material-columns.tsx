@@ -7,7 +7,7 @@ import { Token } from "@/user-api-types"
 
 export type MaterialRow = {
   id: number
-  job_site: number | undefined
+  job_site: number
   last_checked_out: string | undefined
   location_lat: number | undefined
   location_lng: number | undefined
@@ -19,7 +19,7 @@ export type MaterialRow = {
 
 }
 
-export const MaterialTableColumns: ((route: string, token: Token | undefined) => ColumnDef<MaterialRow>[]) = (route, token) => ([
+export const MaterialTableColumns: ((route: string | undefined, token: Token | undefined) => ColumnDef<MaterialRow>[]) = (route, token) => ([
   {
     accessorKey: "id",
     header: ({ column }) => {
@@ -65,13 +65,7 @@ export const MaterialTableColumns: ((route: string, token: Token | undefined) =>
       const material_row = row.original
       const material: Material = {
         id: material_row.id,
-        job_site: material_row.job_site ? {
-          Int64: material_row.job_site,
-          Valid: true
-        } : {
-          Int64: 0,
-          Valid: false
-        },
+        job_site: material_row.job_site,
         last_checked_out: material_row.last_checked_out ? {
           Time: material_row.last_checked_out,
           Valid: true
