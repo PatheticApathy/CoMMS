@@ -17,7 +17,7 @@ export interface AddCheckoutLog {
 //*********************************** Material related types ***********************************
 
 export interface AddMaterial {
-  job_site: JobSite
+  job_site: number
   location_lat: LocationLat
   location_lng: LocationLng
   name: Name
