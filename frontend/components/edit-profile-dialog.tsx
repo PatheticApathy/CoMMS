@@ -59,16 +59,16 @@ const fetcher = async  (url: string) => {
 
 export function EditProfile() {
 
-    const { data, trigger, error, isMutating } = useSWRMutation('api/user/update', changeProfile, {throwOnError: false})
+    const { data, trigger, error, isMutating } = useSWRMutation('/api/user/update', changeProfile, {throwOnError: false})
 
     let token = getToken()
     let id = 1
 
-    const { data: tokenData, error: error2 } = useSWR(['api/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
+    const { data: tokenData, error: error2 } = useSWR(['/api/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
     if (tokenData)
         id = tokenData.id
 
-    const { data: user, error: error3, mutate: userMutate } = useSWR<User, string>(`api/user/search?id=${id}`, fetcher)
+    const { data: user, error: error3, mutate: userMutate } = useSWR<User, string>(`/api/user/search?id=${id}`, fetcher)
     userMutate()
 
     if (error3) return <p>Error loading Profile.</p>;
