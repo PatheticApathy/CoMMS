@@ -72,6 +72,9 @@ export default function JobsiteMapClient() {
     if (!user.jobsite_id) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
     const userJobsite = user.jobsite_id.Int64
     const site = sites[userJobsite-1]
+
+    if (!site) {return (<p className='flex items-center justify-center w-screen h-screen'>No Jobsite Found</p>)}
+
     const siteName = site.name
 
     return (

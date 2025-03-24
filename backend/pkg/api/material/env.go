@@ -41,7 +41,7 @@ func (e *Env) materialLogHandlers() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /search", e.getMaterialLogsHandler)
 	mux.HandleFunc("GET /all", e.getAllMaterialLogsHandler)
-	mux.HandleFunc("POST /add", e.postMaterialHandler)
+	mux.HandleFunc("POST /add", e.postMaterialLogsHandler)
 	mux.HandleFunc("PUT /note", e.changeMaterialLogNoteHandler)
 	mux.HandleFunc("GET /recent", e.getRecentMaterialLogsForMaterialHandler)
 	return mux

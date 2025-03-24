@@ -8,6 +8,7 @@ import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import useSWRMutation from "swr/mutation"
+import { mutate } from "swr"
 import useSWR from "swr"
 import { ComboboxFormField } from "@/components/form-maker/form-combobox"
 import { Material, AddMaterial } from "@/material-api-types"
@@ -35,7 +36,7 @@ const fetchJobsites = async (url: string): Promise<JobSite[]> => {
   return res.json();
 };
 
-export default function MaterialForm() {
+export default function MaterialForm({ route }: { route: string | undefined }) {
   // Form controller
   const form = useForm<z.infer<typeof AddMaterialSchema>>({
     resolver: zodResolver(AddMaterialSchema),
@@ -70,16 +71,14 @@ export default function MaterialForm() {
       data.json().then((resp: Material) => {
         console.log("success");
         toast.success(`Material ${resp.name.String} Added!`);
+        mutate(route)
       });
     },
   });
 
   const SendAddMaterialRequest = (values: z.infer<typeof AddMaterialSchema>) => {
     const payload: AddMaterial = {
-      job_site: {
-        Valid: true,
-        Int64: values.job_site
-      },
+      job_site: values.job_site,
       location_lat: {
         Valid: false,
         Float64: 0
@@ -100,7 +99,6 @@ export default function MaterialForm() {
       },
       unit: values.unit
     };
-    console.log(payload);
     trigger(payload);
   };
 

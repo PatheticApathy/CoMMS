@@ -14,7 +14,7 @@ import AddMaterialLogForm from "./material-add-log-form";
 import { Material } from "@/material-api-types";
 
 
-export default function AddMaterialFormDialouge({ materials, children }: Readonly<{ materials: Material[] | undefined, children: React.ReactNode; }>) {
+export default function AddMaterialFormDialouge({ materials, route, children }: Readonly<{ materials: Material[] | undefined, route: string | undefined, children: React.ReactNode; }>) {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -33,7 +33,7 @@ export default function AddMaterialFormDialouge({ materials, children }: Readonl
             <DialogDescription>Add material to be managed. Once you are done, everyone who needs to see it can see it.</DialogDescription>
             <br />
             <div>
-              <MaterialForm />
+              <MaterialForm route={route} />
             </div>
           </TabsContent>
           <TabsContent value="Add Material Log">
