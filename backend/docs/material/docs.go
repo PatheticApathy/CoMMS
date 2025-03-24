@@ -702,13 +702,21 @@ const docTemplate = `{
                 "summary": "fetches material logs based on given query parameters",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "collectionFormat": "csv",
                         "description": "id of material log",
                         "name": "id",
                         "in": "query"
                     },
                     {
-                        "type": "integer",
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "collectionFormat": "csv",
                         "description": "id of material",
                         "name": "material",
                         "in": "query"
@@ -881,6 +889,64 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/coworkers": {
+            "get": {
+                "description": "Adds user to the database using valid json structure",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "post user to database",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "user id",
+                        "name": "user",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "company id",
+                        "name": "company",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "jobsite id",
+                        "name": "site",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User login token",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/userdb.GetUsersByJobsiteAndCompanyRow"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/user/create": {
             "post": {
                 "security": [
@@ -949,7 +1015,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/auth.Token"
                         }
                     }
                 ],
@@ -1126,8 +1192,13 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "user's identification number",
                         "name": "id",
-                        "in": "query",
-                        "required": true
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "user's username",
+                        "name": "username",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1240,47 +1311,6 @@ const docTemplate = `{
                     }
                 }
             }
-        },
-        "/user/username": {
-            "get": {
-                "description": "Gets user using username",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "users"
-                ],
-                "summary": "fetches user based on given paremeters",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "user's identification number",
-                        "name": "username",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "users",
-                        "schema": {
-                            "$ref": "#/definitions/userdb.User"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid username",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {
@@ -1297,6 +1327,14 @@ const docTemplate = `{
                     "$ref": "#/definitions/sql.NullString"
                 },
                 "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "auth.Token": {
+            "type": "object",
+            "properties": {
+                "token": {
                     "type": "string"
                 }
             }
@@ -1318,6 +1356,7 @@ const docTemplate = `{
         "materialdb.AddCheckoutLogParams": {
             "type": "object",
             "properties": {
+                "amount": {},
                 "item_id": {
                     "type": "integer"
                 },
@@ -1347,7 +1386,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "job_site": {
-                    "$ref": "#/definitions/sql.NullInt64"
+                    "type": "integer"
                 },
                 "location_lat": {
                     "$ref": "#/definitions/sql.NullFloat64"
@@ -1397,6 +1436,7 @@ const docTemplate = `{
         "materialdb.CheckoutLog": {
             "type": "object",
             "properties": {
+                "amount": {},
                 "checkin_time": {
                     "$ref": "#/definitions/sql.NullTime"
                 },
@@ -1421,7 +1461,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "job_site": {
-                    "$ref": "#/definitions/sql.NullInt64"
+                    "type": "integer"
                 },
                 "last_checked_out": {
                     "$ref": "#/definitions/sql.NullTime"
@@ -1612,6 +1652,44 @@ const docTemplate = `{
                 }
             }
         },
+        "userdb.GetUsersByJobsiteAndCompanyRow": {
+            "type": "object",
+            "properties": {
+                "company_id": {
+                    "$ref": "#/definitions/sql.NullInt64"
+                },
+                "company_name": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "firstname": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "jobsite_id": {
+                    "$ref": "#/definitions/sql.NullInt64"
+                },
+                "jobsite_name": {
+                    "type": "string"
+                },
+                "lastname": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "profilepicture": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "role": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "userdb.GetUsersWithCompanyAndJobsiteRow": {
             "type": "object",
             "properties": {
@@ -1638,9 +1716,6 @@ const docTemplate = `{
                 },
                 "lastname": {
                     "$ref": "#/definitions/sql.NullString"
-                },
-                "password": {
-                    "type": "string"
                 },
                 "phone": {
                     "type": "string"

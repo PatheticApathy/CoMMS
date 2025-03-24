@@ -11,6 +11,11 @@ definitions:
       username:
         type: string
     type: object
+  auth.Token:
+    properties:
+      token:
+        type: string
+    type: object
   auth.UnEncrypted:
     properties:
       id:
@@ -22,6 +27,7 @@ definitions:
     type: object
   materialdb.AddCheckoutLogParams:
     properties:
+      amount: {}
       item_id:
         type: integer
       user_id:
@@ -41,7 +47,7 @@ definitions:
   materialdb.AddMaterialParams:
     properties:
       job_site:
-        $ref: '#/definitions/sql.NullInt64'
+        type: integer
       location_lat:
         $ref: '#/definitions/sql.NullFloat64'
       location_lng:
@@ -73,6 +79,7 @@ definitions:
     type: object
   materialdb.CheckoutLog:
     properties:
+      amount: {}
       checkin_time:
         $ref: '#/definitions/sql.NullTime'
       checkout_time:
@@ -89,7 +96,7 @@ definitions:
       id:
         type: integer
       job_site:
-        $ref: '#/definitions/sql.NullInt64'
+        type: integer
       last_checked_out:
         $ref: '#/definitions/sql.NullTime'
       location_lat:
@@ -214,6 +221,31 @@ definitions:
       name:
         type: string
     type: object
+  userdb.GetUsersByJobsiteAndCompanyRow:
+    properties:
+      company_id:
+        $ref: '#/definitions/sql.NullInt64'
+      company_name:
+        type: string
+      email:
+        type: string
+      firstname:
+        $ref: '#/definitions/sql.NullString'
+      jobsite_id:
+        $ref: '#/definitions/sql.NullInt64'
+      jobsite_name:
+        type: string
+      lastname:
+        $ref: '#/definitions/sql.NullString'
+      phone:
+        type: string
+      profilepicture:
+        $ref: '#/definitions/sql.NullString'
+      role:
+        $ref: '#/definitions/sql.NullString'
+      username:
+        type: string
+    type: object
   userdb.GetUsersWithCompanyAndJobsiteRow:
     properties:
       company_id:
@@ -232,8 +264,6 @@ definitions:
         type: string
       lastname:
         $ref: '#/definitions/sql.NullString'
-      password:
-        type: string
       phone:
         type: string
       profilepicture:
@@ -778,14 +808,20 @@ paths:
     get:
       description: Can get material using it's id, or the material it relates to
       parameters:
-      - description: id of material log
+      - collectionFormat: csv
+        description: id of material log
         in: query
+        items:
+          type: integer
         name: id
-        type: integer
-      - description: id of material
+        type: array
+      - collectionFormat: csv
+        description: id of material
         in: query
+        items:
+          type: integer
         name: material
-        type: integer
+        type: array
       produces:
       - application/json
       responses:
@@ -899,6 +935,45 @@ paths:
       summary: fetches all users
       tags:
       - users
+  /user/coworkers:
+    get:
+      description: Adds user to the database using valid json structure
+      parameters:
+      - description: user id
+        in: query
+        name: user
+        required: true
+        type: integer
+      - description: company id
+        in: query
+        name: company
+        required: true
+        type: integer
+      - description: jobsite id
+        in: query
+        name: site
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User login token
+          schema:
+            items:
+              $ref: '#/definitions/userdb.GetUsersByJobsiteAndCompanyRow'
+            type: array
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: post user to database
+      tags:
+      - users
   /user/create:
     post:
       consumes:
@@ -942,7 +1017,7 @@ paths:
         name: users
         required: true
         schema:
-          type: string
+          $ref: '#/definitions/auth.Token'
       responses:
         "200":
           description: User login data token
@@ -1057,8 +1132,11 @@ paths:
       - description: user's identification number
         in: query
         name: id
-        required: true
         type: integer
+      - description: user's username
+        in: query
+        name: username
+        type: string
       produces:
       - application/json
       responses:
@@ -1133,33 +1211,6 @@ paths:
           schema:
             type: string
       summary: updates user based on given parameters
-      tags:
-      - users
-  /user/username:
-    get:
-      description: Gets user using username
-      parameters:
-      - description: user's identification number
-        in: query
-        name: username
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: users
-          schema:
-            $ref: '#/definitions/userdb.User'
-        "400":
-          description: Invalid username
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            type: string
-      summary: fetches user based on given paremeters
       tags:
       - users
 swagger: "2.0"

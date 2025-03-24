@@ -10,7 +10,7 @@ CREATE TABLE Materials (
   location_lat FLOAT,
   location_lng FLOAT,
   last_checked_out DATETIME,
-  job_site INTEGER
+  job_site INTEGER NOT NULL
 );
 -- +goose StatementEnd
 

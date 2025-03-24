@@ -17,7 +17,7 @@ export interface AddCheckoutLog {
 //*********************************** Material related types ***********************************
 
 export interface AddMaterial {
-  job_site: JobSite
+  job_site: number
   location_lat: LocationLat
   location_lng: LocationLng
   name: Name
@@ -28,7 +28,7 @@ export interface AddMaterial {
 }
 export interface Material {
   id: number
-  job_site: JobSite
+  job_site: number
   last_checked_out: { Valid: bool, Time: string }
   location_lat: LocationLat
   location_lng: LocationLng

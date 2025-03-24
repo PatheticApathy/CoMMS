@@ -83,6 +83,47 @@ func (q *Queries) GetAllJobSites(ctx context.Context) ([]GetAllJobSitesRow, erro
 	return items, nil
 }
 
+const getAllJobSitesByCompany = `-- name: GetAllJobSitesByCompany :many
+SELECT id, name, addr, location_lat, location_lng FROM JobSites WHERE company_id=?
+`
+
+type GetAllJobSitesByCompanyRow struct {
+	ID          int64           `json:"id"`
+	Name        string          `json:"name"`
+	Addr        sql.NullString  `json:"addr"`
+	LocationLat sql.NullFloat64 `json:"location_lat"`
+	LocationLng sql.NullFloat64 `json:"location_lng"`
+}
+
+func (q *Queries) GetAllJobSitesByCompany(ctx context.Context, companyID sql.NullInt64) ([]GetAllJobSitesByCompanyRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAllJobSitesByCompany, companyID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllJobSitesByCompanyRow
+	for rows.Next() {
+		var i GetAllJobSitesByCompanyRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Addr,
+			&i.LocationLat,
+			&i.LocationLng,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getJobSite = `-- name: GetJobSite :one
 SELECT id, name, addr, location_lat, location_lng FROM JobSites WHERE id=?
 `

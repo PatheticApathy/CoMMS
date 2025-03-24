@@ -35,6 +35,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import InitAddFormDialougeAdmin from "@/components/add-jobsite-form/jobsite-add-admin";
 
 import useSWR from "swr";
 import { User, UserJoin, Company, JobSite } from "@/user-api-types";
@@ -336,6 +337,7 @@ export function UserTable() {
           }
           className="max-w-sm"
         />
+        <InitAddFormDialougeAdmin/>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">

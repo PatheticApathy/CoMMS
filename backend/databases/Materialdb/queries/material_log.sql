@@ -15,13 +15,13 @@ WHERE material_id = ?;
 SELECT * 
 FROM  MaterialLogs
 WHERE material_id = ?
-ORDER BY timestamp
+ORDER BY timestamp DESC
 LIMIT 10;
 
 -- name: AddMaterialLog :one
 INSERT 
 INTO MaterialLogs(material_id, note, status, quantity_change,timestamp)
-VALUES (?,?,?,?,date()) 
+VALUES (?,?,?,?,datetime('now')) 
 RETURNING *;
 
 

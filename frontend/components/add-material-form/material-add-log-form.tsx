@@ -8,10 +8,10 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import useSWRMutation from "swr/mutation"
 import { ComboboxFormField } from "@/components/form-maker/form-combobox"
-import { Material, AddMaterialLog } from "@/material-api-types"
+import { Material, AddMaterialLog, MaterialLog } from "@/material-api-types"
 import FormInput from "../form-maker/form-input"
 import { toast } from "sonner"
-import useSWR, { Fetcher } from "swr"
+import useSWR, { Fetcher, mutate } from "swr"
 import Loading from "../loading"
 import FormTextInput from "../form-maker/form-textbox"
 
@@ -27,17 +27,14 @@ const AddMaterialLogSchema = z.object({
 
 //fetcher
 const PostAddMaterialLog = async (url: string, { arg }: { arg: AddMaterialLog }) => await fetch(url, { method: 'POST', body: JSON.stringify(arg) })
-const GetMaterials: Fetcher<Material[], string> = async (...args) => fetch(...args, { method: 'GET', cache: 'force-cache' },).then(res => res.json())
 
-export default function AddMaterialLogForm() {
-
-  const { data: materials, error: material_error, isLoading: material_loading } = useSWR("/api/material/material/all", GetMaterials)
+export default function AddMaterialLogForm({ materials }: { materials: Material[] }) {
 
   //form controller
   const form = useForm<z.infer<typeof AddMaterialLogSchema>>({
     resolver: zodResolver(AddMaterialLogSchema),
     defaultValues: {
-      material_id: 0,
+      material_id: -1,
       note: "",
       quantity_change: 0,
       status: "In Stock",
@@ -50,16 +47,6 @@ export default function AddMaterialLogForm() {
     { label: "Out of Stock", value: "Out of Stock" },
   ]
 
-  const SendAddMaterialLogRequest = (values: z.infer<typeof AddMaterialLogSchema>) => {
-    const payload: AddMaterialLog = {
-      material_id: values.material_id,
-      note: { String: values.note, Valid: true },
-      quantity_change: values.quantity_change,
-      status: values.status,
-    }
-    console.log(payload)
-    trigger(payload)
-  }
 
   const { trigger, isMutating } = useSWRMutation('/api/material/mlogs/add', PostAddMaterialLog, {
     onError(err) {
@@ -71,31 +58,33 @@ export default function AddMaterialLogForm() {
         toast.error(data.text() || "Error has occured");
         return
       }
-      data.json().then((resp: Material) => {
+      data.json().then((log: MaterialLog) => {
         console.log("success")
-        toast.success(`Material Log Added!`);
+        toast.success(`Material Log for material id: ${log.material_id} Added!`);
+        mutate(`/api/material/mlogs/recent?id=${log.material_id}`)
       })
     },
   })
 
 
+  const SendAddMaterialLogRequest = (values: z.infer<typeof AddMaterialLogSchema>) => {
+    const payload: AddMaterialLog = {
+      material_id: values.material_id,
+      note: { String: values.note, Valid: true },
+      quantity_change: values.quantity_change,
+      status: values.status,
+    }
+    trigger(payload)
+  }
+
   //material logs combobox
   const MatetrialLogComboBox = () => {
-    if (material_loading) {
-      return <div className="flex flex-row" >Loading materials<Loading /></div>;
-    }
-    if (material_error) {
-      return <div className="text-red-500">Error loading materials</div>;
-    }
-    if (materials) {
-      const options = materials.map(log => ({
-        label: log.name.Valid ? log.name.String : String(log.id),
-        value: log.id,
-      }));
+    const options = materials.map(material => ({
+      label: material.name.Valid ? material.name.String : String(material.id),
+      value: material.id,
+    }));
 
-      return <ComboboxFormField form_attr={{ name: "materials", description: "Material to add log to", form: form }} default_label="Choose material to add log to" options={options} />
-    }
-    return <div className="text-red-500">No Materials</div>
+    return <ComboboxFormField form_attr={{ name: "material_id", description: "Material to add log to", form: form }} default_label="Choose material to add log to" options={options} />
   }
   return (
     <Form {...form}>
