@@ -13,7 +13,7 @@ import (
 const addMaterialLog = `-- name: AddMaterialLog :one
 INSERT 
 INTO MaterialLogs(material_id, note, status, quantity_change,timestamp)
-VALUES (?,?,?,?,date('now')) 
+VALUES (?,?,?,?,datetime('now')) 
 RETURNING id, material_id, note, status, quantity_change, timestamp
 `
 
