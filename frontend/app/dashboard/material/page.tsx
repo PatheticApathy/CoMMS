@@ -17,14 +17,14 @@ export default function AllMaterialPage() {
 
   const { data: token, isLoading: t_loading } = useSWR('/api/user/decrypt', TokenFetcher,)
   const { data: user } = useSWR(token ? `/api/user/search?id=${token.id}` : null, fetchUser,)
-  const { data: materials, error, isLoading } = useSWR(user ? `/api/material/material/search?site=${user.id}` : null, fetcher)
+  const { data: materials, error, isLoading } = useSWR(user ? `/api/material/material/search?site=${user.jobsite_id}` : null, fetcher)
 
   if (isLoading || t_loading) { return (<div className='flex items-center justify-center w-screen h-screen'>Loading <Loading /></div>) }
   if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured while trying to load materials</p>) }
   return (
     <div>
-      <FilterAndTable route={user ? `/api/material/material/search?site=${user.id}` : undefined} header="Materials" materials={materials} />
-      <InitAddFormDialouge route={user ? `/api/material/material/search?site=${user.id}` : undefined} materials={materials} />
+      <FilterAndTable route={user ? `/api/material/material/search?site=${user.jobsite_id}` : undefined} header="Materials" materials={materials} />
+      <InitAddFormDialouge route={user ? `/api/material/material/search?site=${user.jobsite_id}` : undefined} materials={materials} />
     </div>
   );
 }
