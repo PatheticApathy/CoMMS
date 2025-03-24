@@ -203,16 +203,16 @@ export default function MaterialSheet({ material, route, children, token }: Read
         console.log("Quantity changed")
 
         if (check) {
-          if (counter < 0) {
+          if (counter >= 0) {
             checkin({ user_id: token!.id, item_id: material.id })
           } else {
-            toast.error("Checkout amount must be negative");
           }
         } else {
-          if (counter > 0) {
+          if (counter < 0) {
             checkout({ user_id: token!.id, item_id: material.id, amount: counter })
-          } else {
             toast.error("Checkin amount must be greater than 0");
+          } else {
+            toast.error("Checkout amount must be negative");
           }
         }
       })

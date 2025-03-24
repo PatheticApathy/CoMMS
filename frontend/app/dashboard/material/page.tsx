@@ -23,8 +23,8 @@ export default function AllMaterialPage() {
   if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured while trying to load materials</p>) }
   return (
     <div>
-      <FilterAndTable route={token ? `/api/material/material/search?site=${token.id}` : undefined} header="Materials" materials={materials} />
-      <InitAddFormDialouge materials={materials} />
+      <FilterAndTable route={user ? `/api/material/material/search?site=${user.id}` : undefined} header="Materials" materials={materials} />
+      <InitAddFormDialouge route={user ? `/api/material/material/search?site=${user.id}` : undefined} materials={materials} />
     </div>
   );
 }
