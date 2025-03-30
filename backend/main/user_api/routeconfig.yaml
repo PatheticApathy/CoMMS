@@ -1,0 +1,50 @@
+routes:
+  /material/material/search:
+    methods:
+      - GET
+    roles:
+      - admin
+      - user
+  #User related routes
+  /user/delete:
+    methods:
+      - DELETE
+    roles:
+      - admin
+      - user
+  /user/coworkers:
+    methods:
+      - GET
+    roles:
+      - admin
+      - user
+  /user/create:
+    methods:
+      - POST
+    roles:
+      - admin
+  /user/join:
+    methods:
+      - GET
+    roles:
+      - admin
+      - roles
+  /user/search:
+    methods:
+      - GET
+    roles:
+      - admin
+      - user
+  /user/update:
+    methods:
+      - PUT
+    roles: 
+      - admin
+      - user
+  /user/all:
+    methods:
+      - GET
+    roles:
+      - admin
+  #Signup does not require authorizatin
+  /user/signup:
