@@ -12,13 +12,13 @@ export default function Welcome() {
           <h2 className="text-3xl pt-10">The Construction Material Management System</h2>
         </div>
         <div className="pt-28">
-          <div className="justify-center">
-            <p className="text-pretty text-center text-xl">
+          <div className="flex flex-col text-center items-center">
+            <p className="text-pretty text-xl max-w-2xl">
               The Construction Material Management System, or CoMMS, is a system through which employees of construction
               companies, or companies in fields that require similar material tracking, can keep track of materials throughout a job site. This system
               is designed to be used through this website for easy accessibility.
             </p>
-            <div className="pt-32 justify-self-center">
+            <div className="w-1/2 pt-32 justify-self-center">
               <Link href="/login">
                 <Button>Go To Login</Button>
               </Link>
