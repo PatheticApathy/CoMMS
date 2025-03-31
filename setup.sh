@@ -44,7 +44,7 @@ done
 OG=$PWD
 
 ##########setup frontend#################
-cd ./frontend/
+cd ./frontend/web/
 npm update --save
 cd $OG
 
