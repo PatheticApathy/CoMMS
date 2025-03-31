@@ -4,7 +4,7 @@ import useSWR, { Fetcher } from 'swr'
 import Loading from '@/components/loading';
 import FilterAndTable from '@/components/table-material/material-filter+table';
 import InitAddFormDialouge from "@/components/add-material-form/material-add-form-button";
-import { getToken, useIdentity, useToken } from '@/hooks/useToken';
+import { getToken, useIdentity } from '@/hooks/useToken';
 import { User } from '@/user-api-types';
 
 

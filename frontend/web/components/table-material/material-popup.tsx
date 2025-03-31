@@ -17,14 +17,15 @@ import { Button } from "../ui/button";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { Token } from "@/user-api-types";
+import { getToken } from "@/hooks/useToken";
 
 //fetchers
-const MaterialLogFetcher: Fetcher<MaterialLog[], string> = async (...args) => fetch(...args, { cache: 'default' }).then(res => res.json())
-const CheckoutLogFetcher: Fetcher<CheckoutLog[], string> = async (...args) => fetch(...args, { cache: 'default' }).then(res => res.json())
-const CheckOut = async (url: string, { arg }: { arg: { user_id: number, item_id: number, amount: number } }) => await fetch(url, { method: 'POST', body: JSON.stringify(arg) })
-const CheckIn = async (url: string, { arg }: { arg: { user_id: number, item_id: number } }) => await fetch(url, { method: 'PUT', body: JSON.stringify(arg) })
-const QuantityChange = async (url: string, { arg }: { arg: ChangeQuantity }) => await fetch(url, { method: 'PUT', body: JSON.stringify(arg) })
-const DeleteMaterial = async (url: string, { arg }: { arg: number }) => await fetch(url, { method: 'DELETE', body: String(arg) })
+const MaterialLogFetcher: Fetcher<MaterialLog[], string> = async (...args) => fetch(...args, { headers: { 'Authorization': getToken() }, cache: 'default' }).then(res => res.json())
+const CheckoutLogFetcher: Fetcher<CheckoutLog[], string> = async (...args) => fetch(...args, { headers: { 'Authorization': getToken() }, cache: 'default' }).then(res => res.json())
+const CheckOut = async (url: string, { arg }: { arg: { user_id: number, item_id: number, amount: number } }) => await fetch(url, { headers: { 'Authorization': getToken() }, method: 'POST', body: JSON.stringify(arg) })
+const CheckIn = async (url: string, { arg }: { arg: { user_id: number, item_id: number } }) => await fetch(url, { headers: { 'Authorization': getToken() }, method: 'PUT', body: JSON.stringify(arg) })
+const QuantityChange = async (url: string, { arg }: { arg: ChangeQuantity }) => await fetch(url, { headers: { 'Authorization': getToken() }, method: 'PUT', body: JSON.stringify(arg) })
+const DeleteMaterial = async (url: string, { arg }: { arg: number }) => await fetch(url, { headers: { 'Authorization': getToken() }, method: 'DELETE', body: String(arg) })
 
 const DisplayMaterialLogs = (material_logs: MaterialLog[] | undefined, error: Boolean, isLoading: Boolean,) => {
   if (isLoading) {

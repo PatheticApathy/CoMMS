@@ -24,10 +24,14 @@ import { redirect } from 'next/navigation'
 import { EditProfile } from "./edit-profile-dialog"
 import useSWR from "swr";
 import { User } from "@/user-api-types";
-import { delTokenNIdentity, useIdentity } from '@/hooks/useToken'
+import { delTokenNIdentity, getToken, useIdentity } from '@/hooks/useToken'
 
 const fetcher = async (url: string) => {
-  const res = await fetch(url)
+  const res = await fetch(url,
+    {
+      headers: { 'Authorization': getToken() }
+    }
+  )
   if (!res.ok) {
     throw new Error("Failed to fetch data");
   }

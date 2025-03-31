@@ -1,27 +1,8 @@
 'use client'
 import { Token } from "@/user-api-types"
 import { redirect } from "next/navigation"
-import React, { useEffect, useState, createContext, useContext } from "react"
+import { useEffect, useState, } from "react"
 
-
-const AuthContext = createContext<{ token: string | null }>({ token: null })
-
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [token, setToken] = useState<string | null>(null);
-
-  useEffect(() => {
-    setToken(getToken())
-  }, [])
-
-  return (
-    <AuthContext.Provider value={{ token }}>
-      {children}
-    </AuthContext.Provider>
-  )
-}
-export function useToken() {
-  return useContext(AuthContext)
-}
 
 export function useIdentity() {
   const [identity, setIdentity] = useState<Token | null>(null);

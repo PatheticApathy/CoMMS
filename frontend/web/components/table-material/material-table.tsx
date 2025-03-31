@@ -28,7 +28,6 @@ export default function MTable({ materials, route }: { materials: Material[], ro
   })
 
   if (!identity) {
-    toast.error('Invalid session')
     return (
       <div className="mx-auto py-10">
         Please log in again
