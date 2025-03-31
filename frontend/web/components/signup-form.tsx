@@ -16,8 +16,8 @@ import { Input } from "@/components/ui/input"
 import { redirect } from 'next/navigation'
 import useSWRMutation from 'swr/mutation'
 import Loading from '@/components/loading'
-import { setToken } from '@/components/localstorage'
 import { SignUpUser } from "@/user-api-types"
+import { setToken } from "@/hooks/useToken"
 
 const formSchema = z.object({
   username: z.string().nonempty(),

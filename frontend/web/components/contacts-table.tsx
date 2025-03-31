@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/dialog"
 import useSWR from "swr";
 import { Token, User, UserJoin } from "@/user-api-types";
-import { getToken } from "./localstorage";
+import { getToken } from "@/hooks/useToken";
 
 const fetcher = async (url: string): Promise<UserJoin[]> => {
   const res = await fetch(url);
@@ -29,7 +29,7 @@ const fetcher = async (url: string): Promise<UserJoin[]> => {
   return res.json();
 };
 
-const fetcher2 = async  (url: string) => {
+const fetcher2 = async (url: string) => {
   const res = await fetch(url)
   if (!res.ok) {
     throw new Error("Failed to fetch data");
@@ -37,7 +37,7 @@ const fetcher2 = async  (url: string) => {
   return res.json();
 };
 
-const fetcher3 = async  (url: string): Promise<User> => {
+const fetcher3 = async (url: string): Promise<User> => {
   const res = await fetch(url)
   if (!res.ok) {
     throw new Error("Failed to fetch data");
@@ -47,16 +47,16 @@ const fetcher3 = async  (url: string): Promise<User> => {
 
 async function getProfileArgs(url: string, arg: string) {
   return fetch(url, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: arg
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: arg
   }).then(res => res.json() as Promise<Token>)
 }
 
 const token = getToken()
 
 export default function ContactsTable({ searchQuery }: { searchQuery: string }) {
-  const { data: user, error: error1 } = useSWR<User, string>( `/api/user/username?username={user.username}`, fetcher2);
+  const { data: user, error: error1 } = useSWR<User, string>(`/api/user/username?username={user.username}`, fetcher2);
 
   if (!token) { return (<p className='flex items-center justify-center w-screen h-screen'>Invalid Token</p>) }
 
@@ -65,11 +65,11 @@ export default function ContactsTable({ searchQuery }: { searchQuery: string }) 
   const { data, error } = useSWR<UserJoin[]>(tokenData && currentuser ? `/api/user/coworkers?user=${tokenData.id}&company=${currentuser?.company_id.Int64}&site=${currentuser?.jobsite_id.Int64}` : null, fetcher);
   console.log(tokenData ? `/api/user/coworkers?user=${tokenData.id}&company=${currentuser?.company_id.Int64}&site=${currentuser?.jobsite_id.Int64}` : null)
   if (error || error2 || error3) return <p>Invalid User.</p>;
-  if (!data) return <p>Loading...</p>;  
+  if (!data) return <p>Loading...</p>;
 
   const filteredData = (data ?? []).filter((user: UserJoin) => {
     const searchLower = searchQuery.toLowerCase();
-  
+
     return (
       user.username.toLowerCase().includes(searchLower) ||
       user.email.toLowerCase().includes(searchLower) ||
@@ -113,17 +113,17 @@ export default function ContactsTable({ searchQuery }: { searchQuery: string }) 
               </TableRow>
             </DialogTrigger>
             <DialogContent className="w-[400px]">
-                <DialogHeader>
-                    <DialogTitle>Profile</DialogTitle>
-                    <DialogDescription>View {user.username}'s Profile</DialogDescription>
-                </DialogHeader>
-                <div className="rounded-full overflow-hidden h-28 w-28">
-                    <img className="" src="https://static.vecteezy.com/system/resources/thumbnails/009/734/564/small/default-avatar-profile-icon-of-social-media-user-vector.jpg"></img>
-                </div>
-                <div>Username: {user.username}</div>
-                <div>Name: {user.firstname.Valid? user.firstname.String : "N/A"} {user.lastname.Valid? user.lastname.String : "N/A"}</div>
-                <div>Email: {user.email}</div>
-                <div>Phone: {user.phone}</div>
+              <DialogHeader>
+                <DialogTitle>Profile</DialogTitle>
+                <DialogDescription>View {user.username}'s Profile</DialogDescription>
+              </DialogHeader>
+              <div className="rounded-full overflow-hidden h-28 w-28">
+                <img className="" src="https://static.vecteezy.com/system/resources/thumbnails/009/734/564/small/default-avatar-profile-icon-of-social-media-user-vector.jpg"></img>
+              </div>
+              <div>Username: {user.username}</div>
+              <div>Name: {user.firstname.Valid ? user.firstname.String : "N/A"} {user.lastname.Valid ? user.lastname.String : "N/A"}</div>
+              <div>Email: {user.email}</div>
+              <div>Phone: {user.phone}</div>
             </DialogContent>
           </Dialog>
         ))}

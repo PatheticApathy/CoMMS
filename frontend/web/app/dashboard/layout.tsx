@@ -1,6 +1,7 @@
 import { cookies } from "next/headers"
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/comms-sidebar"
+import { AuthProvider } from "@/hooks/useToken";
 
 
 export default async function DashBoardLayout({
@@ -15,11 +16,13 @@ export default async function DashBoardLayout({
   return (
     <>
       <SidebarProvider defaultOpen={defaultOpen}>
-        <AppSidebar />
-        <main>
-          <SidebarTrigger />
-          {children}
-        </main>
+        <AuthProvider>
+          <AppSidebar />
+          <main>
+            <SidebarTrigger />
+            {children}
+          </main>
+        </AuthProvider>
       </SidebarProvider>
     </>
   );

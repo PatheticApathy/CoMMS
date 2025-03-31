@@ -97,7 +97,7 @@ func main() {
 
 	auth_config, err := middleware.RouteConfig(bytes.NewReader(yaml))
 	if err != nil {
-		log.Fatal("Could not setup suthorization routing: %s, err")
+		log.Fatal("Could not setup suthorization routing: %s", err)
 	}
 
 	env := handler.NewEnv(db, secret)

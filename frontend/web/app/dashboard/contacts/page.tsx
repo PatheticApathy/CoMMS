@@ -3,16 +3,13 @@
 import { useState } from "react";
 import ContactsTable from "@/components/contacts-table";
 import InputWithButton from "@/components/search-button";
-import { getToken } from "@/components/localstorage";
 import useSWR, { Fetcher } from "swr";
 import { Token } from "@/user-api-types";
-
-const tkn = getToken()
-const TokenFetcher: Fetcher<Token, string> = async (...args) => fetch(...args, { method: 'POST', body: tkn, cache: 'force-cache' },).then(res => res.json())
+import { getToken, useIdentity } from "@/hooks/useToken";
 
 export default function Contacts() {
   const [searchQuery, setSearchQuery] = useState("");
-  const { data: token, isLoading: t_loading } = useSWR('/api/user/decrypt', TokenFetcher,)
+  const identity = useIdentity()
 
   return (
     <div className="flex flex-col justify-center items-center w-screen">

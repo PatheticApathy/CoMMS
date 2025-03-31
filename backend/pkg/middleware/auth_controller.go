@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"slices"
+	"strings"
 
 	handler "github.com/PatheticApathy/CoMMS/pkg/api/user"
 	"github.com/PatheticApathy/CoMMS/pkg/auth"
@@ -32,6 +33,7 @@ func AuthController(next http.Handler, e *handler.Env, config routeConfig) http.
 		if route, ok := config.Routes[r.URL.Path]; ok && slices.Contains(route.Methods, r.Method) {
 
 			token := r.Header.Get("Authorization")
+			token = strings.Trim(token, `"`)
 			payload, err := auth.VerifyToken(token, []byte(e.Secret))
 			if err != nil {
 				log.Printf("Error: %s", err)

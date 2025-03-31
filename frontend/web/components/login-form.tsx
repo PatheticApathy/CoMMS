@@ -16,8 +16,8 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { setToken } from '@/components/localstorage'
 import { LogInUser } from "@/user-api-types"
+import { setToken } from "@/hooks/useToken"
 
 const formSchema = z.object({
   username: z.string(),
@@ -38,7 +38,7 @@ async function logIn(url: string, { arg }: { arg: LogInUser }) {
 
 export default function LoginForm() {
 
-  const { data, trigger, error, isMutating } = useSWRMutation('api/user/login', logIn, {throwOnError: false})
+  const { data, trigger, error, isMutating } = useSWRMutation('api/user/login', logIn, { throwOnError: false })
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -57,7 +57,7 @@ export default function LoginForm() {
   }
 
   //validate form data(data is safe at this point)
-  async function onSubmit(values: z.infer<typeof formSchema>) {    
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     trigger(values)
   }
 

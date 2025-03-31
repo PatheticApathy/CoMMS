@@ -1,11 +1,95 @@
 routes:
+###############################Checkout realted routes#############################################
+  /material/checkout/all:
+    methods:
+      - GET
+    roles:
+      - admin
+  /material/checkout/in:
+    methods:
+      - PUT
+    roles:
+      - admin
+      - user
+  /material/checkout/out:
+    methods:
+      - POST
+    roles:
+      - admin
+      - user
+  /material/checkout/recent:
+    methods:
+      - GET
+    roles:
+      - admin
+      - user
+###################################Material related routes##############################################
+  /material/material/add:
+    methods:
+      - POST
+    roles:
+      - admin
+      - user
+  /material/material/all:
+    methods:
+      - GET
+    roles:
+      - admin
+  /material/material/change:
+    methods:
+      - PUT
+    roles:
+      - admin
+      - user
+  /material/material/delete:
+    methods:
+      - DELETE
+    roles:
+      - admin
+      - user
   /material/material/search:
     methods:
       - GET
     roles:
       - admin
       - user
-  #User related routes
+##################################Material Log related routes###############################################################
+  /material/mlogs/add:
+    methods:
+      - POST
+    roles:
+      - admin
+      - user
+  /material/mlogs/note:
+    methods:
+      - PUT
+    roles:
+      - admin
+      - user
+  /material/mlogs/all:
+    methods:
+      - GET
+    roles:
+      - admin
+      - user
+  /material/mlogs/recent:
+    methods:
+      - GET
+    roles:
+      - admin
+      - user
+  /material/mlogs/search:
+    methods:
+      - GET
+    roles:
+      - admin
+      - user
+##################################User related routes#############################################
+  /user/all:
+    methods:
+      - GET
+    roles:
+      - admin
   /user/delete:
     methods:
       - DELETE
@@ -41,10 +125,45 @@ routes:
     roles: 
       - admin
       - user
-  /user/all:
+  #Signup does not require authorizatin
+  /user/signup:
+  #decrypt should never require auth
+  /user/decrypt:
+  #neithe should login/loggout
+  /user/loggout:
+  /user/loggin:
+##################################Jobsite related routes#############################################
+  /sites/add:
+    methods:
+      - POST
+    roles:
+      - admin
+  /sites/all:
     methods:
       - GET
     roles:
       - admin
-  #Signup does not require authorizatin
-  /user/signup:
+  /sites/search:
+    methods:
+      - GET
+    roles:
+      - admin
+      - user
+##############################Comapny related Routes################################################
+  /company/all:
+    methods:
+      - GET
+    roles:
+      - admin
+  /company/create:
+    methods:
+      - POST
+    roles:
+      - admin
+  /company/search:
+    methods:
+      - GET
+    roles:
+      - admin
+      - user
+
