@@ -276,14 +276,14 @@ const docTemplate = `{
         },
         "/user/coworkers": {
             "get": {
-                "description": "Adds user to the database using valid json structure",
+                "description": "pulls users that match either jobsite or company ID with the current user, excluding the current user",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "users"
                 ],
-                "summary": "post user to database",
+                "summary": "gets coworkers for contacts",
                 "parameters": [
                     {
                         "type": "integer",
@@ -647,6 +647,64 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Failed to signup user",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/subordinates": {
+            "get": {
+                "description": "pulls users that match either jobsite or company ID with the current user, including the current user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "gets subordinates for contacts",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "user id",
+                        "name": "user",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "company id",
+                        "name": "company",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "jobsite id",
+                        "name": "site",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User login token",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/userdb.GetUsersByJobsiteAndCompanyRow"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
                         "schema": {
                             "type": "string"
                         }

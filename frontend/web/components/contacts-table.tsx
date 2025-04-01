@@ -63,7 +63,7 @@ export default function ContactsTable({ searchQuery }: { searchQuery: string }) 
   const { data: tokenData, error: error2 } = useSWR(['/api/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
   const { data: currentuser, error: error3 } = useSWR<User, string>(tokenData ? `/api/user/search?id=${tokenData?.id}` : null, fetcher3);
   const { data, error } = useSWR<UserJoin[]>(tokenData && currentuser ? `/api/user/coworkers?user=${tokenData.id}&company=${currentuser?.company_id.Int64}&site=${currentuser?.jobsite_id.Int64}` : null, fetcher);
-  console.log(tokenData ? `/api/user/coworkers?user=${tokenData.id}&company=${currentuser?.company_id.Int64}&site=${currentuser?.jobsite_id.Int64}` : null)
+  //console.log(tokenData ? `/api/user/coworkers?user=${tokenData.id}&company=${currentuser?.company_id.Int64}&site=${currentuser?.jobsite_id.Int64}` : null)
   if (error || error2 || error3) return <p>Invalid User.</p>;
   if (!data) return <p>Loading...</p>;  
 

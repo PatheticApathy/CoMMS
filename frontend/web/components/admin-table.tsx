@@ -38,11 +38,20 @@ import {
 import InitAddFormDialougeAdmin from "@/components/add-jobsite-form/jobsite-add-admin";
 
 import useSWR from "swr";
-import { User, UserJoin, Company, JobSite } from "@/user-api-types";
+import { User, UserJoin, Company, JobSite, Token } from "@/user-api-types";
 import Loading from "@/components/loading";
+import { getToken } from "./localstorage";
 
 const fetcher = async (url: string): Promise<UserJoin[]> => {
   const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error("Failed to fetch data");
+  }
+  return res.json();
+};
+
+const fetchUser = async  (url: string): Promise<User> => {
+  const res = await fetch(url)
   if (!res.ok) {
     throw new Error("Failed to fetch data");
   }
@@ -256,8 +265,18 @@ export const columns: ColumnDef<User>[] = [
   },
 ];
 
+async function getProfileArgs(url: string, arg: string) {
+  return fetch(url, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: arg
+  }).then(res => res.json() as Promise<Token>)
+}
+
+const token = getToken()
+
 export function UserTable() {
-  const { data, error } = useSWR<UserJoin[]>("/api/user/join", fetcher);
+  //const { data, error } = useSWR<UserJoin[]>("/api/user/join", fetcher);
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -267,6 +286,12 @@ export function UserTable() {
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
+  if (!token) { return (<p className='flex items-center justify-center w-screen h-screen'>Invalid Token</p>) }
+
+  const { data: tokenData, error: error2 } = useSWR(['/api/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
+  const { data: currentuser, error: error3 } = useSWR<User, string>(tokenData ? `/api/user/search?id=${tokenData?.id}` : null, fetchUser);
+  const { data, error } = useSWR<UserJoin[]>(tokenData && currentuser ? `/api/user/subordinates?user=${tokenData.id}&company=${currentuser?.company_id.Int64}&site=${currentuser?.jobsite_id.Int64}` : null, fetcher);
+  //console.log(tokenData ? `/api/user/coworkers?user=${tokenData.id}&company=${currentuser?.company_id.Int64}&site=${currentuser?.jobsite_id.Int64}` : null) 
   const table = useReactTable({
     data: data || [],
     columns,
@@ -286,6 +311,9 @@ export function UserTable() {
     },
   });
 
+  if (error || error2 || error3) return <p>Invalid User.</p>;
+  if (!data) return <p>Loading...</p>;
+
   if (error) {
     return <div>Error loading data</div>;
   }
@@ -293,6 +321,7 @@ export function UserTable() {
   if (!data) {
     return <Loading />;
   }
+  console.log(data)
 
   return (
     <div className="w-full">

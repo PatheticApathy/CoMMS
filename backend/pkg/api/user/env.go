@@ -40,6 +40,7 @@ func (e *Env) userHandlers() http.Handler {
 	mux.HandleFunc("POST /decrypt", e.DecryptHanlder)
 	mux.HandleFunc("GET /join", e.joinTables)
 	mux.HandleFunc("GET /coworkers", e.getCoworkers)
+	mux.HandleFunc("GET /subordinates", e.getSubordinates)
 	return mux
 }
 
