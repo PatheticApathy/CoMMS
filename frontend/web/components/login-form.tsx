@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unescpaed-entities */
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"

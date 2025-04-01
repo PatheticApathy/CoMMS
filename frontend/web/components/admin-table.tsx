@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { useState } from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -75,7 +75,7 @@ const deleteUser = async (id: number) => {
   return res.json();
 };
 
-const updateUser = async (id: number, field: string, value: { String: string; Valid: boolean} | { Int64: number; Valid: boolean }) => {
+const updateUser = async (id: number, field: string, value: { String: string; Valid: boolean } | { Int64: number; Valid: boolean }) => {
   const res = await fetch(`/api/user/update`, {
     method: "PUT",
     headers: {
@@ -168,9 +168,9 @@ export const columns: ColumnDef<User>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const user = row.original;
-      const [newCompany, setNewCompany] = React.useState("");
-      const [newJobsite, setNewJobsite] = React.useState("");
-      const [newRole, setNewRole] = React.useState("");
+      const [newCompany, setNewCompany] = useState("");
+      const [newJobsite, setNewJobsite] = useState("");
+      const [newRole, setNewRole] = useState("");
 
       const { data: companies } = useSWR<Company[]>("/api/company/all", fetchCompanies);
       const { data: jobsites } = useSWR<JobSite[]>("/api/sites/all", fetchJobsites);
@@ -211,7 +211,7 @@ export const columns: ColumnDef<User>[] = [
               Copy id #
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem 
+            <DropdownMenuItem
               onClick={() => deleteUser(user.id)}
             >
               Delete user
@@ -245,7 +245,7 @@ export const columns: ColumnDef<User>[] = [
                 onChange={(e) => setNewRole(e.target.value)}
                 className="max-w-sm"
               />
-              <Button onClick={(e) => { e.preventDefault(); updateUser(user.id, "role", { String: newRole, Valid: true}); }}>
+              <Button onClick={(e) => { e.preventDefault(); updateUser(user.id, "role", { String: newRole, Valid: true }); }}>
                 Change role
               </Button>
             </DropdownMenuItem>
@@ -259,13 +259,13 @@ export const columns: ColumnDef<User>[] = [
 export function UserTable() {
   const { data, error } = useSWR<UserJoin[]>("/api/user/join", fetcher);
 
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
     []
   );
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
+    useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = useState({});
 
   const table = useReactTable({
     data: data || [],
@@ -337,7 +337,7 @@ export function UserTable() {
           }
           className="max-w-sm"
         />
-        <InitAddFormDialougeAdmin/>
+        <InitAddFormDialougeAdmin />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
@@ -376,9 +376,9 @@ export function UserTable() {
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   );
                 })}

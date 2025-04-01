@@ -27,7 +27,7 @@ const CheckIn = async (url: string, { arg }: { arg: { user_id: number, item_id: 
 const QuantityChange = async (url: string, { arg }: { arg: ChangeQuantity }) => await fetch(url, { headers: { 'Authorization': getToken() }, method: 'PUT', body: JSON.stringify(arg) })
 const DeleteMaterial = async (url: string, { arg }: { arg: number }) => await fetch(url, { headers: { 'Authorization': getToken() }, method: 'DELETE', body: String(arg) })
 
-const DisplayMaterialLogs = (material_logs: MaterialLog[] | undefined, error: Boolean, isLoading: Boolean,) => {
+const DisplayMaterialLogs = (material_logs: MaterialLog[] | undefined, error: boolean, isLoading: boolean,) => {
   if (isLoading) {
     return <div>Loading<Loading /></div>;
   }
@@ -66,7 +66,7 @@ const DisplayMaterialLogs = (material_logs: MaterialLog[] | undefined, error: Bo
   }
 }
 
-const DisplayCheckouts = (checkout_logs: CheckoutLog[] | undefined, error: Boolean, isLoading: Boolean,) => {
+const DisplayCheckouts = (checkout_logs: CheckoutLog[] | undefined, error: boolean, isLoading: boolean,) => {
   if (isLoading) {
     return <div>Loading<Loading /></div>;
   }
@@ -160,7 +160,7 @@ export default function MaterialSheet({ material, route, children, token }: Read
         toast.error(resp.text() || "Error has occured");
         return
       }
-      resp.json().then((_: Material) => {
+      resp.json().then(() => {
         console.log("Checked Out")
         mutate(`/api/material/checkout/recent?id=${material.id}`)
         mutate(`/api/material/mlogs/recent?id=${material.id}`)
@@ -180,7 +180,7 @@ export default function MaterialSheet({ material, route, children, token }: Read
         toast.error(resp.text() || "Error has occured");
         return
       }
-      resp.json().then((_: Material) => {
+      resp.json().then(() => {
         console.log("Checked In")
         mutate(`/api/material/checkout/recent?id=${material.id}`)
         mutate(`/api/material/mlogs/recent?id=${material.id}`)
@@ -200,7 +200,7 @@ export default function MaterialSheet({ material, route, children, token }: Read
         toast.error(resp.text() || "Error has occured");
         return
       }
-      resp.json().then((_: Material) => {
+      resp.json().then(() => {
         console.log("Quantity changed")
 
         if (check) {
@@ -225,7 +225,7 @@ export default function MaterialSheet({ material, route, children, token }: Read
       setCheck(Boolean(checkout_logs?.find((log) => !log.checkin_time.Valid && log.user_id == token.id)))
     }
 
-  })
+  }, [checkout_logs, token])
   return (
     <Sheet>
       <SheetTrigger asChild>{children}</SheetTrigger>

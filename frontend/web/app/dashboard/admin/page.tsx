@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { UserTable } from '@/components/admin-table';
 import { MaterialTable } from '@/components/admin-material';
 import { Button } from '@/components/ui/button';
@@ -20,11 +20,11 @@ const token = getToken()
 
 export default function AdminPage() {
   const [showFirstTable, setShowFirstTable] = useState(true);
+  const { data: tokenData, error: error2 } = useSWR([token ? '/api/user/decrypt' : null, token], ([url, token]) => getProfileArgs(url, token))
 
 
   if (!token) { return (<p className='flex items-center justify-center w-screen h-screen'>Invalid Token</p>) }
 
-  const { data: tokenData, error: error2 } = useSWR(['/api/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
 
   if (error2) { return (<p className='flex items-center justify-center w-screen h-screen'>{error2.message}</p>) }
 

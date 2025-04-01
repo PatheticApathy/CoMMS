@@ -25,7 +25,7 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import useSWR from "swr"
 import { User, Firstname, Lastname } from "@/user-api-types"
-import { useIdentity, useToken } from "@/hooks/useToken"
+import { useIdentity, getToken } from "@/hooks/useToken"
 
 const formSchema = z.object({
   username: z.string(),
@@ -39,7 +39,7 @@ const formSchema = z.object({
 async function changeProfile(url: string, { arg }) {
   return fetch(url, {
     method: 'PUT',
-    headers: { 'Authorization': useToken().token! },
+    headers: { 'Authorization': getToken() },
     body: JSON.stringify(arg)
   }).then(res => res.json())
 }

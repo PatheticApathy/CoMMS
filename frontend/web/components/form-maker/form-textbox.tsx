@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { FormField, FormItem, FormDescription, FormMessage, FormControl } from "@/components/ui/form"
 import { UseFormReturn } from "react-hook-form"
 import { Input } from "../ui/input"

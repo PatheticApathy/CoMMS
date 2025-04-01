@@ -11,7 +11,7 @@ import { ComboboxFormField } from "@/components/form-maker/form-combobox"
 import { Material, AddMaterialLog, MaterialLog } from "@/material-api-types"
 import FormInput from "../form-maker/form-input"
 import { toast } from "sonner"
-import useSWR, { Fetcher, mutate } from "swr"
+import { mutate } from "swr"
 import FormTextInput from "../form-maker/form-textbox"
 import { getToken } from "@/hooks/useToken"
 
