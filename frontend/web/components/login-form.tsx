@@ -51,7 +51,6 @@ export default function LoginForm() {
   if (isMutating) { return (<div className='flex items-center justify-center w-screen h-screen'>Loading <Loading /></div>) }
   if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
   if (data) {
-    console.log(`Le Token is gooda ${data}`);
     setToken(data)
     redirect('/dashboard')
   }

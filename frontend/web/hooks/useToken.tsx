@@ -3,6 +3,7 @@ import { Token } from "@/user-api-types"
 import { redirect } from "next/navigation"
 import { useEffect, useState, } from "react"
 
+const ExpirationDate =  /* (days * 60sec * 60min * 24hrs) */2 * 60 * 60 * 24
 
 export function useIdentity() {
   const [identity, setIdentity] = useState<Token | null>(null);
@@ -17,10 +18,10 @@ export function useIdentity() {
 }
 
 export function setToken(token: string) {
-  localStorage.setItem('token', token)
+  document.cookie = `token=${encodeURI(token)}; Path=/; Max-Age=${ExpirationDate}`
 }
 export function delTokenNIdentity() {
-  localStorage.removeItem('token')
+  document.cookie.replace(/token=*/, "")
   sessionStorage.removeItem('identity')
 }
 
@@ -29,7 +30,7 @@ async function getIdentity() {
   const identity = sessionStorage.getItem('identity')
   if (!identity) {
     //if it does not, fetch a new one
-    const token = localStorage.getItem('token')
+    const token = document.cookie.split(";").find((row) => row.startsWith('token='))?.split("=")[1]
 
     //if no token, redirect to login
     if (!token) { redirect('/login') }
@@ -37,7 +38,7 @@ async function getIdentity() {
     //Get token
     const resp = await fetch('/api/user/decrypt', {
       method: 'POST',
-      body: token
+      body: decodeURI(token)
     })
 
     if (!resp.ok) {
@@ -53,7 +54,8 @@ async function getIdentity() {
 
 
 export function getToken() {
-  const token = localStorage.getItem('token')
+  const token = document.cookie.split("; ").find((row) => row.startsWith('token='))?.split("=")[1]
+  console.log(token)
   if (!token) { redirect('/login') }
-  return token
+  return decodeURI(token)
 }

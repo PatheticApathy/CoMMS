@@ -15,6 +15,7 @@ import { Material, AddMaterial } from "@/material-api-types"
 import FormInput from "../form-maker/form-input"
 import { JobSite } from "@/user-api-types"
 import { toast } from "sonner"
+import { getToken } from "@/hooks/useToken"
 
 // Schema for form
 const AddMaterialSchema = z.object({
@@ -27,9 +28,11 @@ const AddMaterialSchema = z.object({
 });
 
 // Fetcher
-const PostAddMaterial = async (url: string, { arg }: { arg: AddMaterial }) => await fetch(url, { method: 'POST', body: JSON.stringify(arg) });
+const PostAddMaterial = async (url: string, { arg }: { arg: AddMaterial }) => await fetch(url, { headers: { 'Authorization': getToken() }, method: 'POST', body: JSON.stringify(arg) });
 const fetchJobsites = async (url: string): Promise<JobSite[]> => {
-  const res = await fetch(url);
+  const res = await fetch(url, {
+    headers: { 'Authorization': getToken() },
+  });
   if (!res.ok) {
     throw new Error("Failed to fetch jobsites");
   }
