@@ -1,28 +1,33 @@
 import {
   Sheet,
   SheetClose,
+  SheetFooter,
   SheetContent,
   SheetDescription,
-  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { CheckoutLog, Material, MaterialLog } from "@/material-api-types";
+import { ChangeQuantity, CheckoutLog, Material, MaterialLog } from "@/material-api-types";
 import Image from "next/image";
 import useSWR, { Fetcher, mutate } from "swr"
 import useSWRMutation from "swr/mutation";
 import Loading from "@/components/loading";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
+import { useEffect, useState } from "react";
+import { Token } from "@/user-api-types";
+import { getToken } from "@/hooks/useToken";
 
 //fetchers
-const MaterialLogFetcher: Fetcher<MaterialLog[], string> = async (...args) => fetch(...args, { cache: 'force-cache' }).then(res => res.json())
-const CheckoutLogFetcher: Fetcher<CheckoutLog[], string> = async (...args) => fetch(...args, { cache: 'force-cache' }).then(res => res.json())
-const CheckOut = async (url: string, { arg }: { arg: { user: number, item: number } }) => await fetch(url, { method: 'POST', body: String(arg) })
-const DeleteMaterial = async (url: string, { arg }: { arg: number }) => await fetch(url, { method: 'DELETE', body: String(arg) })
+const MaterialLogFetcher: Fetcher<MaterialLog[], string> = async (...args) => fetch(...args, { headers: { 'Authorization': getToken() }, cache: 'default' }).then(res => res.json())
+const CheckoutLogFetcher: Fetcher<CheckoutLog[], string> = async (...args) => fetch(...args, { headers: { 'Authorization': getToken() }, cache: 'default' }).then(res => res.json())
+const CheckOut = async (url: string, { arg }: { arg: { user_id: number, item_id: number, amount: number } }) => await fetch(url, { headers: { 'Authorization': getToken() }, method: 'POST', body: JSON.stringify(arg) })
+const CheckIn = async (url: string, { arg }: { arg: { user_id: number, item_id: number } }) => await fetch(url, { headers: { 'Authorization': getToken() }, method: 'PUT', body: JSON.stringify(arg) })
+const QuantityChange = async (url: string, { arg }: { arg: ChangeQuantity }) => await fetch(url, { headers: { 'Authorization': getToken() }, method: 'PUT', body: JSON.stringify(arg) })
+const DeleteMaterial = async (url: string, { arg }: { arg: number }) => await fetch(url, { headers: { 'Authorization': getToken() }, method: 'DELETE', body: String(arg) })
 
-const DisplayMaterialLogs = (material_logs: MaterialLog[] | undefined, error: boolean, isLoading: boolean,) => {
+const DisplayMaterialLogs = (material_logs: MaterialLog[] | undefined, error: Boolean, isLoading: Boolean,) => {
   if (isLoading) {
     return <div>Loading<Loading /></div>;
   }
@@ -46,7 +51,7 @@ const DisplayMaterialLogs = (material_logs: MaterialLog[] | undefined, error: bo
                 })()
                 }
                 <br />
-                {`${log.status} with ${log.quantity_change} ${log.quantity_change > 0 ? "Added" : "Removed"}`}
+                {`${log.status} with ${Math.abs(log.quantity_change)} ${log.quantity_change > 0 ? "Added" : "Removed"}`}
                 <br />
                 {log.note.Valid ? log.note.String : "Not Additional Notes"}
               </div>
@@ -61,7 +66,7 @@ const DisplayMaterialLogs = (material_logs: MaterialLog[] | undefined, error: bo
   }
 }
 
-const DisplayCheckouts = (checkout_logs: CheckoutLog[] | undefined, error: boolean, isLoading: boolean,) => {
+const DisplayCheckouts = (checkout_logs: CheckoutLog[] | undefined, error: Boolean, isLoading: Boolean,) => {
   if (isLoading) {
     return <div>Loading<Loading /></div>;
   }
@@ -75,8 +80,8 @@ const DisplayCheckouts = (checkout_logs: CheckoutLog[] | undefined, error: boole
         {
           checkout_logs.map((log) => {
             return (
-              <div key={log.user_id}>
-                <h3>Chekout pertains to {log.user_id}</h3>
+              <div key={log.id}>
+                <h3>Chekout pertains to user id: {log.user_id}</h3>
                 <br />
                 {(() => {
                   const checkout = new Date(log.checkout_time);
@@ -86,11 +91,13 @@ const DisplayCheckouts = (checkout_logs: CheckoutLog[] | undefined, error: boole
                 })()
                 }
                 <br />
+                {`Amount checked out ${log.amount}`}
+                <br />
                 {
                   (() => {
 
                     if (log.checkin_time.Valid) {
-                      const checkin = new Date(log.checkin_time.time);
+                      const checkin = new Date(log.checkin_time.Time);
                       return (
                         `Checked in on : ${checkin.toLocaleDateString()} ${checkin.toLocaleTimeString()}`
                       );
@@ -109,25 +116,32 @@ const DisplayCheckouts = (checkout_logs: CheckoutLog[] | undefined, error: boole
   } else {
     return <div className="text-center">Never Checked out</div>;
   }
-
 }
-export default function MaterialSheet({ material, route, children }: Readonly<{
+
+export default function MaterialSheet({ material, route, children, token }: Readonly<{
   material: Material,
-  route: string,
   children: React.ReactNode;
+  route: string | undefined
+  token: Token | undefined
 }>) {
 
+  const [check, setCheck] = useState(false)
+  const [counter, setcount] = useState(0)
   const { data: checkout_logs, isLoading: checkout_loading, error: checkout_error } = useSWR(`/api/material/checkout/recent?id=${material.id}`, CheckoutLogFetcher)
   const { data: material_logs, isLoading: material_loading, error: material_error } = useSWR(`/api/material/mlogs/recent?id=${material.id}`, MaterialLogFetcher)
 
-  const { trigger, isMutating } = useSWRMutation('/api/material/material/delete', DeleteMaterial, {
+  const { trigger } = useSWRMutation('/api/material/material/delete', DeleteMaterial, {
     onError(err) {
-      console.log(err)
+      console.error(err)
       toast.error(err.message || "Error has occured");
 
     },
-    onSuccess(data) {
-      data.json().then((resp: Material) => {
+    onSuccess(resp) {
+      if (!resp.ok) {
+        toast.error(resp.text() || "Error has occured");
+        return
+      }
+      resp.json().then((resp: Material) => {
         mutate(route)
         console.log("Successfully deleted")
         toast.success(`Material ${resp.name.String} Deleted!`);
@@ -135,31 +149,90 @@ export default function MaterialSheet({ material, route, children }: Readonly<{
     },
 
   })
-  const { trigger: t2, isMutating: _ } = useSWRMutation('/api/material/checkout/out', CheckOut, {
+  const { trigger: checkout, isMutating: checking_out } = useSWRMutation('/api/material/checkout/out', CheckOut, {
     onError(err) {
-      console.log(err)
+      console.error(err)
       toast.error(err.message || "Error has occured");
 
     },
-    onSuccess(data) {
-      data.json().then((_: Material) => {
+    onSuccess(resp) {
+      if (!resp.ok) {
+        toast.error(resp.text() || "Error has occured");
+        return
+      }
+      resp.json().then((_: Material) => {
         console.log("Checked Out")
+        mutate(`/api/material/checkout/recent?id=${material.id}`)
+        mutate(`/api/material/mlogs/recent?id=${material.id}`)
         toast.success(`Checked Out!`);
       })
     },
-
   })
 
+  const { trigger: checkin, isMutating: checking_in } = useSWRMutation('/api/material/checkout/in', CheckIn, {
+    onError(err) {
+      console.error(err)
+      toast.error(err.message || "Error has occured");
 
-  //TODO: make it switch to a check in for  function 
+    },
+    onSuccess(resp) {
+      if (!resp.ok) {
+        toast.error(resp.text() || "Error has occured");
+        return
+      }
+      resp.json().then((_: Material) => {
+        console.log("Checked In")
+        mutate(`/api/material/checkout/recent?id=${material.id}`)
+        mutate(`/api/material/mlogs/recent?id=${material.id}`)
+        toast.success(`Checked In!`);
+      })
+    },
+  })
 
+  const { trigger: send_amount } = useSWRMutation('/api/material/material/change', QuantityChange, {
+    onError(err) {
+      console.error(err)
+      toast.error(err.message || "Error has occured");
+
+    },
+    onSuccess(resp) {
+      if (!resp.ok) {
+        toast.error(resp.text() || "Error has occured");
+        return
+      }
+      resp.json().then((_: Material) => {
+        console.log("Quantity changed")
+
+        if (check) {
+          if (counter >= 0) {
+            checkin({ user_id: token!.id, item_id: material.id })
+          } else {
+          }
+        } else {
+          if (counter < 0) {
+            checkout({ user_id: token!.id, item_id: material.id, amount: counter })
+            toast.error("Checkin amount must be greater than 0");
+          } else {
+            toast.error("Checkout amount must be negative");
+          }
+        }
+      })
+    },
+  })
+
+  useEffect(() => {
+    if (checkout_logs && token) {
+      setCheck(Boolean(checkout_logs?.find((log) => !log.checkin_time.Valid && log.user_id == token.id)))
+    }
+
+  })
   return (
     <Sheet>
       <SheetTrigger asChild>{children}</SheetTrigger>
       <SheetContent side="right" className="flex flex-col">
         <div className="overflow-auto">
           {(() => {
-            if (material) {
+            if (material && token) {
               return (
                 <>
                   <SheetHeader className="flex-none border-b text-left">
@@ -175,7 +248,7 @@ export default function MaterialSheet({ material, route, children }: Readonly<{
                     <br />
                     {`${material.status} with ${material.quantity} ${material.unit}`}
                     <br />
-                    {material.last_checked_out ? `last checked out on ${material.last_checked_out}` : "Never checked out"}
+                    {material.last_checked_out.Valid ? `last checked out on ${new Date(material.last_checked_out.Time).toLocaleString()}` : "Never checked out"}
                     <hr />
                     <div className="place-content-center">
                       {
@@ -184,14 +257,30 @@ export default function MaterialSheet({ material, route, children }: Readonly<{
                     </div>
                     <hr />
                     <div className="flex flex-col content-center gap-4">
-                      <Button variant="secondary" className="justify-center " >Checkout</Button>
-                      <div>
+                      {(() => {
+                        if (checking_out || checking_in) {
+                          return <Loading />
+                        } else {
+                          return (
+                            <div className="flex flex-row flex-auto">
+                              <Button onClick={() => { send_amount({ quantity: counter, id: material.id }) }} variant={check ? "default" : "secondary"} className="w-2/3" >{check ? "Checkin" : "Checkout"}</Button>
+                              <div className="flex flex-row text-center w-1/3 ">
+                                <div className="w-1/4"><Button onClick={() => setcount(counter + 1)}>+</Button></div>
+                                <div className="w-2/4 text content-center"><h1 className="text-slate-300 text-center ml-3">{counter}</h1></div>
+                                <div><Button className="w-1/4" onClick={() => setcount(counter - 1)}>-</Button></div>
+                              </div>
+                            </div>
+                          )
+                        }
+                      })()
+                      }
+                      < div className="place-content-center">
                         {
                           DisplayCheckouts(checkout_logs, checkout_error, checkout_loading)
                         }
                       </div>
                     </div>
-                  </div>
+                  </div >
                   <SheetFooter className="flex flex-col place-content-center">
                     <SheetClose asChild>
                       <Button variant={'destructive'} onClick={async () => {
@@ -203,13 +292,16 @@ export default function MaterialSheet({ material, route, children }: Readonly<{
                   </SheetFooter>
                 </>
               )
+            } else {
+              return (
+                <>
+                  <SheetTitle className="text-2xl">{material.name.Valid ? material.name.String : "No Name Found"}</SheetTitle>
+                  <p className='flex items-center justify-center h-screen'>No additional data for material or invalid credentials. Try logging in again</p>
+                </>
+              )
             }
-            else {
-              return (<p className='flex items-center justify-center h-screen'>No additional data for material</p>)
-            }
-          }
-          )()}
+          })()}
         </div>
-      </SheetContent>
+      </SheetContent >
     </Sheet >)
 }

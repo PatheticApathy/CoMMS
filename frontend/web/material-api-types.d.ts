@@ -6,6 +6,7 @@ export interface CheckoutLog {
   id: number
   item_id: number
   user_id: number
+  amount: number
 }
 
 export interface AddCheckoutLog {
@@ -16,7 +17,7 @@ export interface AddCheckoutLog {
 //*********************************** Material related types ***********************************
 
 export interface AddMaterial {
-  job_site: JobSite
+  job_site: number
   location_lat: LocationLat
   location_lng: LocationLng
   name: Name
@@ -27,8 +28,8 @@ export interface AddMaterial {
 }
 export interface Material {
   id: number
-  job_site: JobSite
-  last_checked_out: string
+  job_site: number
+  last_checked_out: { Valid: bool, Time: string }
   location_lat: LocationLat
   location_lng: LocationLng
   name: Name
@@ -47,12 +48,6 @@ export enum MaterialStatus {
   OutOfStock = "Out of Stock",
   LowStock = "Low Stock"
 }
-
-export interface JobSite {
-  Int64: number
-  Valid: boolean
-}
-
 
 export interface Name {
   String: string
@@ -93,20 +88,6 @@ export interface Note {
   Valid: boolean
 }
 
-//**************************** Jobsite related types ***************************
-
-export interface Jobsite {
-  addr: Addr
-  location_lat: LocationLat
-  location_lng: LocationLng
-  name: string
-}
-
-export interface Addr {
-  String: string
-  Valid: boolean
-}
-
 //**************************misc******************
 
 export interface LocationLat {
@@ -120,6 +101,6 @@ export interface LocationLng {
 }
 
 export interface CheckinTime {
-  time: string
+  Time: string
   Valid: boolean
 }

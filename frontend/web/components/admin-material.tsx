@@ -39,7 +39,7 @@ import {
 import useSWR from "swr";
 import { Material } from "@/material-api-types";
 import Loading from "@/components/loading";
-import InitAddFormDialouge from "@/components/add-material-form/material-add-form-button";
+import InitAddFormDialougeAdmin from "@/components/add-material-form/material-add-admin";
 
 const fetcher = async (url: string): Promise<Material[]> => {
   const res = await fetch(url);
@@ -55,7 +55,7 @@ const deleteMaterial = async (id: number) => {
     body: String(id),
   });
   if (!res.ok) {
-    throw new Error("Failed to delete user");
+    throw new Error("Failed to delete material");
   }
   return res.json();
 };
@@ -111,21 +111,6 @@ export const columns: ColumnDef<Material>[] = [
     },
   },
   {
-    accessorKey: "last_checked_out",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Last Checked Out
-          <ArrowUpDown />
-        </Button>
-      );
-    },
-    cell: ({ row }) => <div className="">{row.getValue("last_checked_out")}</div>,
-  },
-  {
     accessorKey: "quantity",
     header: "Quantity",
     cell: ({ row }) => <div className="">{row.getValue("quantity")}</div>,
@@ -158,18 +143,7 @@ export const columns: ColumnDef<Material>[] = [
   {
     accessorKey: "job_site",
     header: "Job Site",
-    cell: ({ row }) => {
-      const jobSite = row.getValue("job_site") as { Int64: number; Valid: boolean };
-      return (
-        <div className="">
-          {jobSite.Int64}
-        </div>
-      );
-    },
-    filterFn: (row, columnId, filterValue) => {
-      const jobSite = row.getValue(columnId) as { String: string; Valid: boolean };
-      return jobSite.String.toLowerCase().includes(filterValue.toLowerCase());
-    },
+    cell: ({ row }) => <div className="">{row.getValue("job_site")}</div>,
   },
   {
     id: "actions",
@@ -256,14 +230,6 @@ export function MaterialTable() {
           className="max-w-sm"
         />
         <Input
-          placeholder="Filter last checked out..."
-          value={(table.getColumn("last_checked_out")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("last_checked_out")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-        <Input
           placeholder="Filter quantity..."
           value={(table.getColumn("quantity")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
@@ -287,7 +253,7 @@ export function MaterialTable() {
           }
           className="max-w-sm"
         />
-        <InitAddFormDialouge />
+        <InitAddFormDialougeAdmin/>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">

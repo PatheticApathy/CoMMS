@@ -19,6 +19,32 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/company/all": {
+            "get": {
+                "description": "Gets companies",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "companies"
+                ],
+                "summary": "fetches all companies",
+                "responses": {
+                    "200": {
+                        "description": "company",
+                        "schema": {
+                            "$ref": "#/definitions/userdb.Company"
+                        }
+                    },
+                    "500": {
+                        "description": "Faliled to get companies",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/company/create": {
             "post": {
                 "description": "Adds company to the database and assigns the user as a company admin",
@@ -58,6 +84,47 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Failed to create company",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/company/search": {
+            "get": {
+                "description": "Gets company using id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "companies"
+                ],
+                "summary": "fetches company based on given paremeters",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "company's identification number",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "company",
+                        "schema": {
+                            "$ref": "#/definitions/userdb.Company"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid id",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "string"
                         }
@@ -207,6 +274,64 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/coworkers": {
+            "get": {
+                "description": "Adds user to the database using valid json structure",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "post user to database",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "user id",
+                        "name": "user",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "company id",
+                        "name": "company",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "jobsite id",
+                        "name": "site",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User login token",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/userdb.GetUsersByJobsiteAndCompanyRow"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/user/create": {
             "post": {
                 "security": [
@@ -342,6 +467,35 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/join": {
+            "get": {
+                "description": "Gets users with company and jobsite names",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "fetches all users with their associated company and jobsite names",
+                "responses": {
+                    "200": {
+                        "description": "users with company and jobsite names",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/userdb.GetUsersWithCompanyAndJobsiteRow"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to get users",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/user/loggout": {
             "post": {
                 "description": "Replaces login cookie with an empty one that deletes itself instantly",
@@ -440,7 +594,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad request",
+                        "description": "Invalid id",
                         "schema": {
                             "type": "string"
                         }
@@ -482,7 +636,7 @@ const docTemplate = `{
                     "200": {
                         "description": "User login token",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/auth.Token"
                         }
                     },
                     "400": {
@@ -708,6 +862,85 @@ const docTemplate = `{
                     "$ref": "#/definitions/sql.NullFloat64"
                 },
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "userdb.GetUsersByJobsiteAndCompanyRow": {
+            "type": "object",
+            "properties": {
+                "company_id": {
+                    "$ref": "#/definitions/sql.NullInt64"
+                },
+                "company_name": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "firstname": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "jobsite_id": {
+                    "$ref": "#/definitions/sql.NullInt64"
+                },
+                "jobsite_name": {
+                    "type": "string"
+                },
+                "lastname": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "profilepicture": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "role": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "userdb.GetUsersWithCompanyAndJobsiteRow": {
+            "type": "object",
+            "properties": {
+                "company_id": {
+                    "$ref": "#/definitions/sql.NullInt64"
+                },
+                "company_name": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "firstname": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "jobsite_id": {
+                    "$ref": "#/definitions/sql.NullInt64"
+                },
+                "jobsite_name": {
+                    "type": "string"
+                },
+                "lastname": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "profilepicture": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "role": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "username": {
                     "type": "string"
                 }
             }

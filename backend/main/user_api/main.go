@@ -2,21 +2,26 @@
 package main
 
 import (
+	"bytes"
 	"database/sql"
+	_ "embed"
 	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"os"
 
+	_ "github.com/PatheticApathy/CoMMS/docs/users"
 	handler "github.com/PatheticApathy/CoMMS/pkg/api/user"
 	"github.com/PatheticApathy/CoMMS/pkg/middleware"
 	"github.com/joho/godotenv"
 	httpSwagger "github.com/swaggo/http-swagger"
 
-	_ "github.com/PatheticApathy/CoMMS/docs/users"
 	_ "modernc.org/sqlite"
 )
+
+//go:embed routeconfig.yaml
+var yaml []byte
 
 //	@title			User API
 //	@version		1.0
@@ -90,6 +95,11 @@ func main() {
 	}
 	defer db.Close()
 
+	auth_config, err := middleware.RouteConfig(bytes.NewReader(yaml))
+	if err != nil {
+		log.Fatal("Could not setup suthorization routing: %s", err)
+	}
+
 	env := handler.NewEnv(db, secret)
 	router := http.NewServeMux()
 	router.Handle("/", env.Handlers())
@@ -103,9 +113,11 @@ func main() {
 
 	serv := http.Server{
 		Addr:    ":" + url.Port(),
-		Handler: middleware.Middlewares(middleware.Json, middleware.Logger)(router),
+		Handler: middleware.AuthController(middleware.Middlewares(middleware.Json, middleware.Logger)(router), &env, auth_config),
 	}
 
 	log.Printf("Server is running on on %s:%s", url.Hostname(), serv.Addr)
+
+	defer serv.Close()
 	log.Fatal(serv.ListenAndServe())
 }

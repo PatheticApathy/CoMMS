@@ -106,16 +106,28 @@ func (q *Queries) GetAllUsers(ctx context.Context) ([]User, error) {
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, username, password, firstname, lastname, company_id, jobsite_id, role, email, phone, profilepicture FROM Users WHERE id = ?
+SELECT id, username, firstname, lastname, company_id, jobsite_id, role, email, phone, profilepicture FROM Users WHERE id = ?
 `
 
-func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
+type GetUserRow struct {
+	ID             int64          `json:"id"`
+	Username       string         `json:"username"`
+	Firstname      sql.NullString `json:"firstname"`
+	Lastname       sql.NullString `json:"lastname"`
+	CompanyID      sql.NullInt64  `json:"company_id"`
+	JobsiteID      sql.NullInt64  `json:"jobsite_id"`
+	Role           sql.NullString `json:"role"`
+	Email          string         `json:"email"`
+	Phone          string         `json:"phone"`
+	Profilepicture sql.NullString `json:"profilepicture"`
+}
+
+func (q *Queries) GetUser(ctx context.Context, id int64) (GetUserRow, error) {
 	row := q.db.QueryRowContext(ctx, getUser, id)
-	var i User
+	var i GetUserRow
 	err := row.Scan(
 		&i.ID,
 		&i.Username,
-		&i.Password,
 		&i.Firstname,
 		&i.Lastname,
 		&i.CompanyID,
@@ -129,16 +141,28 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
 }
 
 const getUserName = `-- name: GetUserName :one
-SELECT id, username, password, firstname, lastname, company_id, jobsite_id, role, email, phone, profilepicture FROM Users WHERE username = ?
+SELECT id, username, firstname, lastname, company_id, jobsite_id, role, email, phone, profilepicture FROM Users WHERE username = ?
 `
 
-func (q *Queries) GetUserName(ctx context.Context, username string) (User, error) {
+type GetUserNameRow struct {
+	ID             int64          `json:"id"`
+	Username       string         `json:"username"`
+	Firstname      sql.NullString `json:"firstname"`
+	Lastname       sql.NullString `json:"lastname"`
+	CompanyID      sql.NullInt64  `json:"company_id"`
+	JobsiteID      sql.NullInt64  `json:"jobsite_id"`
+	Role           sql.NullString `json:"role"`
+	Email          string         `json:"email"`
+	Phone          string         `json:"phone"`
+	Profilepicture sql.NullString `json:"profilepicture"`
+}
+
+func (q *Queries) GetUserName(ctx context.Context, username string) (GetUserNameRow, error) {
 	row := q.db.QueryRowContext(ctx, getUserName, username)
-	var i User
+	var i GetUserNameRow
 	err := row.Scan(
 		&i.ID,
 		&i.Username,
-		&i.Password,
 		&i.Firstname,
 		&i.Lastname,
 		&i.CompanyID,
@@ -149,6 +173,129 @@ func (q *Queries) GetUserName(ctx context.Context, username string) (User, error
 		&i.Profilepicture,
 	)
 	return i, err
+}
+
+const getUsersByJobsiteAndCompany = `-- name: GetUsersByJobsiteAndCompany :many
+SELECT u.username, u.firstname, u.lastname, u.company_id, u.jobsite_id, u.role, u.email, u.phone, u.profilepicture,
+       c.name as company_name, j.name as jobsite_name
+FROM Users u 
+JOIN Companies c ON u.company_id = c.id 
+JOIN JobSites j ON u.jobsite_id = j.id
+WHERE ? = u.company_id 
+    OR  u.jobsite_id = ?
+    AND u.id != ?
+`
+
+type GetUsersByJobsiteAndCompanyParams struct {
+	CompanyID sql.NullInt64 `json:"company_id"`
+	JobsiteID sql.NullInt64 `json:"jobsite_id"`
+	ID        int64         `json:"id"`
+}
+
+type GetUsersByJobsiteAndCompanyRow struct {
+	Username       string         `json:"username"`
+	Firstname      sql.NullString `json:"firstname"`
+	Lastname       sql.NullString `json:"lastname"`
+	CompanyID      sql.NullInt64  `json:"company_id"`
+	JobsiteID      sql.NullInt64  `json:"jobsite_id"`
+	Role           sql.NullString `json:"role"`
+	Email          string         `json:"email"`
+	Phone          string         `json:"phone"`
+	Profilepicture sql.NullString `json:"profilepicture"`
+	CompanyName    string         `json:"company_name"`
+	JobsiteName    string         `json:"jobsite_name"`
+}
+
+func (q *Queries) GetUsersByJobsiteAndCompany(ctx context.Context, arg GetUsersByJobsiteAndCompanyParams) ([]GetUsersByJobsiteAndCompanyRow, error) {
+	rows, err := q.db.QueryContext(ctx, getUsersByJobsiteAndCompany, arg.CompanyID, arg.JobsiteID, arg.ID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetUsersByJobsiteAndCompanyRow
+	for rows.Next() {
+		var i GetUsersByJobsiteAndCompanyRow
+		if err := rows.Scan(
+			&i.Username,
+			&i.Firstname,
+			&i.Lastname,
+			&i.CompanyID,
+			&i.JobsiteID,
+			&i.Role,
+			&i.Email,
+			&i.Phone,
+			&i.Profilepicture,
+			&i.CompanyName,
+			&i.JobsiteName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getUsersWithCompanyAndJobsite = `-- name: GetUsersWithCompanyAndJobsite :many
+SELECT u.id, u.username, u.firstname, u.lastname, u.company_id, u.jobsite_id, u.role, u.email, u.phone, u.profilepicture, 
+c.name as company_name, j.name as jobsite_name
+FROM Users u JOIN Companies c ON u.company_id = c.id JOIN JobSites j ON u.jobsite_id = j.id
+`
+
+type GetUsersWithCompanyAndJobsiteRow struct {
+	ID             int64          `json:"id"`
+	Username       string         `json:"username"`
+	Firstname      sql.NullString `json:"firstname"`
+	Lastname       sql.NullString `json:"lastname"`
+	CompanyID      sql.NullInt64  `json:"company_id"`
+	JobsiteID      sql.NullInt64  `json:"jobsite_id"`
+	Role           sql.NullString `json:"role"`
+	Email          string         `json:"email"`
+	Phone          string         `json:"phone"`
+	Profilepicture sql.NullString `json:"profilepicture"`
+	CompanyName    string         `json:"company_name"`
+	JobsiteName    string         `json:"jobsite_name"`
+}
+
+func (q *Queries) GetUsersWithCompanyAndJobsite(ctx context.Context) ([]GetUsersWithCompanyAndJobsiteRow, error) {
+	rows, err := q.db.QueryContext(ctx, getUsersWithCompanyAndJobsite)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetUsersWithCompanyAndJobsiteRow
+	for rows.Next() {
+		var i GetUsersWithCompanyAndJobsiteRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Username,
+			&i.Firstname,
+			&i.Lastname,
+			&i.CompanyID,
+			&i.JobsiteID,
+			&i.Role,
+			&i.Email,
+			&i.Phone,
+			&i.Profilepicture,
+			&i.CompanyName,
+			&i.JobsiteName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const signUp = `-- name: SignUp :one

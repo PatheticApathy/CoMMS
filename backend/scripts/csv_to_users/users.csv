@@ -1,4 +1,4 @@
-Username,Password,Firstname,Lastname,CompanyID,JobSiteID,Email,Phone,Profilepicture
+Username,Password,Firstname,Lastname,CompanyID,JobSiteID,Role,Email,Phone,Profilepicture
 jdoe,password123,John,Doe,1,1,admin,jdoe@example.com,123-456-7890,test.png
 asmith,password456,Alice,Smith,1,1,user,asmith@example.com,234-567-8901,test.png
 bjones,password789,Bob,Jones,1,2,user,bjones@example.com,345-678-9012,test.png

@@ -44,8 +44,10 @@ done
 OG=$PWD
 
 ##########setup frontend#################
-cd ./frontend/
-npm update --save
+cd ./frontend/web/
+npm install
+cd ../mobile
+npm install
 cd $OG
 
 ###########setup backend#################
@@ -68,6 +70,8 @@ $GOOSE down-to 0
 $GOOSE up
 $SQLC generate
 cd ./../../
+go run scripts/csv_to_companies/main.go scripts/csv_to_companies/companies.csv
+go run scripts/csv_to_jobsites/main.go scripts/csv_to_jobsites/jobsites.csv
 go run scripts/csv_to_users/main.go scripts/csv_to_users/users.csv
 cd $OG
 

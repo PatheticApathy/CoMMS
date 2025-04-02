@@ -3,11 +3,12 @@ import { Material } from "@/material-api-types"
 import MaterialSheet from "./material-popup"
 import { Button } from "../ui/button"
 import { ArrowUpDown } from "lucide-react"
+import { Token } from "@/user-api-types"
 
 export type MaterialRow = {
   id: number
-  job_site: number | undefined
-  last_checked_out: string
+  job_site: number
+  last_checked_out: string | undefined
   location_lat: number | undefined
   location_lng: number | undefined
   name: string | undefined
@@ -18,8 +19,7 @@ export type MaterialRow = {
 
 }
 
-export const MaterialTableColumns: ((route: string) => ColumnDef<MaterialRow>[]) = (route) => ([
-
+export const MaterialTableColumns: ((route: string | undefined, token: Token | undefined) => ColumnDef<MaterialRow>[]) = (route, token) => ([
   {
     accessorKey: "id",
     header: ({ column }) => {
@@ -65,14 +65,14 @@ export const MaterialTableColumns: ((route: string) => ColumnDef<MaterialRow>[])
       const material_row = row.original
       const material: Material = {
         id: material_row.id,
-        job_site: material_row.job_site ? {
-          Int64: material_row.job_site,
+        job_site: material_row.job_site,
+        last_checked_out: material_row.last_checked_out ? {
+          Time: material_row.last_checked_out,
           Valid: true
         } : {
-          Int64: 0,
+          Time: "N/A",
           Valid: false
         },
-        last_checked_out: material_row.last_checked_out,
         location_lat: material_row.location_lat ? {
           Float64: material_row.location_lat,
           Valid: true
@@ -91,8 +91,8 @@ export const MaterialTableColumns: ((route: string) => ColumnDef<MaterialRow>[])
           String: material_row.name,
           Valid: true
         } : {
-          String: "",
-          Valid: false
+          String: "No name provided",
+          Valid: true
         },
 
         quantity: material_row.quantity,
@@ -101,8 +101,8 @@ export const MaterialTableColumns: ((route: string) => ColumnDef<MaterialRow>[])
           String: material_row.name,
           Valid: true
         } : {
-          String: "",
-          Valid: false
+          String: "No name provided",
+          Valid: true
         },
         unit: material_row.unit
       }
@@ -110,7 +110,7 @@ export const MaterialTableColumns: ((route: string) => ColumnDef<MaterialRow>[])
 
       return (
         <div className="justify-end">
-          <MaterialSheet material={material} route={route}>
+          <MaterialSheet material={material} route={route} token={token}>
             <Button variant={'ghost'}>More details</Button>
           </MaterialSheet>
         </div>

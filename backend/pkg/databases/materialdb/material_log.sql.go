@@ -13,7 +13,7 @@ import (
 const addMaterialLog = `-- name: AddMaterialLog :one
 INSERT 
 INTO MaterialLogs(material_id, note, status, quantity_change,timestamp)
-VALUES (?,?,?,?,date()) 
+VALUES (?,?,?,?,datetime('now')) 
 RETURNING id, material_id, note, status, quantity_change, timestamp
 `
 
@@ -163,7 +163,7 @@ const getRecentMaterialLogsForMaterial = `-- name: GetRecentMaterialLogsForMater
 SELECT id, material_id, note, status, quantity_change, timestamp 
 FROM  MaterialLogs
 WHERE material_id = ?
-ORDER BY timestamp
+ORDER BY timestamp DESC
 LIMIT 10
 `
 

@@ -27,6 +27,7 @@ definitions:
     type: object
   materialdb.AddCheckoutLogParams:
     properties:
+      amount: {}
       item_id:
         type: integer
       user_id:
@@ -46,7 +47,7 @@ definitions:
   materialdb.AddMaterialParams:
     properties:
       job_site:
-        $ref: '#/definitions/sql.NullInt64'
+        type: integer
       location_lat:
         $ref: '#/definitions/sql.NullFloat64'
       location_lng:
@@ -78,6 +79,7 @@ definitions:
     type: object
   materialdb.CheckoutLog:
     properties:
+      amount: {}
       checkin_time:
         $ref: '#/definitions/sql.NullTime'
       checkout_time:
@@ -94,8 +96,9 @@ definitions:
       id:
         type: integer
       job_site:
-        $ref: '#/definitions/sql.NullInt64'
-      last_checked_out: {}
+        type: integer
+      last_checked_out:
+        $ref: '#/definitions/sql.NullTime'
       location_lat:
         $ref: '#/definitions/sql.NullFloat64'
       location_lng:
@@ -125,13 +128,6 @@ definitions:
         type: string
       timestamp:
         type: string
-    type: object
-  materialdb.UpdateCheckinlogParams:
-    properties:
-      item_id:
-        type: integer
-      user_id:
-        type: integer
     type: object
   sql.NullFloat64:
     properties:
@@ -223,6 +219,58 @@ definitions:
       location_lng:
         $ref: '#/definitions/sql.NullFloat64'
       name:
+        type: string
+    type: object
+  userdb.GetUsersByJobsiteAndCompanyRow:
+    properties:
+      company_id:
+        $ref: '#/definitions/sql.NullInt64'
+      company_name:
+        type: string
+      email:
+        type: string
+      firstname:
+        $ref: '#/definitions/sql.NullString'
+      jobsite_id:
+        $ref: '#/definitions/sql.NullInt64'
+      jobsite_name:
+        type: string
+      lastname:
+        $ref: '#/definitions/sql.NullString'
+      phone:
+        type: string
+      profilepicture:
+        $ref: '#/definitions/sql.NullString'
+      role:
+        $ref: '#/definitions/sql.NullString'
+      username:
+        type: string
+    type: object
+  userdb.GetUsersWithCompanyAndJobsiteRow:
+    properties:
+      company_id:
+        $ref: '#/definitions/sql.NullInt64'
+      company_name:
+        type: string
+      email:
+        type: string
+      firstname:
+        $ref: '#/definitions/sql.NullString'
+      id:
+        type: integer
+      jobsite_id:
+        $ref: '#/definitions/sql.NullInt64'
+      jobsite_name:
+        type: string
+      lastname:
+        $ref: '#/definitions/sql.NullString'
+      phone:
+        type: string
+      profilepicture:
+        $ref: '#/definitions/sql.NullString'
+      role:
+        $ref: '#/definitions/sql.NullString'
+      username:
         type: string
     type: object
   userdb.JobSite:
@@ -340,12 +388,12 @@ paths:
       - application/json
       description: Adds checkin time to existing checkout log
       parameters:
-      - description: item id and user id
+      - description: id of checkoutlog
         in: body
         name: logid
         required: true
         schema:
-          $ref: '#/definitions/materialdb.UpdateCheckinlogParams'
+          type: integer
       produces:
       - application/json
       responses:
@@ -423,6 +471,23 @@ paths:
       summary: fetches recent checkout logs for a given material id
       tags:
       - checkout logs
+  /company/all:
+    get:
+      description: Gets companies
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: company
+          schema:
+            $ref: '#/definitions/userdb.Company'
+        "500":
+          description: Faliled to get companies
+          schema:
+            type: string
+      summary: fetches all companies
+      tags:
+      - companies
   /company/create:
     post:
       consumes:
@@ -452,6 +517,33 @@ paths:
           schema:
             type: string
       summary: post company to database
+      tags:
+      - companies
+  /company/search:
+    get:
+      description: Gets company using id
+      parameters:
+      - description: company's identification number
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: company
+          schema:
+            $ref: '#/definitions/userdb.Company'
+        "400":
+          description: Invalid id
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: fetches company based on given paremeters
       tags:
       - companies
   /material/add:
@@ -716,14 +808,20 @@ paths:
     get:
       description: Can get material using it's id, or the material it relates to
       parameters:
-      - description: id of material log
+      - collectionFormat: csv
+        description: id of material log
         in: query
+        items:
+          type: integer
         name: id
-        type: integer
-      - description: id of material
+        type: array
+      - collectionFormat: csv
+        description: id of material
         in: query
+        items:
+          type: integer
         name: material
-        type: integer
+        type: array
       produces:
       - application/json
       responses:
@@ -837,6 +935,45 @@ paths:
       summary: fetches all users
       tags:
       - users
+  /user/coworkers:
+    get:
+      description: Adds user to the database using valid json structure
+      parameters:
+      - description: user id
+        in: query
+        name: user
+        required: true
+        type: integer
+      - description: company id
+        in: query
+        name: company
+        required: true
+        type: integer
+      - description: jobsite id
+        in: query
+        name: site
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User login token
+          schema:
+            items:
+              $ref: '#/definitions/userdb.GetUsersByJobsiteAndCompanyRow'
+            type: array
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: post user to database
+      tags:
+      - users
   /user/create:
     post:
       consumes:
@@ -924,6 +1061,25 @@ paths:
       summary: removes user based on given paremeters
       tags:
       - users
+  /user/join:
+    get:
+      description: Gets users with company and jobsite names
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: users with company and jobsite names
+          schema:
+            items:
+              $ref: '#/definitions/userdb.GetUsersWithCompanyAndJobsiteRow'
+            type: array
+        "500":
+          description: Failed to get users
+          schema:
+            type: string
+      summary: fetches all users with their associated company and jobsite names
+      tags:
+      - users
   /user/loggout:
     post:
       description: Replaces login cookie with an empty one that deletes itself instantly
@@ -989,7 +1145,7 @@ paths:
           schema:
             $ref: '#/definitions/userdb.User'
         "400":
-          description: Bad request
+          description: Invalid id
           schema:
             type: string
         "500":
@@ -1017,7 +1173,7 @@ paths:
         "200":
           description: User login token
           schema:
-            type: string
+            $ref: '#/definitions/auth.Token'
         "400":
           description: Invalid input
           schema:

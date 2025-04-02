@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -20,20 +21,20 @@ import (
 //	@Tags			users
 //	@Produce		json
 //	@Param			id	query		int				false	"user's identification number"
-//	@Param username query string  false  "user's username"
+//	@Param			username	query		string				false	"user's username"
 //	@Success		200	{object}	userdb.User		"users"
-//	@Failure		400	{string}	string			"Bad request"
+//	@Failure		400	{string}	string			"Invalid id"
 //	@Failure		500	{string}	string			"Internal Server Error"
 //	@Router			/user/search [get]
 func (e *Env) getUser(w http.ResponseWriter, r *http.Request) {
-	log.Println("Handling search request")
+	log.Println("Handling getUser request")
 	query := r.URL.Query()
 	if query.Has("id") {
 		id, err := strconv.Atoi(query.Get("id"))
 		log.Printf("Received request with id: %d", id)
 		if err != nil {
 			log.Printf("Invalid id, reason: %e", err)
-			http.Error(w, "Bad Request", http.StatusBadRequest)
+			http.Error(w, "Invalid id", http.StatusBadRequest)
 			return
 		}
 
@@ -41,7 +42,7 @@ func (e *Env) getUser(w http.ResponseWriter, r *http.Request) {
 		user, err := e.Queries.GetUser(r.Context(), int64(id))
 		if err != nil {
 			log.Printf("Could not find user, reason: %e", err)
-			http.Error(w, "Bad Request", http.StatusBadRequest)
+			http.Error(w, "Invalid id", http.StatusBadRequest)
 			return
 		}
 
@@ -51,8 +52,6 @@ func (e *Env) getUser(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
-
-		log.Println("User response successfully sent")
 	}
 
 	if query.Has("username") {
@@ -63,7 +62,7 @@ func (e *Env) getUser(w http.ResponseWriter, r *http.Request) {
 		user, err := e.Queries.GetUserName(r.Context(), string(username))
 		if err != nil {
 			log.Printf("Could not find user, reason: %e", err)
-			http.Error(w, "Bad request", http.StatusBadRequest)
+			http.Error(w, "Invalid username", http.StatusBadRequest)
 			return
 		}
 
@@ -74,8 +73,8 @@ func (e *Env) getUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		log.Println("User response successfully sent")
 	}
+	log.Println("User response successfully sent")
 }
 
 // getUsers hanlder returns all users godoc
@@ -106,6 +105,51 @@ func (e *Env) getUsers(w http.ResponseWriter, r *http.Request) {
 	log.Println("Users response successfully sent")
 }
 
+// Get handler that gets coworkers for contacts
+//
+//	@Summary		post user to database
+//	@Description	Adds user to the database using valid json structure
+//	@Tags			users
+//	@Produce		json
+//	@Param			user	query		int	true	"user id"
+//	@Param			company	query		int	true	"company id"
+//	@Param			site	query		int	true	"jobsite id"
+//	@Success		200		{array}	userdb.GetUsersByJobsiteAndCompanyRow		"User login token"
+//	@Failure		500		{string}	string										"Internal server error"
+//	@Failure		400		{string}	string										"Bad request"
+//	@Router			/user/coworkers [get]
+func (e *Env) getCoworkers(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+
+	if query.Has("user") && query.Has("company") && query.Has("site") {
+		log.Println("Fetching all coworkers from the database")
+		company_id, err := strconv.Atoi(query.Get("company"))
+		user_id, err := strconv.Atoi(query.Get("user"))
+		site_id, err := strconv.Atoi(query.Get("site"))
+
+		users, err := e.Queries.GetUsersByJobsiteAndCompany(r.Context(), userdb.GetUsersByJobsiteAndCompanyParams{
+			CompanyID: sql.NullInt64{Int64: int64(company_id), Valid: true},
+			ID:        int64(user_id),
+			JobsiteID: sql.NullInt64{Int64: int64(site_id), Valid: true},
+		})
+		if err != nil {
+			log.Printf("Failed to get users, reason: %v", err)
+			http.Error(w, "Failed to get users", http.StatusInternalServerError)
+			return
+		}
+		log.Printf("Successfully retrieved %d users", len(users))
+		if err := json.NewEncoder(w).Encode(&users); err != nil {
+			log.Printf("Failed to encode users response, reason: %v", err)
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		log.Println("Users response successfully sent")
+		return
+	}
+	log.Printf("Invalid input")
+	http.Error(w, "Bad request", http.StatusBadRequest)
+}
+
 // SignUp handler that adds a user to the the db  godoc
 //
 //	@Summary		post user to database
@@ -114,7 +158,7 @@ func (e *Env) getUsers(w http.ResponseWriter, r *http.Request) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			users	body		userdb.SignUpParams	true	"Format of signup user request"
-//	@Success		200		{string}	string			"User login token"
+//	@Success		200		{object}	auth.Token			"User login token"
 //	@Failure		400		{string}	string					"Invalid input"
 //	@Failure		500		{string}	string					"Failed to signup user"
 //	@Router			/user/signup [post]
@@ -153,14 +197,14 @@ func (e *Env) SignUp(w http.ResponseWriter, r *http.Request) {
 
 	token, err := auth.CreateToken(identity, []byte(e.Secret))
 	if err != nil {
-		log.Printf("Could not create id token: %e", err)
+		log.Printf("Could not create id token: %s", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 
 	// send to client
 	if err := json.NewEncoder(w).Encode(&token); err != nil {
-		log.Printf("Could not encode json token, reason: %e", err)
+		log.Printf("Could not encode json token, reason: %s", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
@@ -239,10 +283,10 @@ func (e *Env) updateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("User %s successfully updated", user.Username)
-	if err := json.NewEncoder(w).Encode(&user); err != nil {
-		log.Printf("Failed to encode user response, reason: %v", err)
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+	log.Println("User successfully updated")
+	if err = json.NewEncoder(w).Encode(user); err != nil {
+		log.Printf("Failed to encode response body, reason: %v", err)
+		http.Error(w, "Invalid input", http.StatusInternalServerError)
 		return
 	}
 }
@@ -283,4 +327,32 @@ func (e *Env) deleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Printf("User with ID: %d successfully deleted", userID)
+}
+
+// getUsersWithCompanyAndJobsite handler returns all users with their associated company and jobsite names godoc
+//
+//	@Summary		fetches all users with their associated company and jobsite names
+//	@Description	Gets users with company and jobsite names
+//	@Tags			users
+//	@Produce		json
+//	@Success		200	{object}	[]userdb.GetUsersWithCompanyAndJobsiteRow	"users with company and jobsite names"
+//	@Failure		500	{string}	string								"Failed to get users"
+//	@Router			/user/join [get]
+func (e *Env) joinTables(w http.ResponseWriter, r *http.Request) {
+	log.Println("Handling getUsersWithCompanyAndJobsite request")
+	log.Println("Fetching all users with company and jobsite names from the database")
+	users, err := e.Queries.GetUsersWithCompanyAndJobsite(r.Context())
+	if err != nil {
+		log.Printf("Failed to get users with company and jobsite names, reason: %v", err)
+		http.Error(w, "Failed to get users", http.StatusInternalServerError)
+		return
+	}
+	log.Printf("Successfully retrieved %d users with company and jobsite names", len(users))
+	if err := json.NewEncoder(w).Encode(&users); err != nil {
+		log.Printf("Failed to encode users response, reason: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	log.Println("Users with company and jobsite names response successfully sent")
 }

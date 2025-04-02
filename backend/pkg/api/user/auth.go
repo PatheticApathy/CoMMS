@@ -87,20 +87,22 @@ func (e *Env) loggout(w http.ResponseWriter, _ *http.Request) {
 //		@Description	 Decrypt user login token
 //		@Tags			users
 //	  @Accept			json
-//		@Param			users	body		string		true	"Format of login user request"
+//		@Param			users	body		auth.Token		true	"Format of login user request"
 //		@Success		200		{object}	auth.Identity					"User login data token"
 //		@Failure		400		{string}	string					"Invalid request"
 //	  @Failure		500		{string}	string					"Server Error"
 //		@Router			/user/decrypt [post]
 func (e *Env) DecryptHanlder(w http.ResponseWriter, r *http.Request) {
-	var token auth.Token
+	var token string
 	if err := json.NewDecoder(r.Body).Decode(&token); err != nil {
-		log.Printf("Could not decode json token, reason: %s", err)
+		log.Printf("Could not decode json token, reason: %e", err)
 		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
 	}
-	log.Printf("Recived token %s", token.Token)
-	payload, err := auth.VerifyToken(token.Token, []byte(e.Secret))
+
+	log.Printf("Recived token %s", token)
+
+	payload, err := auth.VerifyToken(token, []byte(e.Secret))
 	if err != nil {
 		log.Printf("Error for authorization request: %s", err)
 		http.Error(w, "Invalid request", http.StatusBadRequest)
@@ -108,7 +110,7 @@ func (e *Env) DecryptHanlder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.NewEncoder(w).Encode(&payload); err != nil {
-		log.Printf("Could not encode json user, reason: %s", err)
+		log.Printf("Could not encode json user, reason: %e", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}

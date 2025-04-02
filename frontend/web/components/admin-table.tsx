@@ -35,15 +35,32 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import InitAddFormDialougeAdmin from "@/components/add-jobsite-form/jobsite-add-admin";
 
 import useSWR from "swr";
-import { User } from "@/user-api-types";
+import { User, UserJoin, Company, JobSite } from "@/user-api-types";
 import Loading from "@/components/loading";
 
-const fetcher = async (url: string): Promise<User[]> => {
+const fetcher = async (url: string): Promise<UserJoin[]> => {
   const res = await fetch(url);
   if (!res.ok) {
     throw new Error("Failed to fetch data");
+  }
+  return res.json();
+};
+
+const fetchCompanies = async (url: string): Promise<Company[]> => {
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error("Failed to fetch companies");
+  }
+  return res.json();
+};
+
+const fetchJobsites = async (url: string): Promise<JobSite[]> => {
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error("Failed to fetch jobsites");
   }
   return res.json();
 };
@@ -58,7 +75,7 @@ const deleteUser = async (id: number) => {
   return res.json();
 };
 
-const updateUser = async (id: number, field: string, value: string) => {
+const updateUser = async (id: number, field: string, value: { String: string; Valid: boolean} | { Int64: number; Valid: boolean }) => {
   const res = await fetch(`/api/user/update`, {
     method: "PUT",
     headers: {
@@ -97,24 +114,22 @@ export const columns: ColumnDef<User>[] = [
   },
   {
     accessorKey: "username",
-    header: "Username",
-    cell: ({ row }) => (
-      <div className="">{row.getValue("username")}</div>
-    ),
-  },
-  {
-    accessorKey: "email",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Email
+          Username
           <ArrowUpDown />
         </Button>
       );
     },
+    cell: ({ row }) => <div className="">{row.getValue("username")}</div>,
+  },
+  {
+    accessorKey: "email",
+    header: "Email",
     cell: ({ row }) => <div className="">{row.getValue("email")}</div>,
   },
   {
@@ -123,70 +138,18 @@ export const columns: ColumnDef<User>[] = [
     cell: ({ row }) => <div className="">{row.getValue("phone")}</div>,
   },
   {
-    accessorKey: "company",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Company
-          <ArrowUpDown />
-        </Button>
-      );
-    },
-    cell: ({ row }) => {
-      const company = row.getValue("company") as { String: string; Valid: boolean };
-      return (
-        <div className="">
-          {company.String}
-        </div>
-      );
-    },
-    filterFn: (row, columnId, filterValue) => {
-      const company = row.getValue(columnId) as { String: string; Valid: boolean };
-      return company.String.toLowerCase().includes(filterValue.toLowerCase());
-    },
+    accessorKey: "company_name",
+    header: "Company",
+    cell: ({ row }) => <div className=""> {row.getValue("company_name")}</div>,
   },
   {
-    accessorKey: "site",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Site
-          <ArrowUpDown />
-        </Button>
-      );
-    },
-    cell: ({ row }) => {
-      const site = row.getValue("site") as { String: string; Valid: boolean };
-      return (
-        <div className="capitalize">
-          {site.String}
-        </div>
-      );
-    },
-    filterFn: (row, columnId, filterValue) => {
-      const site = row.getValue(columnId) as { String: string; Valid: boolean };
-      return site.String.toLowerCase().includes(filterValue.toLowerCase());
-    },
+    accessorKey: "jobsite_name",
+    header: "Jobsite",
+    cell: ({ row }) => <div className="">{row.getValue("jobsite_name")}</div>,
   },
   {
     accessorKey: "role",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Role
-          <ArrowUpDown />
-        </Button>
-      );
-    },
+    header: "Role",
     cell: ({ row }) => {
       const role = row.getValue("role") as { String: string; Valid: boolean };
       return (
@@ -206,8 +169,31 @@ export const columns: ColumnDef<User>[] = [
     cell: ({ row }) => {
       const user = row.original;
       const [newCompany, setNewCompany] = React.useState("");
-      const [newSite, setNewSite] = React.useState("");
+      const [newJobsite, setNewJobsite] = React.useState("");
       const [newRole, setNewRole] = React.useState("");
+
+      const { data: companies } = useSWR<Company[]>("/api/company/all", fetchCompanies);
+      const { data: jobsites } = useSWR<JobSite[]>("/api/sites/all", fetchJobsites);
+
+      const handleUpdateCompany = (e: React.FormEvent) => {
+        e.preventDefault();
+        const company = companies?.find(c => c.name.toLowerCase() === newCompany.toLowerCase());
+        if (company) {
+          updateUser(user.id, "company_id", { Int64: company.id, Valid: true });
+        } else {
+          console.error("Company not found");
+        }
+      };
+
+      const handleUpdateJobsite = (e: React.FormEvent) => {
+        e.preventDefault();
+        const jobsite = jobsites?.find(j => j.name.toLowerCase() === newJobsite.toLowerCase());
+        if (jobsite) {
+          updateUser(user.id, "jobsite_id", { Int64: jobsite.id, Valid: true });
+        } else {
+          console.error("Jobsite not found");
+        }
+      };
 
       return (
         <DropdownMenu>
@@ -220,15 +206,15 @@ export const columns: ColumnDef<User>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(user.username)}
+              onClick={() => navigator.clipboard.writeText(user.id.toString())}
             >
-              Copy username
+              Copy id #
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem 
               onClick={() => deleteUser(user.id)}
             >
-              Delete
+              Delete user
             </DropdownMenuItem>
             <DropdownMenuItem onClick={(e) => e.preventDefault()}>
               <Input
@@ -237,19 +223,19 @@ export const columns: ColumnDef<User>[] = [
                 onChange={(e) => setNewCompany(e.target.value)}
                 className="max-w-sm"
               />
-              <Button onClick={(e) => { e.preventDefault(); updateUser(user.id, "company", newCompany); }}>
+              <Button onClick={handleUpdateCompany}>
                 Change company
               </Button>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={(e) => e.preventDefault()}>
               <Input
                 placeholder="New Site"
-                value={newSite}
-                onChange={(e) => setNewSite(e.target.value)}
+                value={newJobsite}
+                onChange={(e) => setNewJobsite(e.target.value)}
                 className="max-w-sm"
               />
-              <Button onClick={(e) => { e.preventDefault(); updateUser(user.id, "site", newSite); }}>
-                Change site
+              <Button onClick={handleUpdateJobsite}>
+                Change jobsite
               </Button>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={(e) => e.preventDefault()}>
@@ -259,7 +245,7 @@ export const columns: ColumnDef<User>[] = [
                 onChange={(e) => setNewRole(e.target.value)}
                 className="max-w-sm"
               />
-              <Button onClick={(e) => { e.preventDefault(); updateUser(user.id, "role", newRole); }}>
+              <Button onClick={(e) => { e.preventDefault(); updateUser(user.id, "role", { String: newRole, Valid: true}); }}>
                 Change role
               </Button>
             </DropdownMenuItem>
@@ -271,7 +257,7 @@ export const columns: ColumnDef<User>[] = [
 ];
 
 export function UserTable() {
-  const { data, error } = useSWR<User[]>("/api/user/all", fetcher);
+  const { data, error } = useSWR<UserJoin[]>("/api/user/join", fetcher);
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -329,17 +315,17 @@ export function UserTable() {
         />
         <Input
           placeholder="Filter company..."
-          value={(table.getColumn("company")?.getFilterValue() as string) ?? ""}
+          value={(table.getColumn("company_name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("company")?.setFilterValue(event.target.value)
+            table.getColumn("company_name")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
         <Input
-          placeholder="Filter site..."
-          value={(table.getColumn("site")?.getFilterValue() as string) ?? ""}
+          placeholder="Filter jobsite..."
+          value={(table.getColumn("jobsite_name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("site")?.setFilterValue(event.target.value)
+            table.getColumn("jobsite_name")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
@@ -351,6 +337,7 @@ export function UserTable() {
           }
           className="max-w-sm"
         />
+        <InitAddFormDialougeAdmin/>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
