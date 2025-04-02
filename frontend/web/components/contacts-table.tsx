@@ -30,7 +30,7 @@ const fetcher = async (url: string): Promise<UserJoin[]> => {
   return res.json();
 };
 
-const fetcher2 = async  (url: string) => {
+const fetcher2 = async (url: string) => {
   const res = await fetch(url)
   if (!res.ok) {
     throw new Error("Failed to fetch data");
@@ -38,7 +38,7 @@ const fetcher2 = async  (url: string) => {
   return res.json();
 };
 
-const fetcher3 = async  (url: string): Promise<User> => {
+const fetcher3 = async (url: string): Promise<User> => {
   const res = await fetch(url)
   if (!res.ok) {
     throw new Error("Failed to fetch data");
@@ -48,9 +48,9 @@ const fetcher3 = async  (url: string): Promise<User> => {
 
 async function getProfileArgs(url: string, arg: string) {
   return fetch(url, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: arg
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: arg
   }).then(res => res.json() as Promise<Token>)
 }
 
@@ -123,17 +123,17 @@ export default function ContactsTable({ searchQuery, tableData, tableAction }: {
               </TableRow>
             </DialogTrigger>
             <DialogContent className="w-[400px]">
-                <DialogHeader>
-                    <DialogTitle>Profile</DialogTitle>
-                    <DialogDescription>View {user.username}'s Profile</DialogDescription>
-                </DialogHeader>
-                <div className="rounded-full overflow-hidden h-28 w-28">
-                    <img className="" src="https://static.vecteezy.com/system/resources/thumbnails/009/734/564/small/default-avatar-profile-icon-of-social-media-user-vector.jpg"></img>
-                </div>
-                <div>Username: {user.username}</div>
-                <div>Name: {user.firstname.Valid? user.firstname.String : "N/A"} {user.lastname.Valid? user.lastname.String : "N/A"}</div>
-                <div>Email: {user.email}</div>
-                <div>Phone: {user.phone}</div>
+              <DialogHeader>
+                <DialogTitle>Profile</DialogTitle>
+                <DialogDescription>View {user.username}'s Profile</DialogDescription>
+              </DialogHeader>
+              <div className="rounded-full overflow-hidden h-28 w-28">
+                <img className="" src="https://static.vecteezy.com/system/resources/thumbnails/009/734/564/small/default-avatar-profile-icon-of-social-media-user-vector.jpg"></img>
+              </div>
+              <div>Username: {user.username}</div>
+              <div>Name: {user.firstname.Valid ? user.firstname.String : "N/A"} {user.lastname.Valid ? user.lastname.String : "N/A"}</div>
+              <div>Email: {user.email}</div>
+              <div>Phone: {user.phone}</div>
             </DialogContent>
           </Dialog>
         ))}

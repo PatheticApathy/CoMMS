@@ -1,23 +1,21 @@
 "use client";
 
 import L, { LatLngBoundsExpression } from "leaflet"
-import { MapContainer, TileLayer, Marker, Popup, Polygon, Rectangle  } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, Polygon, Rectangle } from "react-leaflet";
 import useSWR from 'swr'
 import { JobSite, User } from '@/user-api-types';
-import Loading from '@/components/loading';
 import "leaflet/dist/leaflet.css";
-import Link from "next/link";
-import { getToken } from '@/components/localstorage'
 import { Token } from '@/user-api-types';
+import { getToken } from "@/hooks/useToken";
 
 const defaultIcon = new L.Icon({
-    iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
-    iconSize: [25, 41], // Size of the icon
-    iconAnchor: [12, 41], // Anchor point of the icon (where the tip is placed)
-    popupAnchor: [1, -34], // Position of the popup relative to the icon
+  iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
+  iconSize: [25, 41], // Size of the icon
+  iconAnchor: [12, 41], // Anchor point of the icon (where the tip is placed)
+  popupAnchor: [1, -34], // Position of the popup relative to the icon
 });
 
-const jobSiteFetcher = async (url:string): Promise<JobSite[]> => {
+const jobSiteFetcher = async (url: string): Promise<JobSite[]> => {
   const res = await fetch(url);
   if (!res.ok) {
     throw new Error("Failed to fetch data");
@@ -25,7 +23,7 @@ const jobSiteFetcher = async (url:string): Promise<JobSite[]> => {
   return res.json();
 }
 
-const userFetcher = async (url:string): Promise<User[]> => {
+const userFetcher = async (url: string): Promise<User[]> => {
   const res = await fetch(url);
   if (!res.ok) {
     throw new Error("Failed to fetch data");
@@ -35,9 +33,9 @@ const userFetcher = async (url:string): Promise<User[]> => {
 
 async function getProfileArgs(url: string, arg: string) {
   return fetch(url, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: arg
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: arg
   }).then(res => res.json() as Promise<Token>)
 }
 
@@ -45,7 +43,7 @@ const token = getToken()
 console.log("Token: ")
 console.log(token)
 
-const bounds : LatLngBoundsExpression = [
+const bounds: LatLngBoundsExpression = [
   [32.5260072, -92.6440465],
   [32.5266895, -92.6427248]
 ]
@@ -63,17 +61,17 @@ export default function JobsiteMapClient() {
 
   const userID = tokenData?.id
 
-  if (!sites || !users || !userID){
+  if (!sites || !users || !userID) {
     return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>)
   }
 
-  if (sites && users && userID){
-    const user = users[userID-1]
+  if (sites && users && userID) {
+    const user = users[userID - 1]
     if (!user.jobsite_id) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
     const userJobsite = user.jobsite_id.Int64
-    const site = sites[userJobsite-1]
+    const site = sites[userJobsite - 1]
 
-    if (!site) {return (<p className='flex items-center justify-center w-screen h-screen'>No Jobsite Found</p>)}
+    if (!site) { return (<p className='flex items-center justify-center w-screen h-screen'>No Jobsite Found</p>) }
 
     const siteName = site.name
 
@@ -93,7 +91,7 @@ export default function JobsiteMapClient() {
             {siteName}
           </Popup>
         </Marker>
-        <Rectangle pathOptions={{color: "purple"}} bounds={bounds}/>      
+        <Rectangle pathOptions={{ color: "purple" }} bounds={bounds} />
       </MapContainer>
     );
   }
