@@ -7,6 +7,8 @@ export interface CheckoutLog {
   item_id: number
   user_id: number
   amount: number
+  checkout_picture: string
+  checkin_picture: string
 }
 
 export interface AddCheckoutLog {
@@ -25,6 +27,7 @@ export interface AddMaterial {
   status: string
   type: Type
   unit: string
+  picture: { Valid: bool, String: string }
 }
 export interface Material {
   id: number

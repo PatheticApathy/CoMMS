@@ -7,7 +7,6 @@ package materialdb
 
 import (
 	"context"
-	"database/sql"
 )
 
 const addCheckoutLog = `-- name: AddCheckoutLog :one
@@ -17,10 +16,10 @@ RETURNING id, item_id, user_id, checkin_time, checkout_time, amount, checkout_pi
 `
 
 type AddCheckoutLogParams struct {
-	ItemID          int64          `json:"item_id"`
-	UserID          int64          `json:"user_id"`
-	Amount          interface{}    `json:"amount"`
-	CheckoutPicture sql.NullString `json:"checkout_picture"`
+	ItemID          int64       `json:"item_id"`
+	UserID          int64       `json:"user_id"`
+	Amount          interface{} `json:"amount"`
+	CheckoutPicture interface{} `json:"checkout_picture"`
 }
 
 func (q *Queries) AddCheckoutLog(ctx context.Context, arg AddCheckoutLogParams) (CheckoutLog, error) {
@@ -129,9 +128,9 @@ RETURNING id, item_id, user_id, checkin_time, checkout_time, amount, checkout_pi
 `
 
 type UpdateCheckinlogParams struct {
-	CheckinPicture sql.NullString `json:"checkin_picture"`
-	ItemID         int64          `json:"item_id"`
-	UserID         int64          `json:"user_id"`
+	CheckinPicture interface{} `json:"checkin_picture"`
+	ItemID         int64       `json:"item_id"`
+	UserID         int64       `json:"user_id"`
 }
 
 func (q *Queries) UpdateCheckinlog(ctx context.Context, arg UpdateCheckinlogParams) (CheckoutLog, error) {

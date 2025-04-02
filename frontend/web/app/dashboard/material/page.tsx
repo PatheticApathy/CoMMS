@@ -12,7 +12,7 @@ const fetcher: Fetcher<Material[], string> = async (...args) => fetch(...args, {
 const fetchUser: Fetcher<User, string> = async (...args) => fetch(...args, { headers: { 'Authorization': getToken() } }).then(res => res.json())
 
 
-//TODO: Prevent checkout of materials if no more materials
+//TODO: Prevent checkout of materials if no more materials(should be implemnted need to test)
 //BUG: Chceking out materials results in a 404, but materials are still taken out of the supply(two bugs)
 export default function AllMaterialPage() {
 

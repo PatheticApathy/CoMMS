@@ -10,14 +10,14 @@ import (
 )
 
 type CheckoutLog struct {
-	ID              int64          `json:"id"`
-	ItemID          int64          `json:"item_id"`
-	UserID          int64          `json:"user_id"`
-	CheckinTime     sql.NullTime   `json:"checkin_time"`
-	CheckoutTime    time.Time      `json:"checkout_time"`
-	Amount          interface{}    `json:"amount"`
-	CheckoutPicture sql.NullString `json:"checkout_picture"`
-	CheckinPicture  sql.NullString `json:"checkin_picture"`
+	ID              int64        `json:"id"`
+	ItemID          int64        `json:"item_id"`
+	UserID          int64        `json:"user_id"`
+	CheckinTime     sql.NullTime `json:"checkin_time"`
+	CheckoutTime    time.Time    `json:"checkout_time"`
+	Amount          interface{}  `json:"amount"`
+	CheckoutPicture interface{}  `json:"checkout_picture"`
+	CheckinPicture  interface{}  `json:"checkin_picture"`
 }
 
 type Material struct {

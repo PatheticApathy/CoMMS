@@ -11,8 +11,8 @@ import (
 )
 
 const addMaterial = `-- name: AddMaterial :one
-INSERT INTO Materials(name,type,quantity,unit,status,location_lat,location_lng,job_site)
-VALUES (?,?,?,?,?,?,?,?)
+INSERT INTO Materials(name,type,quantity,unit,status,location_lat,location_lng,job_site, picture)
+VALUES (?,?,?,?,?,?,?,?,?)
 RETURNING id, name, type, quantity, unit, status, location_lat, location_lng, last_checked_out, job_site, picture
 `
 
@@ -25,6 +25,7 @@ type AddMaterialParams struct {
 	LocationLat sql.NullFloat64 `json:"location_lat"`
 	LocationLng sql.NullFloat64 `json:"location_lng"`
 	JobSite     int64           `json:"job_site"`
+	Picture     sql.NullString  `json:"picture"`
 }
 
 func (q *Queries) AddMaterial(ctx context.Context, arg AddMaterialParams) (Material, error) {
@@ -37,6 +38,7 @@ func (q *Queries) AddMaterial(ctx context.Context, arg AddMaterialParams) (Mater
 		arg.LocationLat,
 		arg.LocationLng,
 		arg.JobSite,
+		arg.Picture,
 	)
 	var i Material
 	err := row.Scan(
@@ -143,7 +145,7 @@ func (q *Queries) DeleteMaterial(ctx context.Context, id int64) (Material, error
 }
 
 const getAllMaterials = `-- name: GetAllMaterials :many
-SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site, last_checked_out FROM Materials
+SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site, last_checked_out, picture FROM Materials
 `
 
 type GetAllMaterialsRow struct {
@@ -157,6 +159,7 @@ type GetAllMaterialsRow struct {
 	LocationLng    sql.NullFloat64 `json:"location_lng"`
 	JobSite        int64           `json:"job_site"`
 	LastCheckedOut sql.NullTime    `json:"last_checked_out"`
+	Picture        sql.NullString  `json:"picture"`
 }
 
 func (q *Queries) GetAllMaterials(ctx context.Context) ([]GetAllMaterialsRow, error) {
@@ -179,6 +182,7 @@ func (q *Queries) GetAllMaterials(ctx context.Context) ([]GetAllMaterialsRow, er
 			&i.LocationLng,
 			&i.JobSite,
 			&i.LastCheckedOut,
+			&i.Picture,
 		); err != nil {
 			return nil, err
 		}
@@ -194,7 +198,7 @@ func (q *Queries) GetAllMaterials(ctx context.Context) ([]GetAllMaterialsRow, er
 }
 
 const getMaterialsByID = `-- name: GetMaterialsByID :many
-SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site, last_checked_out FROM Materials WHERE id=?
+SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site, last_checked_out, picture FROM Materials WHERE id=?
 `
 
 type GetMaterialsByIDRow struct {
@@ -208,6 +212,7 @@ type GetMaterialsByIDRow struct {
 	LocationLng    sql.NullFloat64 `json:"location_lng"`
 	JobSite        int64           `json:"job_site"`
 	LastCheckedOut sql.NullTime    `json:"last_checked_out"`
+	Picture        sql.NullString  `json:"picture"`
 }
 
 func (q *Queries) GetMaterialsByID(ctx context.Context, id int64) ([]GetMaterialsByIDRow, error) {
@@ -230,6 +235,7 @@ func (q *Queries) GetMaterialsByID(ctx context.Context, id int64) ([]GetMaterial
 			&i.LocationLng,
 			&i.JobSite,
 			&i.LastCheckedOut,
+			&i.Picture,
 		); err != nil {
 			return nil, err
 		}
@@ -245,7 +251,7 @@ func (q *Queries) GetMaterialsByID(ctx context.Context, id int64) ([]GetMaterial
 }
 
 const getMaterialsByJobsiteID = `-- name: GetMaterialsByJobsiteID :many
-SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site, last_checked_out
+SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site, last_checked_out, picture
 FROM Materials
 WHERE job_site=?
 `
@@ -261,6 +267,7 @@ type GetMaterialsByJobsiteIDRow struct {
 	LocationLng    sql.NullFloat64 `json:"location_lng"`
 	JobSite        int64           `json:"job_site"`
 	LastCheckedOut sql.NullTime    `json:"last_checked_out"`
+	Picture        sql.NullString  `json:"picture"`
 }
 
 func (q *Queries) GetMaterialsByJobsiteID(ctx context.Context, jobSite int64) ([]GetMaterialsByJobsiteIDRow, error) {
@@ -283,6 +290,7 @@ func (q *Queries) GetMaterialsByJobsiteID(ctx context.Context, jobSite int64) ([
 			&i.LocationLng,
 			&i.JobSite,
 			&i.LastCheckedOut,
+			&i.Picture,
 		); err != nil {
 			return nil, err
 		}
@@ -298,7 +306,7 @@ func (q *Queries) GetMaterialsByJobsiteID(ctx context.Context, jobSite int64) ([
 }
 
 const getMaterialsByQuantity = `-- name: GetMaterialsByQuantity :many
-SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site, last_checked_out
+SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site, last_checked_out, picture
 FROM Materials 
 WHERE quantity=? AND unit=?
 `
@@ -319,6 +327,7 @@ type GetMaterialsByQuantityRow struct {
 	LocationLng    sql.NullFloat64 `json:"location_lng"`
 	JobSite        int64           `json:"job_site"`
 	LastCheckedOut sql.NullTime    `json:"last_checked_out"`
+	Picture        sql.NullString  `json:"picture"`
 }
 
 func (q *Queries) GetMaterialsByQuantity(ctx context.Context, arg GetMaterialsByQuantityParams) ([]GetMaterialsByQuantityRow, error) {
@@ -341,6 +350,7 @@ func (q *Queries) GetMaterialsByQuantity(ctx context.Context, arg GetMaterialsBy
 			&i.LocationLng,
 			&i.JobSite,
 			&i.LastCheckedOut,
+			&i.Picture,
 		); err != nil {
 			return nil, err
 		}
@@ -356,7 +366,7 @@ func (q *Queries) GetMaterialsByQuantity(ctx context.Context, arg GetMaterialsBy
 }
 
 const getMaterialsBySite = `-- name: GetMaterialsBySite :many
-SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site, last_checked_out FROM Materials WHERE job_site=?
+SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site, last_checked_out, picture FROM Materials WHERE job_site=?
 `
 
 type GetMaterialsBySiteRow struct {
@@ -370,6 +380,7 @@ type GetMaterialsBySiteRow struct {
 	LocationLng    sql.NullFloat64 `json:"location_lng"`
 	JobSite        int64           `json:"job_site"`
 	LastCheckedOut sql.NullTime    `json:"last_checked_out"`
+	Picture        sql.NullString  `json:"picture"`
 }
 
 func (q *Queries) GetMaterialsBySite(ctx context.Context, jobSite int64) ([]GetMaterialsBySiteRow, error) {
@@ -392,6 +403,7 @@ func (q *Queries) GetMaterialsBySite(ctx context.Context, jobSite int64) ([]GetM
 			&i.LocationLng,
 			&i.JobSite,
 			&i.LastCheckedOut,
+			&i.Picture,
 		); err != nil {
 			return nil, err
 		}
@@ -407,7 +419,7 @@ func (q *Queries) GetMaterialsBySite(ctx context.Context, jobSite int64) ([]GetM
 }
 
 const getMaterialsByType = `-- name: GetMaterialsByType :many
-SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site , last_checked_out FROM Materials WHERE type=?
+SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site , last_checked_out, picture FROM Materials WHERE type=?
 `
 
 type GetMaterialsByTypeRow struct {
@@ -421,6 +433,7 @@ type GetMaterialsByTypeRow struct {
 	LocationLng    sql.NullFloat64 `json:"location_lng"`
 	JobSite        int64           `json:"job_site"`
 	LastCheckedOut sql.NullTime    `json:"last_checked_out"`
+	Picture        sql.NullString  `json:"picture"`
 }
 
 func (q *Queries) GetMaterialsByType(ctx context.Context, type_ sql.NullString) ([]GetMaterialsByTypeRow, error) {
@@ -443,6 +456,7 @@ func (q *Queries) GetMaterialsByType(ctx context.Context, type_ sql.NullString) 
 			&i.LocationLng,
 			&i.JobSite,
 			&i.LastCheckedOut,
+			&i.Picture,
 		); err != nil {
 			return nil, err
 		}
