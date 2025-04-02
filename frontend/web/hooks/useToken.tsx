@@ -8,12 +8,13 @@ const ExpirationDate =  /* (days * 60sec * 60min * 24hrs) */2 * 60 * 60 * 24
 export function useIdentity() {
   const [identity, setIdentity] = useState<Token | null>(null);
   useEffect(() => {
-    const fetchIdentity = async () => {
+    (async () => {
+    const fetchIdentity = () => async () => {
       const user_identity = await getIdentity();
       setIdentity(user_identity)
     }
     fetchIdentity()
-  }, [])
+  })()}, [])
   return identity
 }
 
@@ -55,7 +56,6 @@ async function getIdentity() {
 
 export function getToken() {
   const token = document.cookie.split("; ").find((row) => row.startsWith('token='))?.split("=")[1]
-  console.log(token)
   if (!token) { redirect('/login') }
   return decodeURI(token)
 }
