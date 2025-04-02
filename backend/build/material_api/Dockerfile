@@ -12,7 +12,7 @@ COPY ./go.mod /api/go.mod
 WORKDIR /api
 
 ## Get foreign packages and build tools
-RUN go mod tidy && \
+RUN go mod download && \
   go install github.com/swaggo/swag/cmd/swag@latest && \
   go install github.com/sqlc-dev/sqlc/cmd/sqlc@v1.27.0 && \
   go install github.com/pressly/goose/v3/cmd/goose@latest
