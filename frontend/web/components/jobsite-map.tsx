@@ -4,6 +4,7 @@ import L, { LatLngBoundsExpression } from "leaflet"
 import { MapContainer, TileLayer, Marker, Popup, Polygon, Rectangle } from "react-leaflet";
 import useSWR from 'swr'
 import { JobSite, User } from '@/user-api-types';
+import Loading from '@/components/loading';
 import "leaflet/dist/leaflet.css";
 import { Token } from '@/user-api-types';
 import { getToken } from "@/hooks/useToken";
