@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/dialog"
 import useSWR from "swr";
 import { Token, User, UserJoin } from "@/user-api-types";
-import { getToken } from "./localstorage";
+import { getToken } from "@/hooks/useToken";
 import { useEffect } from "react";
 
 const fetcher = async (url: string): Promise<UserJoin[]> => {
@@ -86,11 +86,6 @@ export default function ContactsTable({ searchQuery, tableData, tableAction }: {
   console.log(tokenData ? `/api/user/coworkers?user=${tokenData.id}&company=${currentuser?.company_id.Int64}&site=${currentuser?.jobsite_id.Int64}` : null)
   if (error || error2 || error3) return <p>Invalid User.</p>;
   if (!data) return <p>Loading...</p>;  
-
- 
-
- 
-
 
   return (
     <Table>
