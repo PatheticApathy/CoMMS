@@ -13,7 +13,7 @@ import (
 const addMaterial = `-- name: AddMaterial :one
 INSERT INTO Materials(name,type,quantity,unit,status,location_lat,location_lng,job_site)
 VALUES (?,?,?,?,?,?,?,?)
-RETURNING id, name, type, quantity, unit, status, location_lat, location_lng, last_checked_out, job_site
+RETURNING id, name, type, quantity, unit, status, location_lat, location_lng, last_checked_out, job_site, picture
 `
 
 type AddMaterialParams struct {
@@ -50,6 +50,7 @@ func (q *Queries) AddMaterial(ctx context.Context, arg AddMaterialParams) (Mater
 		&i.LocationLng,
 		&i.LastCheckedOut,
 		&i.JobSite,
+		&i.Picture,
 	)
 	return i, err
 }
@@ -58,7 +59,7 @@ const changeQuantity = `-- name: ChangeQuantity :one
 UPDATE Materials
   SET quantity = ?
   WHERE  id = ?
-RETURNING id, name, type, quantity, unit, status, location_lat, location_lng, last_checked_out, job_site
+RETURNING id, name, type, quantity, unit, status, location_lat, location_lng, last_checked_out, job_site, picture
 `
 
 type ChangeQuantityParams struct {
@@ -80,6 +81,7 @@ func (q *Queries) ChangeQuantity(ctx context.Context, arg ChangeQuantityParams) 
 		&i.LocationLng,
 		&i.LastCheckedOut,
 		&i.JobSite,
+		&i.Picture,
 	)
 	return i, err
 }
@@ -88,7 +90,7 @@ const changeStatus = `-- name: ChangeStatus :one
 UPDATE Materials
   SET status = ?
   WHERE  id = ?
-RETURNING id, name, type, quantity, unit, status, location_lat, location_lng, last_checked_out, job_site
+RETURNING id, name, type, quantity, unit, status, location_lat, location_lng, last_checked_out, job_site, picture
 `
 
 type ChangeStatusParams struct {
@@ -110,6 +112,7 @@ func (q *Queries) ChangeStatus(ctx context.Context, arg ChangeStatusParams) (Mat
 		&i.LocationLng,
 		&i.LastCheckedOut,
 		&i.JobSite,
+		&i.Picture,
 	)
 	return i, err
 }
@@ -117,7 +120,7 @@ func (q *Queries) ChangeStatus(ctx context.Context, arg ChangeStatusParams) (Mat
 const deleteMaterial = `-- name: DeleteMaterial :one
 DELETE FROM Materials
 WHERE id = ?
-RETURNING id, name, type, quantity, unit, status, location_lat, location_lng, last_checked_out, job_site
+RETURNING id, name, type, quantity, unit, status, location_lat, location_lng, last_checked_out, job_site, picture
 `
 
 func (q *Queries) DeleteMaterial(ctx context.Context, id int64) (Material, error) {
@@ -134,6 +137,7 @@ func (q *Queries) DeleteMaterial(ctx context.Context, id int64) (Material, error
 		&i.LocationLng,
 		&i.LastCheckedOut,
 		&i.JobSite,
+		&i.Picture,
 	)
 	return i, err
 }
