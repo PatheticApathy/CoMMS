@@ -109,10 +109,9 @@ const getSubordinatesByJobsiteAndCompany = `-- name: GetSubordinatesByJobsiteAnd
 SELECT u.username, u.firstname, u.lastname, u.company_id, u.jobsite_id, u.role, u.email, u.phone, u.profilepicture,
        c.name as company_name, j.name as jobsite_name
 FROM Users u 
-JOIN Companies c ON u.company_id = c.id 
-JOIN JobSites j ON u.jobsite_id = j.id
-WHERE (? = u.company_id OR u.jobsite_id = ?)
-    OR (u.company_id IS NULL OR u.jobsite_id IS NULL)
+LEFT JOIN Companies c ON u.company_id = c.id 
+LEFT JOIN JobSites j ON u.jobsite_id = j.id
+WHERE ((? = u.company_id OR u.jobsite_id = ?) OR (u.company_id IS NULL OR u.jobsite_id IS NULL))
     AND u.id != ?
 `
 
@@ -132,8 +131,8 @@ type GetSubordinatesByJobsiteAndCompanyRow struct {
 	Email          string         `json:"email"`
 	Phone          string         `json:"phone"`
 	Profilepicture sql.NullString `json:"profilepicture"`
-	CompanyName    string         `json:"company_name"`
-	JobsiteName    string         `json:"jobsite_name"`
+	CompanyName    sql.NullString `json:"company_name"`
+	JobsiteName    sql.NullString `json:"jobsite_name"`
 }
 
 func (q *Queries) GetSubordinatesByJobsiteAndCompany(ctx context.Context, arg GetSubordinatesByJobsiteAndCompanyParams) ([]GetSubordinatesByJobsiteAndCompanyRow, error) {

@@ -37,6 +37,5 @@ SELECT u.username, u.firstname, u.lastname, u.company_id, u.jobsite_id, u.role, 
 FROM Users u 
 LEFT JOIN Companies c ON u.company_id = c.id 
 LEFT JOIN JobSites j ON u.jobsite_id = j.id
-WHERE (? = u.company_id OR u.jobsite_id = ?)
-    OR (u.company_id IS NULL OR u.jobsite_id IS NULL)
+WHERE ((? = u.company_id OR u.jobsite_id = ?) OR (u.company_id IS NULL OR u.jobsite_id IS NULL))
     AND u.id != ?;

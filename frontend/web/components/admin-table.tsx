@@ -149,12 +149,26 @@ export const columns: ColumnDef<User>[] = [
   {
     accessorKey: "company_name",
     header: "Company",
-    cell: ({ row }) => <div className=""> {row.getValue("company_name")}</div>,
+    cell: ({ row }) => {
+      const company_name = row.getValue("company_name") as { String: string; Valid: boolean };
+    return (
+      <div className="">
+        {company_name.String}
+      </div>
+    );
+  }
   },
   {
     accessorKey: "jobsite_name",
     header: "Jobsite",
-    cell: ({ row }) => <div className="">{row.getValue("jobsite_name")}</div>,
+    cell: ({ row }) => {
+        const jobsite_name = row.getValue("jobsite_name") as { String: string; Valid: boolean };
+      return (
+        <div className="">
+          {jobsite_name.String}
+        </div>
+      );
+    }
   },
   {
     accessorKey: "role",

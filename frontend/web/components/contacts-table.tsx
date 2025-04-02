@@ -76,8 +76,8 @@ export default function ContactsTable({ searchQuery }: { searchQuery: string }) 
       user.phone.toLowerCase().includes(searchLower) ||
       (user.firstname.Valid && user.firstname.String.toLowerCase().includes(searchLower)) ||
       (user.lastname.Valid && user.lastname.String.toLowerCase().includes(searchLower)) ||
-      (user.company_name.toLowerCase().includes(searchLower)) ||
-      (user.jobsite_name.toLowerCase().includes(searchLower)) ||
+      (user.company_name.Valid && user.company_name.String.toLowerCase().includes(searchLower)) ||
+      (user.jobsite_name.Valid && user.jobsite_name.String.toLowerCase().includes(searchLower)) ||
       (user.role.Valid && user.role.String.toLowerCase().includes(searchLower))
     );
   });
@@ -105,8 +105,8 @@ export default function ContactsTable({ searchQuery }: { searchQuery: string }) 
                 <TableCell>{user.username}</TableCell>
                 <TableCell>{user.firstname?.Valid ? user.firstname.String : "N/A"}</TableCell>
                 <TableCell>{user.lastname?.Valid ? user.lastname.String : "N/A"}</TableCell>
-                <TableCell>{user.company_name}</TableCell>
-                <TableCell>{user.jobsite_name}</TableCell>
+                <TableCell>{user.company_name.String}</TableCell>
+                <TableCell>{user.jobsite_name.String}</TableCell>
                 <TableCell>{user.role?.Valid ? user.role.String : "N/A"}</TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>{user.phone}</TableCell>
