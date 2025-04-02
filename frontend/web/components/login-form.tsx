@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { LogInUser } from "@/user-api-types"
-import { setToken } from "@/hooks/useToken"
+import { getToken, setToken } from "@/hooks/useToken"
 
 const formSchema = z.object({
   username: z.string(),
@@ -27,6 +27,7 @@ const formSchema = z.object({
 
 async function logIn(url: string, { arg }: { arg: LogInUser }) {
   return fetch(url, {
+    headers: { 'Authorization': getToken() },
     method: 'POST',
     body: JSON.stringify(arg)
   }).then((res) => {
