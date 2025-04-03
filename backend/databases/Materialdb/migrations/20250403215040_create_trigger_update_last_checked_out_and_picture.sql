@@ -13,3 +13,4 @@ END;
 -- +goose StatementBegin
 DROP TRIGGER update_last_checked_out;
 -- +goose StatementEnd
+

@@ -1189,7 +1189,11 @@ const docTemplate = `{
                 "summary": "fetches user based on given paremeters",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "collectionFormat": "csv",
                         "description": "user's identification number",
                         "name": "id",
                         "in": "query"
@@ -1205,7 +1209,7 @@ const docTemplate = `{
                     "200": {
                         "description": "users",
                         "schema": {
-                            "$ref": "#/definitions/userdb.User"
+                            "$ref": "#/definitions/userdb.GetUserRow"
                         }
                     },
                     "400": {
@@ -1657,6 +1661,41 @@ const docTemplate = `{
                     "$ref": "#/definitions/sql.NullFloat64"
                 },
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "userdb.GetUserRow": {
+            "type": "object",
+            "properties": {
+                "company_id": {
+                    "$ref": "#/definitions/sql.NullInt64"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "firstname": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "jobsite_id": {
+                    "$ref": "#/definitions/sql.NullInt64"
+                },
+                "lastname": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "profilepicture": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "role": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "username": {
                     "type": "string"
                 }
             }
