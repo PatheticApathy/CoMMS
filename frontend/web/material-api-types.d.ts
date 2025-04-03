@@ -40,6 +40,7 @@ export interface Material {
   status: string
   type: Type
   unit: string
+  picture: { Valid: bool, String: string }
 }
 
 export interface ChangeQuantity {

@@ -18,14 +18,18 @@ import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { Token } from "@/user-api-types";
 import { getToken } from "@/hooks/useToken";
+import { Input } from "../ui/input";
+import AddFileDialog from "../add-file-dialog";
+import { FileWithPath } from "react-dropzone";
 
 //fetchers
 const MaterialLogFetcher: Fetcher<MaterialLog[], string> = async (...args) => fetch(...args, { headers: { 'Authorization': getToken() }, cache: 'default' }).then(res => res.json())
 const CheckoutLogFetcher: Fetcher<CheckoutLog[], string> = async (...args) => fetch(...args, { headers: { 'Authorization': getToken() }, cache: 'default' }).then(res => res.json())
-const CheckOut = async (url: string, { arg }: { arg: { user_id: number, item_id: number, amount: number } }) => await fetch(url, { headers: { 'Authorization': getToken() }, method: 'POST', body: JSON.stringify(arg) })
-const CheckIn = async (url: string, { arg }: { arg: { user_id: number, item_id: number } }) => await fetch(url, { headers: { 'Authorization': getToken() }, method: 'PUT', body: JSON.stringify(arg) })
+const CheckOut = async (url: string, { arg }: { arg: { checkout_picture: string, user_id: number, item_id: number, amount: number } }) => await fetch(url, { headers: { 'Authorization': getToken() }, method: 'POST', body: JSON.stringify(arg) })
+const CheckIn = async (url: string, { arg }: { arg: { checkin_picture: string, user_id: number, item_id: number } }) => await fetch(url, { headers: { 'Authorization': getToken() }, method: 'PUT', body: JSON.stringify(arg) })
 const QuantityChange = async (url: string, { arg }: { arg: ChangeQuantity }) => await fetch(url, { headers: { 'Authorization': getToken() }, method: 'PUT', body: JSON.stringify(arg) })
 const DeleteMaterial = async (url: string, { arg }: { arg: number }) => await fetch(url, { headers: { 'Authorization': getToken() }, method: 'DELETE', body: String(arg) })
+const PostPicture = async (url: string, { arg }: { arg: { type: string, file: Blob } }) => await fetch(url, { headers: { 'Content-Type': `image/${arg.type}` }, method: 'POST', body: arg.file });
 
 const DisplayMaterialLogs = (material_logs: MaterialLog[] | undefined, error: boolean, isLoading: boolean,) => {
   if (isLoading) {
@@ -91,7 +95,7 @@ const DisplayCheckouts = (checkout_logs: CheckoutLog[] | undefined, error: boole
                 })()
                 }
                 <br />
-                {`Amount checked out ${log.amount}`}
+                {`Amount checked out ${Math.abs(log.amount)}`}
                 <br />
                 {
                   (() => {
@@ -99,7 +103,7 @@ const DisplayCheckouts = (checkout_logs: CheckoutLog[] | undefined, error: boole
                     if (log.checkin_time.Valid) {
                       const checkin = new Date(log.checkin_time.Time);
                       return (
-                        `Checked in on : ${checkin.toLocaleDateString()} ${checkin.toLocaleTimeString()}`
+                        `Checked back in on : ${checkin.toLocaleDateString()} ${checkin.toLocaleTimeString()}`
                       );
                     } else {
                       return ("Still checked out")
@@ -130,6 +134,7 @@ export default function MaterialSheet({ material, route, children, token }: Read
   const { data: checkout_logs, isLoading: checkout_loading, error: checkout_error } = useSWR(`/api/material/checkout/recent?id=${material.id}`, CheckoutLogFetcher)
   const { data: material_logs, isLoading: material_loading, error: material_error } = useSWR(`/api/material/mlogs/recent?id=${material.id}`, MaterialLogFetcher)
 
+  const { trigger: download } = useSWRMutation('/api/picture', PostPicture);
   const { trigger } = useSWRMutation('/api/material/material/delete', DeleteMaterial, {
     onError(err) {
       console.error(err)
@@ -149,76 +154,64 @@ export default function MaterialSheet({ material, route, children, token }: Read
     },
 
   })
-  const { trigger: checkout, isMutating: checking_out } = useSWRMutation('/api/material/checkout/out', CheckOut, {
-    onError(err) {
-      console.error(err)
-      toast.error(err.message || "Error has occured");
+  const { trigger: checkout, isMutating: checking_out } = useSWRMutation('/api/material/checkout/out', CheckOut)
 
-    },
-    onSuccess(resp) {
-      if (!resp.ok) {
-        toast.error(resp.text() || "Error has occured");
+  const { trigger: checkin, isMutating: checking_in } = useSWRMutation('/api/material/checkout/in', CheckIn)
+
+  const { trigger: send_amount } = useSWRMutation('/api/material/material/change', QuantityChange)
+
+  const handle_checkout = async (files: readonly FileWithPath[]) => {
+    try {
+      toast.message("Sending picture")
+      const extension = files ? files[0].name.split('.').pop() : undefined
+      if (!extension) {
+        toast.error("Invald file extension");
         return
       }
-      resp.json().then(() => {
-        console.log("Checked Out")
-        mutate(`/api/material/checkout/recent?id=${material.id}`)
-        mutate(`/api/material/mlogs/recent?id=${material.id}`)
-        toast.success(`Checked Out!`);
-      })
-    },
-  })
-
-  const { trigger: checkin, isMutating: checking_in } = useSWRMutation('/api/material/checkout/in', CheckIn, {
-    onError(err) {
-      console.error(err)
-      toast.error(err.message || "Error has occured");
-
-    },
-    onSuccess(resp) {
-      if (!resp.ok) {
-        toast.error(resp.text() || "Error has occured");
+      const picture_resp = await download({ type: extension, file: files![0] })
+      if (!picture_resp.ok) {
+        const message = await picture_resp.json() as { message: string }
+        toast.error(message.message || "Error has occured");
         return
       }
-      resp.json().then(() => {
-        console.log("Checked In")
-        mutate(`/api/material/checkout/recent?id=${material.id}`)
-        mutate(`/api/material/mlogs/recent?id=${material.id}`)
-        toast.success(`Checked In!`);
-      })
-    },
-  })
+      //TODO: set last checkout picture to current picture of item
+      const name = await picture_resp.json() as { name: string }
+      const check_pick = `/${name.name}`
 
-  const { trigger: send_amount } = useSWRMutation('/api/material/material/change', QuantityChange, {
-    onError(err) {
-      console.error(err)
-      toast.error(err.message || "Error has occured");
-
-    },
-    onSuccess(resp) {
-      if (!resp.ok) {
-        toast.error(resp.text() || "Error has occured");
+      //Make checkin/out request
+      let check_resp = undefined
+      if (check && (counter > 0)) {
+        check_resp = await checkin({ checkin_picture: check_pick, user_id: token!.id, item_id: material.id })
+      } else if (counter > 0) {
+        check_resp = await checkout({ checkout_picture: check_pick, user_id: token!.id, item_id: material.id, amount: -counter })
+      } else {
+        toast.error("Must pick a non-negative value")
         return
       }
-      resp.json().then(() => {
-        console.log("Quantity changed")
 
-        if (check) {
-          if (counter >= 0) {
-            checkin({ user_id: token!.id, item_id: material.id })
-          } else {
-          }
-        } else {
-          if (counter < 0) {
-            checkout({ user_id: token!.id, item_id: material.id, amount: counter })
-            toast.error("Checkin amount must be greater than 0");
-          } else {
-            toast.error("Checkout amount must be negative");
-          }
-        }
-      })
-    },
-  })
+      if (!check_resp.ok) {
+        toast.error(await check_resp.text() || "Error has occured");
+        return
+      }
+
+      //Change corresponding amount on maaterial
+      const resp = await send_amount({ quantity: counter, id: material.id })
+      if (!resp.ok) {
+        toast.error(await resp.text() || "Error has occured");
+        return
+      }
+
+      const new_material: Material = await resp.json()
+      console.log(`checked ${check ? "in" : "out"}`)
+      mutate(`/api/material/checkout/recent?id=${new_material.id}`)
+      mutate(`/api/material/mlogs/recent?id=${new_material.id}`)
+      toast.message(`${new_material.name.Valid ? new_material.name.String : ""} checked ${check ? "in" : "out"}`)
+
+    } catch (err) {
+      toast.error(String(err) || "Error has occured");
+    }
+
+  }
 
   useEffect(() => {
     if (checkout_logs && token) {
@@ -233,6 +226,7 @@ export default function MaterialSheet({ material, route, children, token }: Read
         <div className="overflow-auto">
           {(() => {
             if (material && token) {
+              console.log(material)
               return (
                 <>
                   <SheetHeader className="flex-none border-b text-left">
@@ -241,7 +235,7 @@ export default function MaterialSheet({ material, route, children, token }: Read
                     </SheetDescription>
                   </SheetHeader>
                   <div className="flex flex-col gap-10 text-lg">
-                    <Image src={'/file.svg'} alt="No Picture of Item found" width={500} height={500}></Image>
+                    <Image src={material.picture.Valid ? material.picture.String : '/file.svg'} alt="No Picture of Item found" width={500} height={500}></Image>
                   </div>
                   <div >
                     {material.type.Valid ? `Type: ${material.type.String}` : "No type found"}
@@ -262,12 +256,12 @@ export default function MaterialSheet({ material, route, children, token }: Read
                           return <Loading />
                         } else {
                           return (
-                            <div className="flex flex-row flex-auto">
-                              <Button onClick={() => { send_amount({ quantity: counter, id: material.id }) }} variant={check ? "default" : "secondary"} className="w-2/3" >{check ? "Checkin" : "Checkout"}</Button>
+                            <div className="flex flex-row flex-auto max-w-96">
+                              <AddFileDialog submitAction={handle_checkout}><Button variant={check ? "default" : "secondary"} className="w-2/3" >{check ? "Checkin" : "Checkout"}</Button></AddFileDialog>
                               <div className="flex flex-row text-center w-1/3 ">
-                                <div className="w-1/4"><Button onClick={() => setcount(counter + 1)}>+</Button></div>
-                                <div className="w-2/4 text content-center"><h1 className="text-slate-300 text-center ml-3">{counter}</h1></div>
-                                <div><Button className="w-1/4" onClick={() => setcount(counter - 1)}>-</Button></div>
+                                <div className="w-2/3333xt content-center"><Input value={counter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                  setcount(Number(e.target.value))
+                                }} className="text-slate-300 text-center bg-gray-950" /></div>
                               </div>
                             </div>
                           )

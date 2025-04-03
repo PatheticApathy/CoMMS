@@ -1,15 +1,16 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TRIGGER update_last_checked_out AFTER INSERT ON CheckoutLogs 
+CREATE TRIGGER update_picture_on_checkin AFTER UPDATE ON CheckoutLogs 
 FOR EACH ROW
 BEGIN
   UPDATE Materials
-    SET last_checked_out = NEW.checkout_time, picture=NEW.checkout_picture
+    SET  picture=NEW.checkout_picture
   WHERE id = NEW.item_id;
 END;
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TRIGGER update_last_checked_out;
+DROP TRIGGER update_picture_on_checkin;
 -- +goose StatementEnd
+

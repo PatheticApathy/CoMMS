@@ -16,6 +16,7 @@ export type MaterialRow = {
   status: string
   type: string | undefined
   unit: string
+  picture: string | undefined
 
 }
 
@@ -104,16 +105,23 @@ export const MaterialTableColumns: ((route: string | undefined, token: Token | u
           String: "No name provided",
           Valid: true
         },
-        unit: material_row.unit
+        unit: material_row.unit,
+        picture: material_row.picture ? {
+          String: material_row.picture,
+          Valid: true
+        } : {
+          String: "./file.svg",
+          Valid: false
+        },
       }
 
 
       return (
-        <div className="justify-end">
+        <div className="justify-end" >
           <MaterialSheet material={material} route={route} token={token}>
             <Button variant={'ghost'}>More details</Button>
           </MaterialSheet>
-        </div>
+        </div >
 
       )
     }

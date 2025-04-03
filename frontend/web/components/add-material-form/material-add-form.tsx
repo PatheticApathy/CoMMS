@@ -16,7 +16,6 @@ import FormInput from "../form-maker/form-input"
 import { JobSite } from "@/user-api-types"
 import { toast } from "sonner"
 import { getToken } from "@/hooks/useToken"
-import { Picture } from "@/app/api/picture/route"
 import FormFileInput from "../form-maker/form-dropzone"
 
 // Schema for form
@@ -32,7 +31,7 @@ const AddMaterialSchema = z.object({
 
 // Fetcher
 const PostAddMaterial = async (url: string, { arg }: { arg: AddMaterial }) => await fetch(url, { headers: { 'Authorization': getToken() }, method: 'POST', body: JSON.stringify(arg) });
-const PostPicture = async (url: string, { arg }: { arg: Picture }) => await fetch(url, { headers: { 'Content-Type': 'application/json' }, method: 'POST', body: JSON.stringify(arg) });
+const PostPicture = async (url: string, { arg }: { arg: { type: string, file: Blob } }) => await fetch(url, { headers: { 'Content-Type': `image/${arg.type}` }, method: 'POST', body: arg.file });
 const fetchJobsites = async (url: string): Promise<JobSite[]> => {
   const res = await fetch(url, {
     headers: { 'Authorization': getToken() },
@@ -70,7 +69,7 @@ export default function MaterialForm({ route }: { route: string | undefined }) {
   const { trigger: download, isMutating: isDownloading } = useSWRMutation('/api/picture', PostPicture);
 
   const SendAddMaterialRequest = async (values: z.infer<typeof AddMaterialSchema>) => {
-    const payload: AddMaterial = {
+    let payload: AddMaterial = {
       job_site: values.job_site,
       location_lat: {
         Valid: false,
@@ -91,27 +90,29 @@ export default function MaterialForm({ route }: { route: string | undefined }) {
         String: values.type
       },
       unit: values.unit,
-      picture: { Valid: true, String: "file.svg" }
+      picture: { Valid: true, String: "/file.svg" }
     };
 
     try {
-      let file_name = "file.svg"
 
-      //send picture and get file name
-      console.log(values.picture)
-      if (values.picture) {
+      if (values.picture && values.picture?.length > 0) {
         toast.message("Sending picture")
-        const resp = await download({ name: values.name, contents: await values.picture[0].text() })
+        const extension = values.picture[0].name.split('.').pop()
+        if (!extension) {
+          toast.error("Invald file extension");
+          return
+        }
+        const resp = await download({ type: extension, file: values.picture[0] })
         if (!resp.ok) {
           const message = await resp.json() as { message: string }
           toast.error(message.message || "Error has occured");
           return
         }
         const name = await resp.json() as { name: string }
-        file_name = name.name
+        payload.picture.String = `/${name.name}`
       }
 
-      console.log(`File name is ${file_name}`)
+      console.log(`File name is ${payload.picture.String}`)
       const resp = await trigger(payload)
       if (!resp.ok) {
         toast.error(await resp.text() || "Error has occured");

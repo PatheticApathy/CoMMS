@@ -24,14 +24,14 @@ import (
 func (e *Env) postCheckout(w http.ResponseWriter, r *http.Request) {
 	var args materialdb.AddCheckoutLogParams
 	if err := json.NewDecoder(r.Body).Decode(&args); err != nil {
-		log.Printf("could not decode to json, reason %e", err)
+		log.Printf("could not decode to json, reason %s", err)
 		http.Error(w, "bad request", http.StatusBadRequest)
 		return
 	}
 
 	req, err := http.NewRequest("GET", e.UserHost+"/user/search?id="+strconv.Itoa(int(args.UserID)), nil)
 	if err != nil {
-		log.Printf("could not connect to user api, reason %e", err)
+		log.Printf("could not connect to user api, reason %s", err)
 		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
 	}
@@ -53,14 +53,14 @@ func (e *Env) postCheckout(w http.ResponseWriter, r *http.Request) {
 
 	checkout, err := e.Queries.AddCheckoutLog(r.Context(), args)
 	if err != nil {
-		log.Printf("could not add checkout log, reason %e", err)
+		log.Printf("could not add checkout log, reason %s", err)
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 
 	log.Printf("Checkout log %d added, checked out", checkout.ID)
 	if err = json.NewEncoder(w).Encode(&checkout); err != nil {
-		log.Printf("could not encode to json, reason %e", err)
+		log.Printf("could not encode to json, reason %s", err)
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
@@ -81,21 +81,21 @@ func (e *Env) postCheckout(w http.ResponseWriter, r *http.Request) {
 func (e *Env) putCheckin(w http.ResponseWriter, r *http.Request) {
 	var arg materialdb.UpdateCheckinlogParams
 	if err := json.NewDecoder(r.Body).Decode(&arg); err != nil {
-		log.Printf("could not decode to json, reason %e", err)
+		log.Printf("could not decode to json, reason %s", err)
 		http.Error(w, "bad request", http.StatusBadRequest)
 		return
 	}
 
 	checkout, err := e.Queries.UpdateCheckinlog(r.Context(), arg)
 	if err != nil {
-		log.Printf("could not change checkout log, reason %e", err)
+		log.Printf("could not change checkout log, reason %s", err)
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 
 	log.Printf("Checkout log %d now checked in", checkout.ID)
 	if err = json.NewEncoder(w).Encode(&checkout); err != nil {
-		log.Printf("could not encode to json, reason %e", err)
+		log.Printf("could not encode to json, reason %s", err)
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
@@ -113,14 +113,14 @@ func (e *Env) putCheckin(w http.ResponseWriter, r *http.Request) {
 func (e *Env) getAllCheckoutLogs(w http.ResponseWriter, r *http.Request) {
 	logs, err := e.Queries.GetAllCheckoutLogs(r.Context())
 	if err != nil {
-		log.Printf("could not get checkout logs, reason %e", err)
+		log.Printf("could not get checkout logs, reason %s", err)
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 
 	log.Printf("Fetching all Checkout logs")
 	if err = json.NewEncoder(w).Encode(&logs); err != nil {
-		log.Printf("could not encode to json, reason %e", err)
+		log.Printf("could not encode to json, reason %s", err)
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
@@ -144,14 +144,14 @@ func (e *Env) getRecentCheckoutLogsForMaterialHandler(w http.ResponseWriter, r *
 
 		id, err := strconv.Atoi(query.Get("id"))
 		if err != nil {
-			log.Printf("Invalid material log id, reason %e", err)
+			log.Printf("Invalid material log id, reason %s", err)
 			http.Error(w, "bad request", http.StatusBadRequest)
 			return
 		}
 
 		material_log, err := e.Queries.GetRecentCheckoutLogsForMaterial(r.Context(), int64(id))
 		if err != nil {
-			log.Printf("Invalid material log id, reason %e", err)
+			log.Printf("Invalid material log id, reason %s", err)
 			http.Error(w, "bad request", http.StatusBadRequest)
 			return
 		}
@@ -159,7 +159,7 @@ func (e *Env) getRecentCheckoutLogsForMaterialHandler(w http.ResponseWriter, r *
 		log.Printf("Found checkout log %d", id)
 
 		if err := json.NewEncoder(w).Encode(&material_log); err != nil {
-			log.Printf("could not encode to json, reason %e", err)
+			log.Printf("could not encode to json, reason %s", err)
 			http.Error(w, "internal server error", http.StatusInternalServerError)
 			return
 		}
