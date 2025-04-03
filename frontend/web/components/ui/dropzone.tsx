@@ -1,9 +1,21 @@
-import React from 'react'
-import { useDropzone } from 'react-dropzone'
+import React, { useCallback } from 'react'
+import { FileWithPath, useDropzone } from 'react-dropzone'
 
 
 export default function DropZone({ file, fileAction }: { file: File, fileAction: (file: File | undefined) => void }) {
-  const { acceptedFiles, getRootProps, getInputProps } = useDropzone()
+  const onDrop = useCallback((acceptedFiles: FileWithPath[]) => {
+    fileAction(acceptedFiles[0])
+  }, [file])
+
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop, accept: {
+      'image/png': ['.png', 'jpeg'],
+      'image/gif': ['.gif'],
+      'image/jpeg': ['.jpeg', '.png'],
+      'image/webp': ['.webp'],
+    },
+    maxFiles: 1
+  })
 
 
   return (
@@ -14,7 +26,7 @@ export default function DropZone({ file, fileAction }: { file: File, fileAction:
       </div>
       <aside>
         <h4>Files</h4>
-        <ul>{file}</ul>
+        <ul>{file.name}</ul>
       </aside>
     </section>
   )

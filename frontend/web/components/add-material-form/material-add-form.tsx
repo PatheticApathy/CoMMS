@@ -16,7 +16,8 @@ import FormInput from "../form-maker/form-input"
 import { JobSite } from "@/user-api-types"
 import { toast } from "sonner"
 import { getToken } from "@/hooks/useToken"
-import { Picture } from "@/app/dashboard/material/api/picture"
+import { Picture } from "@/app/api/picture/route"
+import FormFileInput from "../form-maker/form-dropzone"
 
 // Schema for form
 const AddMaterialSchema = z.object({
@@ -26,12 +27,12 @@ const AddMaterialSchema = z.object({
   status: z.enum(["In Stock", "Out of Stock", "Low Stock"]),
   type: z.string().min(2, { message: "Type must be more than 2 characters" }),
   unit: z.string().min(1, { message: "Unit must be greater than 1" }),
-  picture: z.instanceof(File).optional(),
+  picture: z.instanceof(FileList).optional(),
 });
 
 // Fetcher
 const PostAddMaterial = async (url: string, { arg }: { arg: AddMaterial }) => await fetch(url, { headers: { 'Authorization': getToken() }, method: 'POST', body: JSON.stringify(arg) });
-const PostPicture = async (url: string, { arg }: { arg: Picture }) => await fetch(url, { headers: { 'Authorization': getToken() }, method: 'POST', body: JSON.stringify(arg) });
+const PostPicture = async (url: string, { arg }: { arg: Picture }) => await fetch(url, { headers: { 'Content-Type': 'application/json' }, method: 'POST', body: JSON.stringify(arg) });
 const fetchJobsites = async (url: string): Promise<JobSite[]> => {
   const res = await fetch(url, {
     headers: { 'Authorization': getToken() },
@@ -97,13 +98,17 @@ export default function MaterialForm({ route }: { route: string | undefined }) {
       let file_name = "file.svg"
 
       //send picture and get file name
+      console.log(values.picture)
       if (values.picture) {
-        const resp = await download({ name: values.name, file: values.picture })
+        toast.message("Sending picture")
+        const resp = await download({ name: values.name, contents: await values.picture[0].text() })
         if (!resp.ok) {
-          toast.error(await resp.text() || "Error has occured");
+          const message = await resp.json() as { message: string }
+          toast.error(message.message || "Error has occured");
           return
         }
-        file_name = await resp.text()
+        const name = await resp.json() as { name: string }
+        file_name = name.name
       }
 
       console.log(`File name is ${file_name}`)
@@ -152,6 +157,7 @@ export default function MaterialForm({ route }: { route: string | undefined }) {
         <ComboboxFormField form_attr={{ name: "status", description: "Initial status of item", form: form }} default_label={"In Stock"} options={status} />
         <FormInput name="type" placeholder="Type" description="Type of item" form={form} />
         <FormInput name="unit" placeholder="Unit" description="Unit of measurement of item" form={form} />
+        <FormFileInput name="picture" placeholder="Add picture" description="Add picture here" form={form} />
         {isMutating || isDownloading ? <Button variant={'ghost'}>Sending</Button> : <Button type="submit">Send Request</Button>}
       </form>
     </Form>
