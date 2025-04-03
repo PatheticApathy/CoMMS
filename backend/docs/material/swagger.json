@@ -1351,6 +1351,7 @@
             "type": "object",
             "properties": {
                 "amount": {},
+                "checkout_picture": {},
                 "item_id": {
                     "type": "integer"
                 },
@@ -1389,6 +1390,9 @@
                     "$ref": "#/definitions/sql.NullFloat64"
                 },
                 "name": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "picture": {
                     "$ref": "#/definitions/sql.NullString"
                 },
                 "quantity": {
@@ -1431,9 +1435,11 @@
             "type": "object",
             "properties": {
                 "amount": {},
+                "checkin_picture": {},
                 "checkin_time": {
                     "$ref": "#/definitions/sql.NullTime"
                 },
+                "checkout_picture": {},
                 "checkout_time": {
                     "type": "string"
                 },
@@ -1467,6 +1473,9 @@
                     "$ref": "#/definitions/sql.NullFloat64"
                 },
                 "name": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "picture": {
                     "$ref": "#/definitions/sql.NullString"
                 },
                 "quantity": {

@@ -1357,6 +1357,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "amount": {},
+                "checkout_picture": {},
                 "item_id": {
                     "type": "integer"
                 },
@@ -1395,6 +1396,9 @@ const docTemplate = `{
                     "$ref": "#/definitions/sql.NullFloat64"
                 },
                 "name": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "picture": {
                     "$ref": "#/definitions/sql.NullString"
                 },
                 "quantity": {
@@ -1437,9 +1441,11 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "amount": {},
+                "checkin_picture": {},
                 "checkin_time": {
                     "$ref": "#/definitions/sql.NullTime"
                 },
+                "checkout_picture": {},
                 "checkout_time": {
                     "type": "string"
                 },
@@ -1473,6 +1479,9 @@ const docTemplate = `{
                     "$ref": "#/definitions/sql.NullFloat64"
                 },
                 "name": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "picture": {
                     "$ref": "#/definitions/sql.NullString"
                 },
                 "quantity": {

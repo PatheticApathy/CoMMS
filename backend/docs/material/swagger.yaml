@@ -28,6 +28,7 @@ definitions:
   materialdb.AddCheckoutLogParams:
     properties:
       amount: {}
+      checkout_picture: {}
       item_id:
         type: integer
       user_id:
@@ -53,6 +54,8 @@ definitions:
       location_lng:
         $ref: '#/definitions/sql.NullFloat64'
       name:
+        $ref: '#/definitions/sql.NullString'
+      picture:
         $ref: '#/definitions/sql.NullString'
       quantity:
         type: integer
@@ -80,8 +83,10 @@ definitions:
   materialdb.CheckoutLog:
     properties:
       amount: {}
+      checkin_picture: {}
       checkin_time:
         $ref: '#/definitions/sql.NullTime'
+      checkout_picture: {}
       checkout_time:
         type: string
       id:
@@ -104,6 +109,8 @@ definitions:
       location_lng:
         $ref: '#/definitions/sql.NullFloat64'
       name:
+        $ref: '#/definitions/sql.NullString'
+      picture:
         $ref: '#/definitions/sql.NullString'
       quantity:
         type: integer

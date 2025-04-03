@@ -29,12 +29,22 @@ func (e *Env) postCheckout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp, err := http.Get(e.UserHost + "/user/search?id=" + strconv.Itoa(int(args.UserID)))
+	req, err := http.NewRequest("GET", e.UserHost+"/user/search?id="+strconv.Itoa(int(args.UserID)), nil)
 	if err != nil {
 		log.Printf("could not connect to user api, reason %e", err)
 		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
 	}
+	req.Header.Set("Authorization", r.Header.Get("Authorization"))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Printf("Error occured while trying to connect to user api: %s", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
 	if resp.StatusCode != http.StatusOK {
 		log.Printf("could not add checkout log, invalid user id: %d", args.UserID)
 		http.Error(w, "Bad request", http.StatusBadRequest)
