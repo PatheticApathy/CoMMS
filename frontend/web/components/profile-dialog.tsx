@@ -23,7 +23,7 @@ import {
 import { redirect } from 'next/navigation'
 import { EditProfile } from "./edit-profile-dialog"
 import useSWR from "swr";
-import { User } from "@/user-api-types";
+import { GetUserRow, User } from "@/user-api-types";
 import { delTokenNIdentity, getToken, useIdentity } from '@/hooks/useToken'
 
 const fetcher = async (url: string) => {
@@ -42,7 +42,7 @@ const fetcher = async (url: string) => {
 export function Profile() {
 
   const identity = useIdentity()
-  const { data: user, error: error3 } = useSWR<User, string>(identity ? `/api/user/search?id=${identity.id}` : null, fetcher);
+  const { data: user, error: error3 } = useSWR<GetUserRow[], string>(identity ? `/api/user/search?id=${identity.id}` : null, fetcher);
 
   if (error3) return <p>Error loading Profile.</p>;
   if (!user) return <p>Loading...</p>;
@@ -82,10 +82,10 @@ export function Profile() {
         <div className="rounded-full overflow-hidden h-28 w-28">
           <img className="" src="https://static.vecteezy.com/system/resources/thumbnails/009/734/564/small/default-avatar-profile-icon-of-social-media-user-vector.jpg"></img>
         </div>
-        <div>Username: {user.username}</div>
-        <div>Name: {user.firstname.Valid ? user.firstname.String : "N/A"} {user.lastname.Valid ? user.lastname.String : "N/A"}</div>
-        <div>Email: {user.email}</div>
-        <div>Phone: {user.phone}</div>
+        <div>Username: {user[0].username}</div>
+        <div>Name: {user[0].firstname.Valid ? user[0].firstname.String : "N/A"} {user[0].lastname.Valid ? user[0].lastname.String : "N/A"}</div>
+        <div>Email: {user[0].email}</div>
+        <div>Phone: {user[0].phone}</div>
         <DialogFooter>
           <EditProfile />
         </DialogFooter>

@@ -16,7 +16,7 @@ import Loading from "@/components/loading";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
-import { Token } from "@/user-api-types";
+import { GetUserRow, Token } from "@/user-api-types";
 import { getToken } from "@/hooks/useToken";
 import { Input } from "../ui/input";
 import AddFileDialog from "../add-file-dialog";
@@ -25,6 +25,7 @@ import { FileWithPath } from "react-dropzone";
 //fetchers
 const MaterialLogFetcher: Fetcher<MaterialLog[], string> = async (...args) => fetch(...args, { headers: { 'Authorization': getToken() }, cache: 'default' }).then(res => res.json())
 const CheckoutLogFetcher: Fetcher<CheckoutLog[], string> = async (...args) => fetch(...args, { headers: { 'Authorization': getToken() }, cache: 'default' }).then(res => res.json())
+const UsersFetcher: Fetcher<GetUserRow[], string> = async (...args) => fetch(...args, { headers: { 'Authorization': getToken() }, cache: 'default' }).then(res => res.json())
 const CheckOut = async (url: string, { arg }: { arg: { checkout_picture: string, user_id: number, item_id: number, amount: number } }) => await fetch(url, { headers: { 'Authorization': getToken() }, method: 'POST', body: JSON.stringify(arg) })
 const CheckIn = async (url: string, { arg }: { arg: { checkin_picture: string, user_id: number, item_id: number } }) => await fetch(url, { headers: { 'Authorization': getToken() }, method: 'PUT', body: JSON.stringify(arg) })
 const QuantityChange = async (url: string, { arg }: { arg: ChangeQuantity }) => await fetch(url, { headers: { 'Authorization': getToken() }, method: 'PUT', body: JSON.stringify(arg) })
@@ -70,7 +71,7 @@ const DisplayMaterialLogs = (material_logs: MaterialLog[] | undefined, error: bo
   }
 }
 
-const DisplayCheckouts = (checkout_logs: CheckoutLog[] | undefined, error: boolean, isLoading: boolean,) => {
+const DisplayCheckouts = (checkout_logs: CheckoutLog[] | undefined, error: boolean, isLoading: boolean, users: GetUserRow[] | undefined) => {
   if (isLoading) {
     return <div>Loading<Loading /></div>;
   }
@@ -85,7 +86,7 @@ const DisplayCheckouts = (checkout_logs: CheckoutLog[] | undefined, error: boole
           checkout_logs.map((log) => {
             return (
               <div key={log.id}>
-                <h3>Chekout pertains to user id: {log.user_id}</h3>
+                <h3>Chekout pertains to user: {users ? users.filter(user => user.id == log.user_id)[0].username : log.user_id}</h3>
                 <br />
                 {(() => {
                   const checkout = new Date(log.checkout_time);
@@ -133,6 +134,7 @@ export default function MaterialSheet({ material, route, children, token }: Read
   const [counter, setcount] = useState(0)
   const { data: checkout_logs, isLoading: checkout_loading, error: checkout_error } = useSWR(`/api/material/checkout/recent?id=${material.id}`, CheckoutLogFetcher)
   const { data: material_logs, isLoading: material_loading, error: material_error } = useSWR(`/api/material/mlogs/recent?id=${material.id}`, MaterialLogFetcher)
+  const { data: usernames } = useSWR(checkout_logs ? `/api/user/search?${checkout_logs.map(log => `id=${log.user_id}`).join('&')}` : undefined, UsersFetcher)
 
   const { trigger: download } = useSWRMutation('/api/picture', PostPicture);
   const { trigger } = useSWRMutation('/api/material/material/delete', DeleteMaterial, {
@@ -176,7 +178,7 @@ export default function MaterialSheet({ material, route, children, token }: Read
       }
       //TODO: set last checkout picture to current picture of item
       const name = await picture_resp.json() as { name: string }
-      const check_pick = `/${name.name}`
+      const check_pick = `/ ${name.name}`
 
       //Make checkin/out request
       let check_resp = undefined
@@ -202,9 +204,8 @@ export default function MaterialSheet({ material, route, children, token }: Read
       }
 
       const new_material: Material = await resp.json()
-      console.log(`checked ${check ? "in" : "out"}`)
-      mutate(`/api/material/checkout/recent?id=${new_material.id}`)
-      mutate(`/api/material/mlogs/recent?id=${new_material.id}`)
+      mutate(`/ api / material / checkout / recent ? id = ${new_material.id}`)
+      mutate(`/ api / material / mlogs / recent ? id = ${new_material.id}`)
       toast.message(`${new_material.name.Valid ? new_material.name.String : ""} checked ${check ? "in" : "out"}`)
 
     } catch (err) {
@@ -226,7 +227,6 @@ export default function MaterialSheet({ material, route, children, token }: Read
         <div className="overflow-auto">
           {(() => {
             if (material && token) {
-              console.log(material)
               return (
                 <>
                   <SheetHeader className="flex-none border-b text-left">
@@ -240,9 +240,9 @@ export default function MaterialSheet({ material, route, children, token }: Read
                   <div >
                     {material.type.Valid ? `Type: ${material.type.String}` : "No type found"}
                     <br />
-                    {`${material.status} with ${material.quantity} ${material.unit}`}
+                    {`${material.status} with ${material.quantity} ${material.unit} `}
                     <br />
-                    {material.last_checked_out.Valid ? `last checked out on ${new Date(material.last_checked_out.Time).toLocaleString()}` : "Never checked out"}
+                    {material.last_checked_out.Valid ? `last checked out on ${new Date(material.last_checked_out.Time).toLocaleString()} ` : "Never checked out"}
                     <hr />
                     <div className="place-content-center">
                       {
@@ -270,7 +270,7 @@ export default function MaterialSheet({ material, route, children, token }: Read
                       }
                       < div className="place-content-center">
                         {
-                          DisplayCheckouts(checkout_logs, checkout_error, checkout_loading)
+                          DisplayCheckouts(checkout_logs, checkout_error, checkout_loading, usernames)
                         }
                       </div>
                     </div>

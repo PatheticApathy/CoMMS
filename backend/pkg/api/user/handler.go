@@ -20,9 +20,10 @@ import (
 //	@Description	Gets user using id(may add more parameters later)
 //	@Tags			users
 //	@Produce		json
-//	@Param			id	query		int				false	"user's identification number"
+//	@Param			id	query		[]int				false	"user's identification number"
 //	@Param			username	query		string				false	"user's username"
-//	@Success		200	{object}	userdb.User		"users"
+//	@Success		200	{object}	[]userdb.GetUserRow		"the ids query can take multiple id's"
+//	@Success		200	{object}	userdb.GetUserRow		"users"
 //	@Failure		400	{string}	string			"Invalid id"
 //	@Failure		500	{string}	string			"Internal Server Error"
 //	@Router			/user/search [get]
@@ -30,24 +31,29 @@ func (e *Env) getUser(w http.ResponseWriter, r *http.Request) {
 	log.Println("Handling getUser request")
 	query := r.URL.Query()
 	if query.Has("id") {
-		id, err := strconv.Atoi(query.Get("id"))
-		log.Printf("Received request with id: %d", id)
-		if err != nil {
-			log.Printf("Invalid id, reason: %e", err)
-			http.Error(w, "Invalid id", http.StatusBadRequest)
-			return
-		}
+		users := make([]userdb.GetUserRow, 0)
+		ids := query["id"]
+		for _, id := range ids {
+			id, err := strconv.Atoi(id)
+			log.Printf("Received request with id: %d", id)
+			if err != nil {
+				log.Printf("Invalid id, reason: %e", err)
+				http.Error(w, "Invalid id", http.StatusBadRequest)
+				return
+			}
 
-		log.Printf("Fetching user with id: %d", id)
-		user, err := e.Queries.GetUser(r.Context(), int64(id))
-		if err != nil {
-			log.Printf("Could not find user, reason: %e", err)
-			http.Error(w, "Invalid id", http.StatusBadRequest)
-			return
-		}
+			log.Printf("Fetching user with id: %d", id)
+			user, err := e.Queries.GetUser(r.Context(), int64(id))
+			if err != nil {
+				log.Printf("Could not find user, reason: %e", err)
+				http.Error(w, "Invalid id", http.StatusBadRequest)
+				return
+			}
 
-		log.Printf("User found: %+v", user)
-		if err := json.NewEncoder(w).Encode(&user); err != nil {
+			users = append(users, user)
+			log.Printf("User found: %s", user.Username)
+		}
+		if err := json.NewEncoder(w).Encode(&users); err != nil {
 			log.Printf("Could not encode json user, reason: %e", err)
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
