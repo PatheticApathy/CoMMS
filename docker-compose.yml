@@ -9,7 +9,7 @@ services:
     restart: always
     build:
       context: ./backend/
-      dockerfile: ./backend/build/user_api/Dockerfile
+      dockerfile: ./build/user_api/Dockerfile
 
   material_api:
     environment:
@@ -19,11 +19,13 @@ services:
     restart: always
     build:
       context: ./backend/
-      dockerfile: ./backend/build/material_api/Dockerfile
+      dockerfile: ./build/material_api/Dockerfile
     depends_on:
       - user_api
 
   nextjs:
+    build:
+      context: ./frontend/web
     depends_on:
       - material_api
       - user_api
