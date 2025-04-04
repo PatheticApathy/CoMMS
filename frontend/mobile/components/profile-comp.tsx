@@ -1,10 +1,48 @@
 import { StyleSheet, Button, Image, View } from 'react-native';
 import { Link } from 'expo-router';
-
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { getToken, delToken } from '@/components/securestore'
+import useSWR from 'swr'
+import { User } from '@/user-api-types'
+import { useRouter } from 'expo-router'
+
+async function getProfileArgs(url: string, arg: string) {
+  return fetch(url, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: arg
+  }).then(res => res.json())
+}
+
+const fetcher = async (url: string) => {
+  const res = await fetch(url)
+  if (!res.ok) {
+    throw new Error("Failed to fetch");
+  }
+  return res.json();
+}
 
 export default function ProfileComp() {
+
+  const router = useRouter()
+
+  let token = getToken()
+  let id = 1
+
+  const { data: tokenData, error: error2 } = useSWR(['https://4ba1-138-47-128-9.ngrok-free.app/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
+  if (tokenData)
+    id = tokenData.id
+
+  const { data: user, error: error3 } = useSWR<User, string>(`https://4ba1-138-47-128-9.ngrok-free.app/user/search?id=${id}`, fetcher)
+
+  if (!user) return <ThemedText>Loading...</ThemedText>;    
+
+  async function logoutSubmit() {
+    delToken()
+    router.navigate('/')
+  }
+
   return (
     <ThemedView>
       <ThemedView style={styles.titleContainer}>
@@ -18,23 +56,21 @@ export default function ProfileComp() {
             }} 
         />
         <ThemedText>
-          Username: Username
+          Username: {user.username}
         </ThemedText>
         <ThemedText>
-          Name: Firstname Lastname
+          Name: {user.firstname.Valid? user.firstname.String : "N/A"} {user.lastname.Valid? user.lastname.String : "N/A"}
         </ThemedText>
         <ThemedText>
-          Email: Example@place.com
+          Email: {user.email}
         </ThemedText>
         <ThemedText>
-          Phone: 8888888888
+          Phone: {user.phone}
         </ThemedText>
       </ThemedView>
       <ThemedView style={styles.buttons}>
         <ThemedView style={styles.logoutButton}>
-            <Link href="/" asChild>
-                <Button title="Logout"></Button>
-            </Link>
+            <Button title="Logout" onPress={logoutSubmit}></Button>
         </ThemedView>
         <ThemedView style={styles.editButton}>
             <Link href="/editProfile" asChild>

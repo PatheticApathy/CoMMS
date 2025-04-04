@@ -9,6 +9,8 @@ import useSWRMutation from 'swr/mutation'
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { SignUpUser } from "@/user-api-types"
+import { setToken, getToken } from "@/components/securestore"
+import { useRouter } from 'expo-router'
 
 const formSchema = z.object({
     username: z.string().nonempty(),
@@ -36,11 +38,7 @@ async function signUp(url: string, { arg }: { arg: SignUpUser }) {
 
 export default function SignupForm() {
 
-    /*let ip: string | null = ''
-
-    NetworkInfo.getIPAddress().then(ipAddress => {
-        ip = ipAddress
-    });*/
+    const router = useRouter()
 
     const { data, trigger, error, isMutating } = useSWRMutation('http://192.168.1.0:8082/user/signup', signUp, { throwOnError: false })
 
@@ -60,7 +58,12 @@ export default function SignupForm() {
     })
 
     if (data) {
-        console.log("Token: ", data)
+        setToken(data)
+    }
+
+    let token = getToken()
+    if (token) {
+        router.navigate('/home')
     }
 
     async function onSubmit(values: z.infer<typeof formSchema>) {

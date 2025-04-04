@@ -78,7 +78,7 @@ export function EditProfile() {
         resolver: zodResolver(formSchema),
         defaultValues: {
             username: user.username,
-            firstname: user.firstname.Valid?  user.firstname.String : "",
+            firstname: user.firstname.Valid? user.firstname.String : "",
             lastname: user.lastname.Valid? user.lastname.String : "",
             email: user.email,
             phone: user.phone,
@@ -109,7 +109,6 @@ export function EditProfile() {
             String: values.phone,
             Valid: Boolean(values.phone)
         }
-        //const intID = Number(id)
         const values2 = {
             username,
             firstname,

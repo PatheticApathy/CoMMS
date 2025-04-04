@@ -9,9 +9,8 @@ import useSWRMutation from 'swr/mutation'
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { LogInUser } from "@/user-api-types"
-import { setToken, getToken, delToken } from "@/components/mmkv"
-
-import { Redirect } from 'expo-router'
+import { setToken, getToken } from "@/components/securestore"
+import { useRouter } from 'expo-router'
 
 const formSchema = z.object({
     username: z.string().nonempty(),
@@ -27,7 +26,9 @@ async function logIn(url: string, { arg }: { arg: LogInUser }) {
 
 export default function LoginForm() {
 
-    const { data, trigger, error, isMutating } = useSWRMutation('https://c5f6-138-47-130-200.ngrok-free.app/user/login', logIn, { throwOnError: false })
+    const router = useRouter()
+
+    const { data, trigger, error, isMutating } = useSWRMutation('https://4ba1-138-47-128-9.ngrok-free.app/user/login', logIn, { throwOnError: false })
 
     const {
         control,
@@ -42,11 +43,14 @@ export default function LoginForm() {
     })
 
     if (error) { console.log("Error: ", error) }
+
     if (data) {
-        console.log("Data: ", data)
         setToken(data)
-        let token = getToken()
-        console.log("token: ", token)
+    }
+
+    let token = getToken()
+    if (token) {
+        router.navigate('/home')
     }
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -96,7 +100,7 @@ export default function LoginForm() {
                 />
             </ThemedView>
             <ThemedView style={styles.button}>
-                    <Button title="Login" onPress={handleSubmit(onSubmit)}></Button>
+                <Button title="Login" onPress={handleSubmit(onSubmit)}></Button>
                 <ThemedText style={styles.signUpText}>Don't Have an Account?</ThemedText>
                 <Link href="/signup" asChild>
                     <ThemedText style={styles.signUpLink}>Sign Up!</ThemedText>

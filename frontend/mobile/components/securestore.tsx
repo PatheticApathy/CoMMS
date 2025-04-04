@@ -16,11 +16,11 @@ export function delToken() {
 }*/
 
 
-export async function getToken() {
-    return SecureStore.getItemAsync('token')
+export function getToken() {
+    return SecureStore.getItem('token')
 }
 export async function setToken(token: string) {
-    SecureStore.setItem('token', token)
+    await SecureStore.setItemAsync('token', token)
 }
 export async function delToken() {
     SecureStore.deleteItemAsync('token')
