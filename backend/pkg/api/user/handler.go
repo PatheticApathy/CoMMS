@@ -17,6 +17,7 @@ import (
 // getUser hanlder returns a user based on given parameters godoc
 //
 //	@Summary		fetches user based on given paremeters
+//	@Security identity
 //	@Description	Gets user using id(may add more parameters later)
 //	@Tags			users
 //	@Produce		json
@@ -86,6 +87,7 @@ func (e *Env) getUser(w http.ResponseWriter, r *http.Request) {
 // getUsers hanlder returns all users godoc
 //
 //	@Summary		fetches all users
+//	@Security identity
 //	@Description	Gets users
 //	@Tags			users
 //	@Produce		json
@@ -114,6 +116,7 @@ func (e *Env) getUsers(w http.ResponseWriter, r *http.Request) {
 // Get handler that gets coworkers for contacts
 //
 //	@Summary		post user to database
+//	@Security identity
 //	@Description	Adds user to the database using valid json structure
 //	@Tags			users
 //	@Produce		json
@@ -159,6 +162,7 @@ func (e *Env) getCoworkers(w http.ResponseWriter, r *http.Request) {
 // SignUp handler that adds a user to the the db  godoc
 //
 //	@Summary		post user to database
+//	@Security identity
 //	@Description	Adds user to the database using valid json structure
 //	@Tags			users
 //	@Accept			json
@@ -262,6 +266,7 @@ func (e *Env) createUser(w http.ResponseWriter, r *http.Request) {
 // updateUser handler returns an updated user based on given parameters godoc
 //
 //	@Summary		updates user based on given parameters
+//	@Security identity
 //	@Description	Updates user using id(may add more parameters later)
 //	@Tags			users
 //	@Produce		json
@@ -300,6 +305,7 @@ func (e *Env) updateUser(w http.ResponseWriter, r *http.Request) {
 // deleteUser hanlder removes a user based on given parameters godoc
 //
 //	@Summary		removes user based on given paremeters
+//	@Security identity
 //	@Description	Deletes user using id(may add more parameters later)
 //	@Tags			users
 //	@Produce		json
@@ -338,6 +344,7 @@ func (e *Env) deleteUser(w http.ResponseWriter, r *http.Request) {
 // getUsersWithCompanyAndJobsite handler returns all users with their associated company and jobsite names godoc
 //
 //	@Summary		fetches all users with their associated company and jobsite names
+//	@Security identity
 //	@Description	Gets users with company and jobsite names
 //	@Tags			users
 //	@Produce		json

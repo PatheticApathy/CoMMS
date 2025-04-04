@@ -515,6 +515,8 @@ paths:
           description: Faliled to get companies
           schema:
             type: string
+      security:
+      - identity: []
       summary: fetches all companies
       tags:
       - companies
@@ -546,6 +548,8 @@ paths:
           description: Failed to create company
           schema:
             type: string
+      security:
+      - identity: []
       summary: post company to database
       tags:
       - companies
@@ -573,6 +577,8 @@ paths:
           description: Internal Server Error
           schema:
             type: string
+      security:
+      - identity: []
       summary: fetches company based on given paremeters
       tags:
       - companies
@@ -899,6 +905,8 @@ paths:
           description: Internal Server Error
           schema:
             type: string
+      security:
+      - identity: []
       summary: post job_site to database
       tags:
       - sites
@@ -918,6 +926,8 @@ paths:
           description: Internal Server Error
           schema:
             type: string
+      security:
+      - identity: []
       summary: fetches all job_sites
       tags:
       - sites
@@ -945,6 +955,8 @@ paths:
           description: Internal Server Error
           schema:
             type: string
+      security:
+      - identity: []
       summary: fetches job_site based on given paremeters
       tags:
       - sites
@@ -962,6 +974,8 @@ paths:
           description: Faliled to get users
           schema:
             type: string
+      security:
+      - identity: []
       summary: fetches all users
       tags:
       - users
@@ -1001,6 +1015,8 @@ paths:
           description: Internal server error
           schema:
             type: string
+      security:
+      - identity: []
       summary: post user to database
       tags:
       - users
@@ -1185,6 +1201,8 @@ paths:
           description: Internal Server Error
           schema:
             type: string
+      security:
+      - identity: []
       summary: fetches user based on given paremeters
       tags:
       - users

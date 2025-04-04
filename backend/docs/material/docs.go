@@ -186,6 +186,11 @@ const docTemplate = `{
         },
         "/company/all": {
             "get": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Gets companies",
                 "produces": [
                     "application/json"
@@ -212,6 +217,11 @@ const docTemplate = `{
         },
         "/company/create": {
             "post": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Adds company to the database and assigns the user as a company admin",
                 "consumes": [
                     "application/json"
@@ -258,6 +268,11 @@ const docTemplate = `{
         },
         "/company/search": {
             "get": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Gets company using id",
                 "produces": [
                     "application/json"
@@ -749,6 +764,11 @@ const docTemplate = `{
         },
         "/sites/add": {
             "post": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Adds job_site to the database using valid json structure",
                 "consumes": [
                     "application/json"
@@ -795,6 +815,11 @@ const docTemplate = `{
         },
         "/sites/all": {
             "get": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Get all jobsites",
                 "produces": [
                     "application/json"
@@ -824,6 +849,11 @@ const docTemplate = `{
         },
         "/sites/search": {
             "get": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Gets jobsites using id(may add more parameters later)",
                 "produces": [
                     "application/json"
@@ -865,6 +895,11 @@ const docTemplate = `{
         },
         "/user/all": {
             "get": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Gets users",
                 "produces": [
                     "application/json"
@@ -891,6 +926,11 @@ const docTemplate = `{
         },
         "/user/coworkers": {
             "get": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Adds user to the database using valid json structure",
                 "produces": [
                     "application/json"
@@ -1179,6 +1219,11 @@ const docTemplate = `{
         },
         "/user/search": {
             "get": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Gets user using id(may add more parameters later)",
                 "produces": [
                     "application/json"
