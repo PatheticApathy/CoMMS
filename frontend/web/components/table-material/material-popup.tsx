@@ -256,14 +256,22 @@ export default function MaterialSheet({ material, route, children, token }: Read
                           return <Loading />
                         } else {
                           return (
-                            <div className="flex flex-row flex-auto max-w-96">
-                              <AddFileDialog submitAction={handle_checkout}><Button variant={check ? "default" : "secondary"} className="w-2/3" >{check ? "Checkin" : "Checkout"}</Button></AddFileDialog>
-                              <div className="flex flex-row text-center w-1/3 ">
-                                <div className="w-2/3333xt content-center"><Input value={counter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                            <>
+                              <div className="flex flex-row flex-auto max-w-96">
+                                <AddFileDialog submitAction={handle_checkout}><Button className="w-32" variant={check ? "default" : "secondary"}>{check ? "Checkin" : "Checkout"}</Button></AddFileDialog>
+                                <div className="w-2/3 content-center"><Input value={counter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                   setcount(Number(e.target.value))
-                                }} className="text-slate-300 text-center bg-gray-950" /></div>
+                                }} className="text-slate-300 text-center bg-gray-950" />
+                                </div>
                               </div>
-                            </div>
+                              <div className="flex flex-row">
+                                <Button className="w-32" variant={check ? "default" : "secondary"}>Add stock</Button>
+                                <div className="w-2/3 content-center"><Input value={counter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                  setcount(Number(e.target.value))
+                                }} className="text-slate-300 text-center bg-gray-950" />
+                                </div>
+                              </div>
+                            </>
                           )
                         }
                       })()
