@@ -9,7 +9,8 @@ import useSWRMutation from 'swr/mutation'
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { LogInUser } from "@/user-api-types"
-import { setToken, getToken } from "@/components/mmkv"
+import { setToken, getToken, delToken } from "@/components/mmkv"
+
 import { Redirect } from 'expo-router'
 
 const formSchema = z.object({
@@ -45,7 +46,7 @@ export default function LoginForm() {
         console.log("Data: ", data)
         setToken(data)
         let token = getToken()
-        console.log("Token: ", token)
+        console.log("token: ", token)
     }
 
     async function onSubmit(values: z.infer<typeof formSchema>) {

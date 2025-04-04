@@ -1,4 +1,5 @@
-import { MMKV } from 'react-native-mmkv'
+import * as SecureStore from 'expo-secure-store';
+/*import { MMKV } from 'react-native-mmkv'
 
 export const storage = new MMKV()
 
@@ -12,15 +13,15 @@ export function setToken(token: string) {
 
 export function delToken() {
     storage.delete('token')
-}
+}*/
 
 
-/*export async function getToken() {
-    await SecureStore.getItemAsync('token')
+export async function getToken() {
+    return SecureStore.getItemAsync('token')
 }
 export async function setToken(token: string) {
-    await SecureStore.setItemAsync('token', token)
+    SecureStore.setItem('token', token)
 }
 export async function delToken() {
-    await SecureStore.deleteItemAsync('token')
-}*/
+    SecureStore.deleteItemAsync('token')
+}
