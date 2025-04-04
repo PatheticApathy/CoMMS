@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { LogInUser } from "@/user-api-types"
-import { getToken, setToken } from "@/hooks/useToken"
+import { getToken, setToken } from "@/hooks/usetoken"
 
 const formSchema = z.object({
   username: z.string(),

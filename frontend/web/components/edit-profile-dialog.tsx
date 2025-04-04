@@ -25,7 +25,7 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import useSWR from "swr"
 import { User, Firstname, Lastname } from "@/user-api-types"
-import { useIdentity, getToken } from "@/hooks/useToken"
+import { useIdentity, getToken } from "@/hooks/usetoken"
 
 const formSchema = z.object({
   username: z.string(),

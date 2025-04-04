@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/dialog"
 import useSWR from "swr";
 import { Token, User, UserJoin } from "@/user-api-types";
-import { getToken } from "@/hooks/useToken";
+import { getToken } from "@/hooks/usetoken";
 import { useEffect } from "react";
 
 const fetcher = async (url: string): Promise<UserJoin[]> => {

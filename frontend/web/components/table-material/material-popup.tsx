@@ -17,7 +17,7 @@ import { Button } from "../ui/button";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { Token } from "@/user-api-types";
-import { getToken } from "@/hooks/useToken";
+import { getToken } from "@/hooks/usetoken";
 
 //fetchers
 const MaterialLogFetcher: Fetcher<MaterialLog[], string> = async (...args) => fetch(...args, { headers: { 'Authorization': getToken() }, cache: 'default' }).then(res => res.json())

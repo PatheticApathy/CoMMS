@@ -3,7 +3,7 @@
 import { useState } from "react";
 import ContactsTable from "@/components/contacts-table";
 import InputWithButton from "@/components/search-button";
-import { getToken } from "@/hooks/useToken";
+import { getToken } from "@/hooks/usetoken";
 import useSWR, { Fetcher } from "swr";
 import { Token, UserJoin } from "@/user-api-types";
 import { Button, buttonVariants } from "@/components/ui/button";

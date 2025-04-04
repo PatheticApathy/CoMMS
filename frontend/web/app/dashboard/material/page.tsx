@@ -4,7 +4,7 @@ import useSWR, { Fetcher } from 'swr'
 import Loading from '@/components/loading';
 import FilterAndTable from '@/components/table-material/material-filter+table';
 import InitAddFormDialouge from "@/components/add-material-form/material-add-form-button";
-import { getToken, useIdentity } from '@/hooks/useToken';
+import { getToken, useIdentity } from '@/hooks/usetoken';
 import { User } from '@/user-api-types';
 
 
@@ -15,7 +15,6 @@ const fetchUser: Fetcher<User, string> = async (...args) => fetch(...args, { hea
 //TODO: Prevent checkout of materials if no more materials
 //BUG: Chceking out materials results in a 404, but materials are still taken out of the supply(two bugs)
 export default function AllMaterialPage() {
-
 
   const identity = useIdentity();
   const { data: user } = useSWR(identity ? `/api/user/search?id=${identity.id}` : null, fetchUser,)

@@ -24,7 +24,7 @@ import { redirect } from 'next/navigation'
 import { EditProfile } from "./edit-profile-dialog"
 import useSWR from "swr";
 import { User } from "@/user-api-types";
-import { delTokenNIdentity, getToken, useIdentity } from '@/hooks/useToken'
+import { delTokenNIdentity, getToken, useIdentity } from '@/hooks/usetoken'
 
 const fetcher = async (url: string) => {
   const res = await fetch(url,
