@@ -40,7 +40,7 @@ async function getProfileArgs(url: string, arg: string) {
     }).then(res=>res.json())
 }*/
 
-const fetcher = async  (url: string) => {
+const fetcher = async (url: string) => {
     const res = await fetch(url)
     if (!res.ok) {
       throw new Error("Failed to fetch data");
