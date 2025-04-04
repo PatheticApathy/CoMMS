@@ -1,0 +1,29 @@
+services:
+  user_api:
+    environment:
+      - MATERIAL_HOST=${material_api}
+      - USER_HOST=${user_api}
+      - USERDB=./databases/Userdb/user.db
+      - SECRETKEY=Q5c3gH5vMOqpjBzaChUCc2L6jK4QVid6
+      - NOMINATIM_HOST=
+    restart: always
+    build:
+      context: ./backend/
+      dockerfile: ./backend/build/user_api/Dockerfile
+
+  material_api:
+    environment:
+      - MATERIAL_HOST=${material_api}
+      - MATERIALDB=./databases/Materialdb/materials.db
+      - USER_HOST=${user_api}
+    restart: always
+    build:
+      context: ./backend/
+      dockerfile: ./backend/build/material_api/Dockerfile
+    depends_on:
+      - user_api
+
+  nextjs:
+    depends_on:
+      - material_api
+      - user_api
