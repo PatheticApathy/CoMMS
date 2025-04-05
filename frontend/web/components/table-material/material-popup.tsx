@@ -123,6 +123,8 @@ const DisplayCheckouts = (checkout_logs: CheckoutLog[] | undefined, error: boole
   }
 }
 
+//TODO: Investigate why material subtractions are not being counted correctly
+//TODO: Finish add quntity button. Needs separate counter and mutator
 export default function MaterialSheet({ material, route, children, token }: Readonly<{
   material: Material,
   children: React.ReactNode;
@@ -176,7 +178,6 @@ export default function MaterialSheet({ material, route, children, token }: Read
         toast.error(message.message || "Error has occured");
         return
       }
-      //TODO: set last checkout picture to current picture of item
       const name = await picture_resp.json() as { name: string }
       const check_pick = `/ ${name.name}`
 
