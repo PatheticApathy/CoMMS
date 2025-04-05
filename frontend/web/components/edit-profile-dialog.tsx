@@ -25,7 +25,8 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import useSWR from "swr"
 import { User, Firstname, Lastname } from "@/user-api-types"
-import { useIdentity, getToken } from "@/hooks/usetoken"
+import { IdentityContext, getToken } from "@/components/identity-provider"
+import { useContext } from "react"
 
 const formSchema = z.object({
   username: z.string(),
@@ -56,7 +57,7 @@ export function EditProfile() {
 
 
   const { data, trigger, error, isMutating } = useSWRMutation('/api/user/update', changeProfile, { throwOnError: false })
-  const id = useIdentity()?.id
+  const id = useContext(IdentityContext)
 
 
   const { data: user, error: error3, mutate: userMutate } = useSWR<User, string>(`/api/user/search?id=${id}`, fetcher)

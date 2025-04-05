@@ -15,7 +15,7 @@ import { Material, AddMaterial } from "@/material-api-types"
 import FormInput from "../form-maker/form-input"
 import { JobSite } from "@/user-api-types"
 import { toast } from "sonner"
-import { getToken } from "@/hooks/usetoken"
+import { getToken } from "@/components/identity-provider"
 
 // Schema for form
 const AddMaterialSchema = z.object({

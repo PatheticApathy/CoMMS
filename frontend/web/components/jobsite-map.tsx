@@ -4,10 +4,9 @@ import L, { LatLngBoundsExpression } from "leaflet"
 import { MapContainer, TileLayer, Marker, Popup, Polygon, Rectangle } from "react-leaflet";
 import useSWR from 'swr'
 import { JobSite, User } from '@/user-api-types';
-import Loading from '@/components/loading';
 import "leaflet/dist/leaflet.css";
 import { Token } from '@/user-api-types';
-import { getToken } from "@/hooks/usetoken";
+import { getToken } from "@/components/identity-provider";
 
 const defaultIcon = new L.Icon({
   iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",

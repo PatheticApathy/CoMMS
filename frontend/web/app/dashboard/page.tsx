@@ -3,8 +3,9 @@
 import Dashboard from '@/components/dashboard';
 import Loading from '@/components/loading';
 import useSWR, { Fetcher } from 'swr'
-import { getToken, useIdentity } from '@/hooks/usetoken';
+import { getToken, IdentityContext } from '@/components/identity-provider';
 import { User, JobSite } from '@/user-api-types';
+import { useContext } from 'react';
 
 const fetchUser: Fetcher<User, string> = async (...args) => fetch(...args, { headers: { 'Authorization': getToken() } }).then(res => res.json())
 const fetchJobsite: Fetcher<JobSite, string> = async (...args) => fetch(...args, { headers: { 'Authorization': getToken() } }).then(res => res.json())
@@ -12,7 +13,7 @@ const fetchJobsite: Fetcher<JobSite, string> = async (...args) => fetch(...args,
 
 export default function DashBoardPage() {
 
-  const identity = useIdentity();
+  const identity = useContext(IdentityContext);
   const { data: user } = useSWR(identity ? `/api/user/search?id=${identity.id}` : null, fetchUser,)
   const { data: jobsite } = useSWR(user ? `/api/sites/search?id=${user.jobsite_id.Valid ? user.jobsite_id.Int64 : undefined}` : null, fetchJobsite,)
 
@@ -20,7 +21,7 @@ export default function DashBoardPage() {
 
   return (
     <div className="flex flex-col justify-center items-center w-screen">
-        <Dashboard route = {user ? `/api/sites/search?id=${user.jobsite_id.Valid ? user.jobsite_id.Int64 : undefined}` : undefined} header="Jobsite" jobsite={jobsite} />
+      <Dashboard route={user ? `/api/sites/search?id=${user.jobsite_id.Valid ? user.jobsite_id.Int64 : undefined}` : undefined} header="Jobsite" jobsite={jobsite} />
     </div>
   );
 }

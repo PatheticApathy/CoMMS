@@ -3,7 +3,7 @@
 import { useState } from "react";
 import ContactsTable from "@/components/contacts-table";
 import InputWithButton from "@/components/search-button";
-import { getToken } from "@/hooks/usetoken";
+import { getToken } from "@/components/identity-provider";
 import useSWR, { Fetcher } from "swr";
 import { Token, UserJoin } from "@/user-api-types";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -38,7 +38,7 @@ export default function Contacts() {
       <div className="flex flex-col justify-self-end items-center">
         <div className="flex items-center space-x-5">
           <InputWithButton onSearch={setSearchQuery} />
-          <CsvDownloadButton className={cn(buttonVariants({variant : 'outline'}))} data={table_data}><FileSpreadsheet /></CsvDownloadButton>
+          <CsvDownloadButton className={cn(buttonVariants({ variant: 'outline' }))} data={table_data}><FileSpreadsheet /></CsvDownloadButton>
           <Button variant="outline" onClick={handlePrint}>
             <Printer />
           </Button>

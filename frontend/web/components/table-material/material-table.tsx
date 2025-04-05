@@ -2,13 +2,14 @@ import { Material } from "@/material-api-types"
 import { DataTable } from "../table-maker/data-table";
 import { MaterialRow } from "./material-columns";
 import { MaterialTableColumns } from "./material-columns";
-import { useIdentity } from "@/hooks/usetoken";
+import { IdentityContext } from "@/components/identity-provider";
+import { useContext } from "react";
 
 
 
 export default function MTable({ materials, route }: { materials: Material[], route: string | undefined }) {
 
-  const identity = useIdentity()
+  const identity = useContext(IdentityContext)
 
 
   const rows = materials.map((material): MaterialRow => {
