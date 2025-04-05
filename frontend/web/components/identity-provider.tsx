@@ -1,9 +1,9 @@
-'use client'
+'use client';
 import { Token } from "@/user-api-types"
 import { redirect } from "next/navigation"
 import { createContext, ReactNode, useEffect, useState } from "react"
 import { toast } from "sonner"
-import useSWR, { Fetcher } from "swr"
+import { Fetcher } from "swr"
 
 const ExpirationDate =  /* (days * 60sec * 60min * 24hrs) */2 * 60 * 60 * 24
 

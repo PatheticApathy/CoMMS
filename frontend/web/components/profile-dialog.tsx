@@ -43,15 +43,16 @@ const fetcher = async (url: string) => {
 export function Profile() {
 
   const identity = useContext(IdentityContext)
-  const { data: user, error: error3 } = useSWR<GetUserRow[], string>(identity ? `/api/user/search?id=${identity.id}` : null, fetcher);
+  const { data: user, error: error3, isLoading } = useSWR<GetUserRow[], string>(identity ? `/api/user/search?id=${identity.id}` : null, fetcher);
 
-  if (error3) return <p>Error loading Profile.</p>;
-  if (!user) return <p>Loading...</p>;
+  if (error3 || !user) return <p>Error loading Profile.</p>;
+  if (isLoading) return <p>Loading...</p>;
 
   async function logoutSubmit() {
     delTokenNIdentity()
     redirect('/')
   }
+  console.log(identity)
 
   return (
     <Dialog>

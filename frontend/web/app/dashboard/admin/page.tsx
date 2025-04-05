@@ -6,7 +6,7 @@ import { MaterialTable } from '@/components/admin-material';
 import { Button } from '@/components/ui/button';
 import useSWR from 'swr'
 import { Token } from '@/user-api-types';
-import { getToken } from '@/hooks/usetoken';
+import { getToken } from '@/components/identity-provider';
 
 async function getProfileArgs(url: string, arg: string) {
   return fetch(url, {
