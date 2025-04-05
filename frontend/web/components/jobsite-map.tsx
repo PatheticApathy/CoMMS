@@ -6,7 +6,7 @@ import useSWR from 'swr'
 import { JobSite, User } from '@/user-api-types';
 import "leaflet/dist/leaflet.css";
 import { Token } from '@/user-api-types';
-import { getToken } from "@/hooks/useToken";
+import { getToken } from "@/components/identity-provider";
 
 const defaultIcon = new L.Icon({
   iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",

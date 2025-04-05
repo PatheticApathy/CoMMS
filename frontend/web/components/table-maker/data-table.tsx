@@ -1,6 +1,8 @@
 "use client"
 
 import * as React from "react"
+import CsvDownloadButton from "react-json-to-csv"
+import { useRouter } from "next/navigation"
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -117,7 +119,7 @@ export function DataTable<TData, TValue>({
           }
           className="max-w-sm"
         />
-
+        <CsvDownloadButton data={data} />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">

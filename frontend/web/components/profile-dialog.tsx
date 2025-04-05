@@ -23,8 +23,9 @@ import {
 import { redirect } from 'next/navigation'
 import { EditProfile } from "./edit-profile-dialog"
 import useSWR from "swr";
-import { GetUserRow, User } from "@/user-api-types";
-import { delTokenNIdentity, getToken, useIdentity } from '@/hooks/useToken'
+import { GetUserRow } from "@/user-api-types";
+import { delTokenNIdentity, getToken, IdentityContext } from '@/components/identity-provider'
+import { useContext } from "react"
 
 const fetcher = async (url: string) => {
   const res = await fetch(url,
@@ -41,7 +42,7 @@ const fetcher = async (url: string) => {
 
 export function Profile() {
 
-  const identity = useIdentity()
+  const identity = useContext(IdentityContext)
   const { data: user, error: error3 } = useSWR<GetUserRow[], string>(identity ? `/api/user/search?id=${identity.id}` : null, fetcher);
 
   if (error3) return <p>Error loading Profile.</p>;

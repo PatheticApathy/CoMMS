@@ -17,10 +17,10 @@ import { Button } from "../ui/button";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { GetUserRow, Token } from "@/user-api-types";
-import { getToken } from "@/hooks/useToken";
 import { Input } from "../ui/input";
 import AddFileDialog from "../add-file-dialog";
 import { FileWithPath } from "react-dropzone";
+import { getToken } from "@/components/identity-provider";
 
 //fetchers
 const MaterialLogFetcher: Fetcher<MaterialLog[], string> = async (...args) => fetch(...args, { headers: { 'Authorization': getToken() }, cache: 'default' }).then(res => res.json())

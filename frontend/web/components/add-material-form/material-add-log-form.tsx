@@ -13,7 +13,7 @@ import FormInput from "../form-maker/form-input"
 import { toast } from "sonner"
 import { mutate } from "swr"
 import FormTextInput from "../form-maker/form-textbox"
-import { getToken } from "@/hooks/useToken"
+import { getToken } from "@/components/identity-provider"
 
 
 //Schema for form

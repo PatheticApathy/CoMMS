@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { LogInUser } from "@/user-api-types"
-import { setToken } from "@/hooks/useToken"
+import { setToken } from "@/components/identity-provider"
 
 const formSchema = z.object({
   username: z.string(),
