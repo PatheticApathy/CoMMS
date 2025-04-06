@@ -1083,6 +1083,11 @@ const docTemplate = `{
         },
         "/user/delete": {
             "delete": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Deletes user using id(may add more parameters later)",
                 "produces": [
                     "application/json"
@@ -1124,6 +1129,11 @@ const docTemplate = `{
         },
         "/user/join": {
             "get": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Gets users with company and jobsite names",
                 "produces": [
                     "application/json"
@@ -1274,6 +1284,11 @@ const docTemplate = `{
         },
         "/user/signup": {
             "post": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Adds user to the database using valid json structure",
                 "consumes": [
                     "application/json"
@@ -1320,6 +1335,11 @@ const docTemplate = `{
         },
         "/user/update": {
             "put": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Updates user using id(may add more parameters later)",
                 "produces": [
                     "application/json"

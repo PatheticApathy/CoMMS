@@ -1104,6 +1104,8 @@ paths:
           description: Failed to delete user
           schema:
             type: string
+      security:
+      - identity: []
       summary: removes user based on given paremeters
       tags:
       - users
@@ -1123,6 +1125,8 @@ paths:
           description: Failed to get users
           schema:
             type: string
+      security:
+      - identity: []
       summary: fetches all users with their associated company and jobsite names
       tags:
       - users
@@ -1233,6 +1237,8 @@ paths:
           description: Failed to signup user
           schema:
             type: string
+      security:
+      - identity: []
       summary: post user to database
       tags:
       - users
@@ -1261,6 +1267,8 @@ paths:
           description: Failed to update user
           schema:
             type: string
+      security:
+      - identity: []
       summary: updates user based on given parameters
       tags:
       - users

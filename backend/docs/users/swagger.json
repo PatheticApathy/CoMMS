@@ -462,6 +462,11 @@
         },
         "/user/delete": {
             "delete": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Deletes user using id(may add more parameters later)",
                 "produces": [
                     "application/json"
@@ -503,6 +508,11 @@
         },
         "/user/join": {
             "get": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Gets users with company and jobsite names",
                 "produces": [
                     "application/json"
@@ -653,6 +663,11 @@
         },
         "/user/signup": {
             "post": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Adds user to the database using valid json structure",
                 "consumes": [
                     "application/json"
@@ -699,6 +714,11 @@
         },
         "/user/update": {
             "put": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Updates user using id(may add more parameters later)",
                 "produces": [
                     "application/json"

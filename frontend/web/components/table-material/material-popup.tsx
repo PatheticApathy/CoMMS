@@ -134,6 +134,7 @@ export default function MaterialSheet({ material, route, children, token }: Read
 
   const [check, setCheck] = useState(false)
   const [counter, setcount] = useState(0)
+  const [add_counter, setaddcount] = useState(0)
   const { data: checkout_logs, isLoading: checkout_loading, error: checkout_error } = useSWR(`/api/material/checkout/recent?id=${material.id}`, CheckoutLogFetcher)
   const { data: material_logs, isLoading: material_loading, error: material_error } = useSWR(`/api/material/mlogs/recent?id=${material.id}`, MaterialLogFetcher)
   const { data: usernames } = useSWR(checkout_logs ? `/api/user/search?${checkout_logs.map(log => `id=${log.user_id}`).join('&')}` : undefined, UsersFetcher)
@@ -179,7 +180,7 @@ export default function MaterialSheet({ material, route, children, token }: Read
         return
       }
       const name = await picture_resp.json() as { name: string }
-      const check_pick = `/ ${name.name}`
+      const check_pick = `/${name.name}`
 
       //Make checkin/out request
       let check_resp = undefined
@@ -197,16 +198,17 @@ export default function MaterialSheet({ material, route, children, token }: Read
         return
       }
 
-      //Change corresponding amount on maaterial
-      const resp = await send_amount({ quantity: counter, id: material.id })
+      //Change corresponding amount on material
+      const resp = await send_amount({ quantity: check ? material.quantity + counter : material.quantity - counter, id: material.id })
       if (!resp.ok) {
         toast.error(await resp.text() || "Error has occured");
         return
       }
 
       const new_material: Material = await resp.json()
-      mutate(`/ api / material / checkout / recent ? id = ${new_material.id}`)
-      mutate(`/ api / material / mlogs / recent ? id = ${new_material.id}`)
+      mutate(`/api/material/checkout/recent?id=${new_material.id}`)
+      mutate(`/api/material/mlogs/recent?id=${new_material.id}`)
+      mutate(route)
       toast.message(`${new_material.name.Valid ? new_material.name.String : ""} checked ${check ? "in" : "out"}`)
 
     } catch (err) {
@@ -214,6 +216,29 @@ export default function MaterialSheet({ material, route, children, token }: Read
     }
 
   }
+  const handle_add_amount = async () => {
+    try {
+      toast.message("Adding to stock")
+
+      //add corresponding amount on material
+      const resp = await send_amount({ quantity: material.quantity + add_counter, id: material.id })
+      if (!resp.ok) {
+        toast.error(await resp.text() || "Error has occured");
+        return
+      }
+
+      const new_material: Material = await resp.json()
+      mutate(`/api/material/checkout/recent?id=${new_material.id}`)
+      mutate(`/api/material/mlogs/recent?id=${new_material.id}`)
+      mutate(route)
+      toast.message(`${new_material.name.Valid ? new_material.name.String : ""} stock changed to ${new_material.quantity}`)
+
+    } catch (err) {
+      toast.error(String(err) || "Error has occured");
+    }
+
+  }
+
 
   useEffect(() => {
     if (checkout_logs && token) {
@@ -266,9 +291,9 @@ export default function MaterialSheet({ material, route, children, token }: Read
                                 </div>
                               </div>
                               <div className="flex flex-row">
-                                <Button className="w-32" variant={check ? "default" : "secondary"}>Add stock</Button>
-                                <div className="w-2/3 content-center"><Input value={counter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                  setcount(Number(e.target.value))
+                                <Button onClick={handle_add_amount} className="w-32" variant="default">Add stock</Button>
+                                <div className="w-2/3 content-center"><Input value={add_counter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                  setaddcount(Number(e.target.value))
                                 }} className="text-slate-300 text-center bg-gray-950" />
                                 </div>
                               </div>
