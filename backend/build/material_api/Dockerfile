@@ -6,7 +6,7 @@ COPY . /api
 WORKDIR /api
 
 ## Get foreign packages and build tools
-RUN go mod download && \
+RUN go mod tidy && \
   go install github.com/swaggo/swag/cmd/swag@latest && \
   go install github.com/sqlc-dev/sqlc/cmd/sqlc@v1.27.0 && \
   go install github.com/pressly/goose/v3/cmd/goose@latest
