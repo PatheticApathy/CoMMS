@@ -11,7 +11,7 @@ import {
 
 import { Profile } from "./profile-dialog"
 import { ModeToggle } from "./darkmode-button"
-import IdentityProvider, { IdentityContext } from "./identity-provider"
+import IdentityProvider from "./identity-provider"
 
 export function AppSidebar() {
   return (

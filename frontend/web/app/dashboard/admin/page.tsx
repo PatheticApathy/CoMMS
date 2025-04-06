@@ -20,7 +20,7 @@ const token = getToken()
 
 export default function AdminPage() {
   const [showFirstTable, setShowFirstTable] = useState(true);
-  const { data: tokenData, error: error2 } = useSWR([token ? '/api/user/decrypt' : null, token], ([url, token]) => getProfileArgs(url, token))
+  const { data: tokenData, error: error2 } = useSWR([token ? '/api/user/decrypt' : null, token], ([url, token]) => url ? getProfileArgs(url, token) : null)
 
 
   if (!token) { return (<p className='flex items-center justify-center w-screen h-screen'>Invalid Token</p>) }

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unescpaed-entities */
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -91,7 +90,7 @@ export default function LoginForm() {
         <div className="flex justify-center">
           <Button disabled={isMutating} className="flex justify-center" type="submit">Login</Button>
         </div>
-        <div className="flex justify-center">Don't Have an Account?</div>
+        <div className="flex justify-center">Don &apos;t Have an Account?</div>
         <Link href="/signup" className="flex justify-center hover:text-blue-500 hover:underline">Sign up!</Link>
       </form>
     </Form>

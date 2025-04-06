@@ -41,7 +41,7 @@ export default function AddFileDialog({ children, submitAction }: { children: Re
         <section className="container">
           <div {...getRootProps({ className: 'dropzone' })}>
             <input {...getInputProps()} />
-            <p>Drag 'n' drop pictures here, or click to select files</p>
+            <p>Drag &apos;n&apos; drop pictures here, or click to select files</p>
             <em>(Only *.jpeg and *.png images will be accepted)</em>
           </div>
           <aside>

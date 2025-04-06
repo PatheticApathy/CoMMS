@@ -3,7 +3,6 @@ import { Token } from "@/user-api-types"
 import { redirect } from "next/navigation"
 import { createContext, ReactNode, useEffect, useState } from "react"
 import { toast } from "sonner"
-import { Fetcher } from "swr"
 
 const ExpirationDate =  /* (days * 60sec * 60min * 24hrs) */2 * 60 * 60 * 24
 
@@ -64,7 +63,7 @@ export default function IdentityProvider({ children }: { children: ReactNode }) 
       })
 
     }
-  }, [])
+  }, [curr, token])
 
   if (identity) { sessionStorage.setItem('identity', JSON.stringify(identity)) }
   return (
@@ -73,6 +72,3 @@ export default function IdentityProvider({ children }: { children: ReactNode }) 
     </IdentityContext.Provider>
   )
 }
-
-
-const fetchIdentity: Fetcher<Token, string> = async (...args) => fetch(...args, { method: 'POST', body: getToken() },).then(res => res.json())

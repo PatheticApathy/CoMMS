@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import CsvDownloadButton from "react-json-to-csv"
-import { useRouter } from "next/navigation"
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
