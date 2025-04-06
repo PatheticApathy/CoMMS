@@ -31,7 +31,7 @@ RUN go run ./scripts/csv_to_users/main.go scripts/csv_to_users/users.csv && \
 WORKDIR /api/main/user_api
 
 # gen docs and compile app
-RUN  swag init -pdl 3 -o ./docs/material/ &&\
+RUN  swag init -pdl 3 -o ./docs/users/ &&\
   go build -o main
 
 #Seccond phase
@@ -39,7 +39,8 @@ FROM alpine:3.21.3
 
 ## Move final binary to small image
 COPY --from=build /api/main/user_api/main /api/main
-COPY --from=build /api/databases/Materialdb/materials.db /api/materials.db
+COPY --from=build /api/databases/Userdb/user.db /api/db/user.db
+VOLUME /api/db
 WORKDIR /api
 
 CMD [ "./main" ]

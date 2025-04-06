@@ -31,7 +31,7 @@ import (
 func main() {
 	// TODO: Integration test for adding materials and checkoutlogs for a jobsite/user
 	if err := godotenv.Load(); err != nil {
-		log.Printf("No .env file found LOL: %s", err)
+		log.Printf("WARNING: .env file found LOL: %s", err)
 	}
 
 	url, err := url.Parse(os.Getenv("MATERIAL_HOST"))

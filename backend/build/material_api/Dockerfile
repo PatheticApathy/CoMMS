@@ -37,7 +37,8 @@ FROM alpine:3.21.3
 
 ## Move final binary to small image
 COPY --from=build /api/main/material_api/main /api/main
-COPY --from=build /api/databases/Materialdb/materials.db /api/materials.db
+COPY --from=build /api/databases/Materialdb/materials.db /api/db/materials.db
+VOLUME /api/db
 WORKDIR /api
 
 CMD [ "./main" ]

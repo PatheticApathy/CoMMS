@@ -44,7 +44,7 @@ var yaml []byte
 // @externalDocs.url			https://swagger.io/resources/open-api/
 func main() {
 	if err := godotenv.Load(); err != nil {
-		log.Printf("No .env file found LOL: %e", err)
+		log.Printf("WARNING: .env file found LOL: %s", err)
 	}
 
 	// goes to osm if not set in .env
