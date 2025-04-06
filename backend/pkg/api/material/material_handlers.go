@@ -212,7 +212,18 @@ func (e *Env) postMaterialHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id := strconv.Itoa(int(material.JobSite))
-	resp, err := http.Get(e.UserHost + "/sites/search?id=" + id)
+
+	req, err := http.NewRequest("GET", e.UserHost+"/sites/search?id="+id, nil)
+	if err != nil {
+		log.Printf("Error occured while trying to connect to user api: %s", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	req.Header.Set("Authorization", r.Header.Get("Authorization"))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	if err != nil {
 		log.Printf("Error occured while trying to connect to user api: %s", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

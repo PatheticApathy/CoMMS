@@ -13,9 +13,10 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown, ChevronDown, FileSpreadsheet, MoreHorizontal, Printer } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import CsvDownloadButton from "react-json-to-csv"
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
@@ -40,6 +41,8 @@ import InitAddFormDialougeAdmin from "@/components/add-jobsite-form/jobsite-add-
 import useSWR from "swr";
 import { User, UserJoin, Company, JobSite } from "@/user-api-types";
 import Loading from "@/components/loading";
+import { cn } from "@/lib/utils";
+
 
 const fetcher = async (url: string): Promise<UserJoin[]> => {
   const res = await fetch(url);
@@ -337,7 +340,11 @@ export function UserTable() {
           }
           className="max-w-sm"
         />
-        <InitAddFormDialougeAdmin />
+        <InitAddFormDialougeAdmin/>
+        <CsvDownloadButton className={cn(buttonVariants({variant : 'outline'}))} data={data}><FileSpreadsheet /></CsvDownloadButton>
+        <Button variant="outline" size="default" onClick={() => window.print()}>
+          <Printer />
+        </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">

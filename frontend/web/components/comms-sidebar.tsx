@@ -10,6 +10,8 @@ import {
 } from "@/components/ui/sidebar"
 
 import { Profile } from "./profile-dialog"
+import { ModeToggle } from "./darkmode-button"
+import IdentityProvider, { IdentityContext } from "./identity-provider"
 
 export function AppSidebar() {
   return (
@@ -47,7 +49,12 @@ export function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <Profile />
+            <IdentityProvider>
+              <div className="grid grid-flow-col grid-rows-3 gap-4 justify-end">
+                <div className="col-span-2 row-start-4 row-end-4"><Profile /></div>
+                <div className="row-start-4 row-end-4"><ModeToggle /></div>
+              </div>
+            </IdentityProvider>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter >

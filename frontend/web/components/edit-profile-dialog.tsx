@@ -24,8 +24,9 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import useSWR from "swr"
-import { User, Firstname, Lastname } from "@/user-api-types"
-import { useIdentity, getToken } from "@/hooks/useToken"
+import { User, Firstname, Lastname, GetUserRow } from "@/user-api-types"
+import { IdentityContext, getToken } from "@/components/identity-provider"
+import { useContext } from "react"
 
 const formSchema = z.object({
   username: z.string(),
@@ -45,7 +46,9 @@ async function changeProfile(url: string, { arg }) {
 }
 
 const fetcher = async (url: string) => {
-  const res = await fetch(url)
+  const res = await fetch(url, {
+    headers: { 'Authorization': getToken() }
+  })
   if (!res.ok) {
     throw new Error("Failed to fetch data");
   }
@@ -53,13 +56,9 @@ const fetcher = async (url: string) => {
 };
 
 export function EditProfile() {
-
-
+  const identity = useContext(IdentityContext)
   const { data, trigger, error, isMutating } = useSWRMutation('/api/user/update', changeProfile, { throwOnError: false })
-  const id = useIdentity()?.id
-
-
-  const { data: user, error: error3, mutate: userMutate } = useSWR<User, string>(`/api/user/search?id=${id}`, fetcher)
+  const { data: user, error: error3, mutate: userMutate } = useSWR<GetUserRow[], string>(identity ? `/api/user/search?id=${identity.id}` : undefined, fetcher)
 
   if (error3) return <p>Error loading Profile.</p>;
   if (!user) return <p>Loading...</p>;
@@ -67,11 +66,11 @@ export function EditProfile() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: user.username,
-      firstname: user.firstname.Valid ? user.firstname.String : "",
-      lastname: user.lastname.Valid ? user.lastname.String : "",
-      email: user.email,
-      phone: user.phone,
+      username: user[0].username,
+      firstname: user[0].firstname.Valid ? user[0].firstname.String : "",
+      lastname: user[0].lastname.Valid ? user[0].lastname.String : "",
+      email: user[0].email,
+      phone: user[0].phone,
     },
   })
 

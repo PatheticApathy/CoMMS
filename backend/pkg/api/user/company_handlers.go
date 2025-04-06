@@ -16,6 +16,7 @@ import (
 //
 //	@Summary		fetches company based on given paremeters
 //	@Description	Gets company using id
+//	@Security identity
 //	@Tags			companies
 //	@Produce		json
 //	@Param			id	query		int				true	"company's identification number"
@@ -57,6 +58,7 @@ func (e *Env) getCompany(w http.ResponseWriter, r *http.Request) {
 // getCompanies hanlder returns all companies godoc
 //
 //	@Summary		fetches all companies
+//	@Security identity
 //	@Description	Gets companies
 //	@Tags			companies
 //	@Produce		json
@@ -85,6 +87,7 @@ func (e *Env) getCompanies(w http.ResponseWriter, r *http.Request) {
 // createCompany handler that adds a company and assigns the user as a company admin
 //
 //	@Summary		post company to database
+//	@Security identity
 //	@Description	Adds company to the database and assigns the user as a company admin
 //	@Tags			companies
 //	@Accept			json

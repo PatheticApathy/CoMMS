@@ -13,9 +13,10 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown, ChevronDown, MoreHorizontal, FileSpreadsheet, Printer } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import CsvDownloadButton from "react-json-to-csv"
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
@@ -40,6 +41,7 @@ import useSWR from "swr";
 import { Material } from "@/material-api-types";
 import Loading from "@/components/loading";
 import InitAddFormDialougeAdmin from "@/components/add-material-form/material-add-admin";
+import { cn } from "@/lib/utils";
 
 const fetcher = async (url: string): Promise<Material[]> => {
   const res = await fetch(url);
@@ -254,6 +256,10 @@ export function MaterialTable() {
           className="max-w-sm"
         />
         <InitAddFormDialougeAdmin/>
+        <CsvDownloadButton className={cn(buttonVariants({variant : 'outline'}))} data={data}><FileSpreadsheet /></CsvDownloadButton>
+        <Button variant="outline" size="default" onClick={() => window.print()}>
+          <Printer />
+        </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
