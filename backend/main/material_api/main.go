@@ -64,8 +64,12 @@ func main() {
 		http.Redirect(w, r, "/swagger", http.StatusPermanentRedirect)
 	})
 
+	port := url.Port()
+	if port == "" {
+		port = "8080"
+	}
 	serv := http.Server{
-		Addr:    ":" + url.Port(),
+		Addr:    ":" + port,
 		Handler: middleware.Middlewares(middleware.Json, middleware.Logger)(router),
 	}
 

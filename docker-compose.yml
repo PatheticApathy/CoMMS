@@ -1,8 +1,8 @@
 services:
   user_api:
     environment:
-      - MATERIAL_HOST=${material_api}
-      - USER_HOST=${user_api}
+      - MATERIAL_HOST=material_api
+      - USER_HOST=user_api
       - USERDB=./databases/Userdb/user.db
       - SECRETKEY=Q5c3gH5vMOqpjBzaChUCc2L6jK4QVid6
       - NOMINATIM_HOST=
@@ -10,22 +10,32 @@ services:
     build:
       context: ./backend/
       dockerfile: ./build/user_api/Dockerfile
+    ports:
+      - 8082:8082
 
   material_api:
     environment:
-      - MATERIAL_HOST=${material_api}
+      - MATERIAL_HOST=material_api
       - MATERIALDB=./databases/Materialdb/materials.db
-      - USER_HOST=${user_api}
+      - USER_HOST=user_api
     restart: always
     build:
       context: ./backend/
       dockerfile: ./build/material_api/Dockerfile
     depends_on:
       - user_api
+    ports:
+      - 8080:8080
 
   nextjs:
+    environment:
+      - API=user_api:8082
     build:
       context: ./frontend/web
+      args:
+        API: user_api:8082
     depends_on:
       - material_api
       - user_api
+    ports:
+      - 3000:3000
