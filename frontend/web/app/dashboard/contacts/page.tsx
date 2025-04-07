@@ -3,21 +3,15 @@
 import { useState } from "react";
 import ContactsTable from "@/components/contacts-table";
 import InputWithButton from "@/components/search-button";
-import { getToken } from "@/components/identity-provider";
-import useSWR, { Fetcher } from "swr";
-import { Token, UserJoin } from "@/user-api-types";
+import { UserJoin } from "@/user-api-types";
 import { Button, buttonVariants } from "@/components/ui/button";
 import CsvDownloadButton from "react-json-to-csv"
 import { cn } from "@/lib/utils";
 import { FileSpreadsheet, Printer } from "lucide-react";
 
 
-const tkn = getToken();
-const TokenFetcher: Fetcher<Token, string> = async (...args) => fetch(...args, { method: "POST", body: tkn, cache: "force-cache" }).then((res) => res.json());
-
 export default function Contacts() {
   const [searchQuery, setSearchQuery] = useState("");
-  const { data: token, isLoading: t_loading } = useSWR("/api/user/decrypt", TokenFetcher);
   const [table_data, setTableData] = useState<UserJoin[]>([]);
 
 

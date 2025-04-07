@@ -1,7 +1,7 @@
 // Server Action
 'use server'
 
-import { Jobsite } from "@/material-api-types"
+import { JobSite } from "@/user-api-types"
 
 export default async function GetContacts() {
   const api_host = process.env.API
@@ -18,7 +18,7 @@ export default async function GetContacts() {
       return { message: "bad request" }
     }
 
-    const jawa = await resp.json() as Jobsite[]
+    const jawa = await resp.json() as JobSite[]
     return jawa
   } catch (err) {
     console.error(err)

@@ -37,11 +37,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import useSWR from "swr";
+import useSWR, { Fetcher } from "swr";
 import { Material } from "@/material-api-types";
 import Loading from "@/components/loading";
 import InitAddFormDialougeAdmin from "@/components/add-material-form/material-add-admin";
 import { cn } from "@/lib/utils";
+import { getToken, IdentityContext } from '@/components/identity-provider';
+import { User } from '@/user-api-types';
+import { useContext } from 'react';
+
+const fetchUser: Fetcher<User, string> = async (...args) => fetch(...args, { headers: { Authorization: getToken() } }).then((res) => res.json());
+
 
 const fetcher = async (url: string): Promise<Material[]> => {
   const res = await fetch(url);
@@ -183,6 +189,8 @@ export const columns: ColumnDef<Material>[] = [
 ];
 
 export function MaterialTable() {
+  const identity = useContext(IdentityContext);
+  const { data: user } = useSWR(identity ? `/api/user/search?id=${identity.id}` : null, fetchUser,)
   const { data, error } = useSWR<Material[]>("/api/material/material/all", fetcher);
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -255,7 +263,7 @@ export function MaterialTable() {
           }
           className="max-w-sm"
         />
-        <InitAddFormDialougeAdmin/>
+        <InitAddFormDialougeAdmin route={user ? `/api/material/material/search?site=${user.jobsite_id.Valid ? user.jobsite_id.Int64 : undefined}` : undefined} materials={data} />
         <CsvDownloadButton className={cn(buttonVariants({variant : 'outline'}))} data={data}><FileSpreadsheet /></CsvDownloadButton>
         <Button variant="outline" size="default" onClick={() => window.print()}>
           <Printer />

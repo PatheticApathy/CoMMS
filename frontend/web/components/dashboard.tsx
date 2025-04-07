@@ -1,4 +1,4 @@
-import { TrendingDownIcon, TrendingUpIcon } from "lucide-react";
+import { TrendingUpIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import {
@@ -11,7 +11,7 @@ import {
 
 import { JobSite } from "@/user-api-types";
 
-export default function Dashboard({ header, jobsite, route }: { header: string, jobsite: JobSite | undefined, route: string | undefined }) {
+export default function Dashboard({ jobsite }: { header: string, jobsite: JobSite | undefined, route: string | undefined }) {
   return (
     <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-4 px-4 lg:px-6 w-full">
       <Card className="@container/card">

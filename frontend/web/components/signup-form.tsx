@@ -17,7 +17,7 @@ import { redirect } from 'next/navigation'
 import useSWRMutation from 'swr/mutation'
 import Loading from '@/components/loading'
 import { SignUpUser } from "@/user-api-types"
-import { setToken } from "@/hooks/usetoken"
+import { setToken } from "@/components/identity-provider"
 
 const formSchema = z.object({
   username: z.string().nonempty(),

@@ -14,6 +14,16 @@ export interface User {
   profilepicture: Profilepicture
 }
 
+
+export interface UpdateProfileParams {
+  firstname: Firstname
+  lastname: { Valid: boolean, String: string }
+  username: { Valid: boolean, String: string }
+  email: { Valid: boolean, String: string }
+  phone: { Valid: boolean, String: string }
+  ID: number
+}
+
 export interface GetUserRow {
   id: number
   username: string

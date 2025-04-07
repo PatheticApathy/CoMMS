@@ -44,7 +44,7 @@ var yaml []byte
 // @externalDocs.url			https://swagger.io/resources/open-api/
 func main() {
 	if err := godotenv.Load(); err != nil {
-		log.Fatalf("No .env file found LOL: %e", err)
+		log.Printf("WARNING: .env file found LOL: %s", err)
 	}
 
 	// goes to osm if not set in .env
@@ -111,8 +111,12 @@ func main() {
 		http.Redirect(w, r, "/swagger", http.StatusPermanentRedirect)
 	})
 
+	port := url.Port()
+	if port == "" {
+		port = "8082"
+	}
 	serv := http.Server{
-		Addr:    ":" + url.Port(),
+		Addr:    ":" + port,
 		Handler: middleware.AuthController(middleware.Middlewares(middleware.Json, middleware.Logger)(router), &env, auth_config),
 	}
 

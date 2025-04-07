@@ -1,9 +1,9 @@
 // Server Action
 'use server'
 
-import { Jobsite } from "@/material-api-types"
+import { JobSite } from "@/user-api-types"
 
-export default async function GetJobsites(/*id: number*/) : Promise<Jobsite | {message: any}> {
+export default async function GetJobsites(/*id: number*/): Promise<JobSite | { message: any }> {
   const api_host = process.env.API
   if (!api_host) {
     return { message: "this not set" }
