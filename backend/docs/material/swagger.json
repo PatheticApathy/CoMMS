@@ -180,6 +180,11 @@
         },
         "/company/all": {
             "get": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Gets companies",
                 "produces": [
                     "application/json"
@@ -206,6 +211,11 @@
         },
         "/company/create": {
             "post": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Adds company to the database and assigns the user as a company admin",
                 "consumes": [
                     "application/json"
@@ -252,6 +262,11 @@
         },
         "/company/search": {
             "get": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Gets company using id",
                 "produces": [
                     "application/json"
@@ -743,6 +758,11 @@
         },
         "/sites/add": {
             "post": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Adds job_site to the database using valid json structure",
                 "consumes": [
                     "application/json"
@@ -789,6 +809,11 @@
         },
         "/sites/all": {
             "get": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Get all jobsites",
                 "produces": [
                     "application/json"
@@ -818,6 +843,11 @@
         },
         "/sites/search": {
             "get": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Gets jobsites using id(may add more parameters later)",
                 "produces": [
                     "application/json"
@@ -859,6 +889,11 @@
         },
         "/user/all": {
             "get": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Gets users",
                 "produces": [
                     "application/json"
@@ -885,6 +920,11 @@
         },
         "/user/coworkers": {
             "get": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "pulls users that match either jobsite or company ID with the current user, excluding the current user",
                 "produces": [
                     "application/json"
@@ -1037,6 +1077,11 @@
         },
         "/user/delete": {
             "delete": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Deletes user using id(may add more parameters later)",
                 "produces": [
                     "application/json"
@@ -1078,6 +1123,11 @@
         },
         "/user/join": {
             "get": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Gets users with company and jobsite names",
                 "produces": [
                     "application/json"
@@ -1173,6 +1223,11 @@
         },
         "/user/search": {
             "get": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Gets user using id(may add more parameters later)",
                 "produces": [
                     "application/json"
@@ -1183,7 +1238,11 @@
                 "summary": "fetches user based on given paremeters",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "collectionFormat": "csv",
                         "description": "user's identification number",
                         "name": "id",
                         "in": "query"
@@ -1199,7 +1258,7 @@
                     "200": {
                         "description": "users",
                         "schema": {
-                            "$ref": "#/definitions/userdb.User"
+                            "$ref": "#/definitions/userdb.GetUserRow"
                         }
                     },
                     "400": {
@@ -1219,6 +1278,11 @@
         },
         "/user/signup": {
             "post": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Adds user to the database using valid json structure",
                 "consumes": [
                     "application/json"
@@ -1323,6 +1387,11 @@
         },
         "/user/update": {
             "put": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Updates user using id(may add more parameters later)",
                 "produces": [
                     "application/json"
@@ -1409,6 +1478,7 @@
             "type": "object",
             "properties": {
                 "amount": {},
+                "checkout_picture": {},
                 "item_id": {
                     "type": "integer"
                 },
@@ -1447,6 +1517,9 @@
                     "$ref": "#/definitions/sql.NullFloat64"
                 },
                 "name": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "picture": {
                     "$ref": "#/definitions/sql.NullString"
                 },
                 "quantity": {
@@ -1489,9 +1562,11 @@
             "type": "object",
             "properties": {
                 "amount": {},
+                "checkin_picture": {},
                 "checkin_time": {
                     "$ref": "#/definitions/sql.NullTime"
                 },
+                "checkout_picture": {},
                 "checkout_time": {
                     "type": "string"
                 },
@@ -1525,6 +1600,9 @@
                     "$ref": "#/definitions/sql.NullFloat64"
                 },
                 "name": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "picture": {
                     "$ref": "#/definitions/sql.NullString"
                 },
                 "quantity": {
@@ -1700,6 +1778,41 @@
                     "$ref": "#/definitions/sql.NullFloat64"
                 },
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "userdb.GetUserRow": {
+            "type": "object",
+            "properties": {
+                "company_id": {
+                    "$ref": "#/definitions/sql.NullInt64"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "firstname": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "jobsite_id": {
+                    "$ref": "#/definitions/sql.NullInt64"
+                },
+                "lastname": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "profilepicture": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "role": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "username": {
                     "type": "string"
                 }
             }

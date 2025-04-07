@@ -2,7 +2,9 @@
 package main
 
 import (
+	"bytes"
 	"database/sql"
+	_ "embed"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -17,6 +19,9 @@ import (
 
 	_ "modernc.org/sqlite"
 )
+
+//go:embed routeconfig.yaml
+var yaml []byte
 
 //	@title			User API
 //	@version		1.0
@@ -39,7 +44,7 @@ import (
 // @externalDocs.url			https://swagger.io/resources/open-api/
 func main() {
 	if err := godotenv.Load(); err != nil {
-		log.Fatalf("No .env file found LOL: %e", err)
+		log.Printf("WARNING: .env file found LOL: %s", err)
 	}
 
 	// goes to osm if not set in .env
@@ -90,6 +95,11 @@ func main() {
 	}
 	defer db.Close()
 
+	auth_config, err := middleware.RouteConfig(bytes.NewReader(yaml))
+	if err != nil {
+		log.Fatal("Could not setup suthorization routing: %s", err)
+	}
+
 	env := handler.NewEnv(db, secret)
 	router := http.NewServeMux()
 	router.Handle("/", env.Handlers())
@@ -101,11 +111,17 @@ func main() {
 		http.Redirect(w, r, "/swagger", http.StatusPermanentRedirect)
 	})
 
+	port := url.Port()
+	if port == "" {
+		port = "8082"
+	}
 	serv := http.Server{
-		Addr:    ":" + url.Port(),
-		Handler: middleware.Middlewares(middleware.Json, middleware.Logger)(router),
+		Addr:    ":" + port,
+		Handler: middleware.AuthController(middleware.Middlewares(middleware.Json, middleware.Logger)(router), &env, auth_config),
 	}
 
 	log.Printf("Server is running on on %s:%s", url.Hostname(), serv.Addr)
+
+	defer serv.Close()
 	log.Fatal(serv.ListenAndServe())
 }

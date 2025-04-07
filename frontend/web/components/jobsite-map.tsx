@@ -4,7 +4,8 @@ import L, { LatLngBoundsExpression } from "leaflet";
 import { MapContainer, TileLayer, Marker, Popup, Rectangle, GeoJSON } from "react-leaflet";
 import useSWR, {Fetcher} from "swr";
 import { JobSite, User } from "@/user-api-types";
-import { getToken } from "@/components/localstorage";
+import { getToken } from "@/components/identity-provider";
+//import { getToken } from "@/components/localstorage";
 import { Token } from "@/user-api-types";
 import { Material } from '@/material-api-types';
 import { useEffect, useState } from "react";
@@ -33,10 +34,10 @@ const userFetcher = async (url: string): Promise<User[]> => {
 
 async function getProfileArgs(url: string, arg: string) {
   return fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: arg,
-  }).then((res) => res.json() as Promise<Token>);
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: arg
+  }).then(res => res.json() as Promise<Token>)
 }
 
 async function fetchNominatimZone(lat: number, lon: number) {
@@ -63,7 +64,7 @@ export default function JobsiteMapClient() {
 
   const { data: sites } = useSWR<JobSite[]>("/api/sites/all", jobSiteFetcher);
   const { data: users } = useSWR<User[]>("/api/user/all", userFetcher);
-  const { data: tokenData, error: error2 } = useSWR( token ? ["/api/user/decrypt", token] : null, ([url, token]) => getProfileArgs(url, token));
+  const { data: tokenData, error: error2 } = useSWR( token ? ['/api/user/decrypt', token] : null, ([url, token]) => getProfileArgs(url, token));
 
   const [bboxZone, setBboxZone] = useState<LatLngBoundsExpression | null>(null);
   const [zonePolygon, setZonePolygon] = useState<any | null>(null);

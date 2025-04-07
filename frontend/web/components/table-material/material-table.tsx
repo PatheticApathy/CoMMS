@@ -2,19 +2,15 @@ import { Material } from "@/material-api-types"
 import { DataTable } from "../table-maker/data-table";
 import { MaterialRow } from "./material-columns";
 import { MaterialTableColumns } from "./material-columns";
-import useSWR, { Fetcher } from "swr"
-import { Token } from "@/user-api-types";
-import { getToken } from "../localstorage";
-import { toast } from "sonner";
+import { IdentityContext } from "@/components/identity-provider";
+import { useContext } from "react";
 
 
-//fetcher
-const TokenFetcher: Fetcher<Token, string> = async (...args) => fetch(...args, { method: 'POST', body: getToken(), cache: 'force-cache' },).then(res => res.json())
 
 export default function MTable({ materials, route }: { materials: Material[], route: string | undefined }) {
 
+  const identity = useContext(IdentityContext)
 
-  const { data: token, error: token_error } = useSWR('/api/user/decrypt', TokenFetcher,)
 
   const rows = materials.map((material): MaterialRow => {
     return {
@@ -27,16 +23,21 @@ export default function MTable({ materials, route }: { materials: Material[], ro
       quantity: material.quantity,
       status: material.status,
       type: material.type.Valid ? material.type.String : undefined,
-      unit: material.unit
+      unit: material.unit,
+      picture: material.picture.Valid ? material.picture.String : undefined
     }
   })
 
-  if (token_error) {
-    toast.error('Invalid session')
+  if (!identity) {
+    return (
+      <div className="mx-auto py-10">
+        Please log in again
+      </div>
+    )
   }
   return (
     <div className="mx-auto py-10">
-      <DataTable columns={MaterialTableColumns(route, token)} data={rows} />
+      <DataTable columns={MaterialTableColumns(route, identity)} data={rows} />
     </div>
   )
 }
