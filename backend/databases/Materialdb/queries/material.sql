@@ -1,28 +1,28 @@
 -- name: GetAllMaterials :many
-SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site, last_checked_out FROM Materials;
+SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site, last_checked_out, picture FROM Materials;
 
 -- name: GetMaterialsByType :many
-SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site , last_checked_out FROM Materials WHERE type=?;
+SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site , last_checked_out, picture FROM Materials WHERE type=?;
 
 -- name: GetMaterialsBySite :many
-SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site, last_checked_out FROM Materials WHERE job_site=?;
+SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site, last_checked_out, picture FROM Materials WHERE job_site=?;
 
 -- name: GetMaterialsByID :many
-SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site, last_checked_out FROM Materials WHERE id=?;
+SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site, last_checked_out, picture FROM Materials WHERE id=?;
 
 -- name: GetMaterialsByQuantity :many
-SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site, last_checked_out
+SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site, last_checked_out, picture
 FROM Materials 
 WHERE quantity=? AND unit=?;
 
 -- name: GetMaterialsByJobsiteID :many
-SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site, last_checked_out
+SELECT id, name, type, quantity, unit, status, location_lat, location_lng, job_site, last_checked_out, picture
 FROM Materials
 WHERE job_site=?;
 
 -- name: AddMaterial :one
-INSERT INTO Materials(name,type,quantity,unit,status,location_lat,location_lng,job_site)
-VALUES (?,?,?,?,?,?,?,?)
+INSERT INTO Materials(name,type,quantity,unit,status,location_lat,location_lng,job_site, picture)
+VALUES (?,?,?,?,?,?,?,?,?)
 RETURNING *;
 
 -- name: ChangeQuantity :one

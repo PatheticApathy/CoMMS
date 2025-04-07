@@ -50,7 +50,7 @@ func TestMain(m *testing.M) {
 
 	// Make proxy for material db
 	mat_proxy := httputil.NewSingleHostReverseProxy(m_url)
-	umux.Handle("/material/", http.StripPrefix("/material", middleware.Auth(mat_proxy, []byte(uenv.Secret), &uenv, "")))
+	umux.Handle("/material/", http.StripPrefix("/material", middleware.Auth(mat_proxy, &uenv, "")))
 
 	userver = httptest.NewServer(umux)
 

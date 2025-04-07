@@ -95,7 +95,7 @@ func (e *Env) loggout(w http.ResponseWriter, _ *http.Request) {
 func (e *Env) DecryptHanlder(w http.ResponseWriter, r *http.Request) {
 	var token string
 	if err := json.NewDecoder(r.Body).Decode(&token); err != nil {
-		log.Printf("Could not decode json token, reason: %e", err)
+		log.Printf("Could not decode json token, reason: %s", err)
 		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
 	}
@@ -110,7 +110,7 @@ func (e *Env) DecryptHanlder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.NewEncoder(w).Encode(&payload); err != nil {
-		log.Printf("Could not encode json user, reason: %e", err)
+		log.Printf("Could not encode json user, reason: %s", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}

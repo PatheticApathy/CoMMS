@@ -1,8 +1,8 @@
 version: "2"
 sql:
   - engine: sqlite
-    queries: ./queries/
     schema: ./migrations/
+    queries: ./queries/
     gen:
       go:
         package: materialdb
