@@ -328,3 +328,32 @@ func (e *Env) deleteMaterialHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+// getMaterialsWithLogs handler returns all with their created at time godoc
+//
+//	@Summary		fetches all materials with their created at time
+//	@Security identity
+//	@Description	Gets materials with their created at time
+//	@Tags			material
+//	@Produce		json
+//	@Success		200	{object}	[]materialdb.GetMaterialsWithLogsRow	"materials with created at time"
+//	@Failure		500	{string}	string								"Failed to get materials"
+//	@Router			/material/created [get]
+func (e *Env) getMaterialsWithLogs(w http.ResponseWriter, r *http.Request) {
+	log.Println("Handling getUsersWithCompanyAndJobsite request")
+	log.Println("Fetching all users with company and jobsite names from the database")
+	users, err := e.Queries.GetMaterialsWithLogs(r.Context())
+	if err != nil {
+		log.Printf("Failed to get users with company and jobsite names, reason: %v", err)
+		http.Error(w, "Failed to get users", http.StatusInternalServerError)
+		return
+	}
+	log.Printf("Successfully retrieved %d users with company and jobsite names", len(users))
+	if err := json.NewEncoder(w).Encode(&users); err != nil {
+		log.Printf("Failed to encode users response, reason: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	log.Println("Users with company and jobsite names response successfully sent")
+}

@@ -96,6 +96,33 @@ definitions:
       user_id:
         type: integer
     type: object
+  materialdb.GetMaterialsWithLogsRow:
+    properties:
+      id:
+        type: integer
+      job_site:
+        type: integer
+      last_checked_out:
+        $ref: '#/definitions/sql.NullTime'
+      location_lat:
+        $ref: '#/definitions/sql.NullFloat64'
+      location_lng:
+        $ref: '#/definitions/sql.NullFloat64'
+      name:
+        $ref: '#/definitions/sql.NullString'
+      picture:
+        $ref: '#/definitions/sql.NullString'
+      quantity:
+        type: integer
+      status:
+        type: string
+      timestamp:
+        type: string
+      type:
+        $ref: '#/definitions/sql.NullString'
+      unit:
+        type: string
+    type: object
   materialdb.Material:
     properties:
       id:
@@ -655,6 +682,27 @@ paths:
           schema:
             type: string
       summary: adjust quantity based on the requested amount
+      tags:
+      - material
+  /material/created:
+    get:
+      description: Gets materials with their created at time
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: materials with created at time
+          schema:
+            items:
+              $ref: '#/definitions/materialdb.GetMaterialsWithLogsRow'
+            type: array
+        "500":
+          description: Failed to get materials
+          schema:
+            type: string
+      security:
+      - identity: []
+      summary: fetches all materials with their created at time
       tags:
       - material
   /material/delete:

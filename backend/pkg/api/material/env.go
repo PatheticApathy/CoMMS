@@ -34,6 +34,7 @@ func (e *Env) materialHandlers() http.Handler {
 	mux.HandleFunc("GET /all", e.getAllMaterial)
 	mux.HandleFunc("PUT /change", e.changeMaterialQuantity)
 	mux.HandleFunc("DELETE /delete", e.deleteMaterialHandler)
+	mux.HandleFunc("GET /created", e.getMaterialsWithLogs)
 	return mux
 }
 

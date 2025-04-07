@@ -427,6 +427,40 @@ const docTemplate = `{
                 }
             }
         },
+        "/material/created": {
+            "get": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
+                "description": "Gets materials with their created at time",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "material"
+                ],
+                "summary": "fetches all materials with their created at time",
+                "responses": {
+                    "200": {
+                        "description": "materials with created at time",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/materialdb.GetMaterialsWithLogsRow"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to get materials",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/material/delete": {
             "delete": {
                 "description": "deltes material from database",
@@ -1555,6 +1589,47 @@ const docTemplate = `{
                 },
                 "user_id": {
                     "type": "integer"
+                }
+            }
+        },
+        "materialdb.GetMaterialsWithLogsRow": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "job_site": {
+                    "type": "integer"
+                },
+                "last_checked_out": {
+                    "$ref": "#/definitions/sql.NullTime"
+                },
+                "location_lat": {
+                    "$ref": "#/definitions/sql.NullFloat64"
+                },
+                "location_lng": {
+                    "$ref": "#/definitions/sql.NullFloat64"
+                },
+                "name": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "picture": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "quantity": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "timestamp": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "unit": {
+                    "type": "string"
                 }
             }
         },

@@ -10,9 +10,9 @@ import {
 } from "@/components/ui/card";
 
 import { JobSite } from "@/user-api-types";
-import { Material } from "@/material-api-types";
+import { MaterialWithLogs } from "@/material-api-types";
 
-export default function Dashboard({jobsite, jobsites, materials, }: { jobsite: JobSite | undefined; jobsites: JobSite[] | undefined; materials: Material[] | undefined;}) {
+export default function Dashboard({jobsite, jobsites, materials, }: { jobsite: JobSite | undefined; jobsites: JobSite[] | undefined; materials: MaterialWithLogs[] | undefined;}) {
   
   const filteredJobsites = jobsites?.filter((site) => site.id !== jobsite?.id);
 
@@ -20,7 +20,7 @@ export default function Dashboard({jobsite, jobsites, materials, }: { jobsite: J
     if (!materials || !jobsiteId) return null;
     const jobsiteMaterials = materials.filter((material) => material.job_site === jobsiteId);
     return jobsiteMaterials.sort(
-      (a, b) => new Date(b.last_checked_out.Time).getTime() - new Date(a.last_checked_out.Time).getTime())[0];
+      (a, b) => new Date(b.timestamp.Time).getTime() - new Date(a.timestamp.Time).getTime()).reverse()[0];
   };
 
   const mainJobsiteMaterial = getMostRecentMaterial(jobsite?.id);
