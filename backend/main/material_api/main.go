@@ -31,7 +31,7 @@ import (
 func main() {
 	// TODO: Integration test for adding materials and checkoutlogs for a jobsite/user
 	if err := godotenv.Load(); err != nil {
-		log.Printf("No .env file found LOL: %s", err)
+		log.Printf("WARNING: .env file found LOL: %s", err)
 	}
 
 	url, err := url.Parse(os.Getenv("MATERIAL_HOST"))
@@ -64,8 +64,12 @@ func main() {
 		http.Redirect(w, r, "/swagger", http.StatusPermanentRedirect)
 	})
 
+	port := url.Port()
+	if port == "" {
+		port = "8080"
+	}
 	serv := http.Server{
-		Addr:    ":" + url.Port(),
+		Addr:    ":" + port,
 		Handler: middleware.Middlewares(middleware.Json, middleware.Logger)(router),
 	}
 

@@ -26,6 +26,7 @@ import useSWR from "swr";
 import { GetUserRow } from "@/user-api-types";
 import { delTokenNIdentity, getToken, IdentityContext } from '@/components/identity-provider'
 import { useContext } from "react"
+import Image from "next/image"
 
 const fetcher = async (url: string) => {
   const res = await fetch(url,
@@ -82,7 +83,7 @@ export function Profile() {
           <DialogDescription>View your profile here. Click Edit Profile to edit your profile.</DialogDescription>
         </DialogHeader>
         <div className="rounded-full overflow-hidden h-28 w-28">
-          <img className="" src="https://static.vecteezy.com/system/resources/thumbnails/009/734/564/small/default-avatar-profile-icon-of-social-media-user-vector.jpg"></img>
+          <Image alt='Yapper' className="" src="https://static.vecteezy.com/system/resources/thumbnails/009/734/564/small/default-avatar-profile-icon-of-social-media-user-vector.jpg" />
         </div>
         <div>Username: {user[0].username}</div>
         <div>Name: {user[0].firstname.Valid ? user[0].firstname.String : "N/A"} {user[0].lastname.Valid ? user[0].lastname.String : "N/A"}</div>

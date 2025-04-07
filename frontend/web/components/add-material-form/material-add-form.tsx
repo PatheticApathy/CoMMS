@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 import { Button } from "@/components//ui/button"
 import Loading from "@/components/loading"
@@ -69,7 +70,7 @@ export default function MaterialForm({ route }: { route: string | undefined }) {
   const { trigger: download, isMutating: isDownloading } = useSWRMutation('/api/picture', PostPicture);
 
   const SendAddMaterialRequest = async (values: z.infer<typeof AddMaterialSchema>) => {
-    let payload: AddMaterial = {
+    const payload: AddMaterial = {
       job_site: values.job_site,
       location_lat: {
         Valid: false,

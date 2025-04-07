@@ -5,7 +5,7 @@ import { FileWithPath, useDropzone } from 'react-dropzone'
 export default function DropZone({ file, fileAction }: { file: File, fileAction: (file: File | undefined) => void }) {
   const onDrop = useCallback((acceptedFiles: FileWithPath[]) => {
     fileAction(acceptedFiles[0])
-  }, [file])
+  }, [fileAction])
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop, accept: {

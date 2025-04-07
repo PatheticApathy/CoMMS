@@ -1,7 +1,7 @@
 "use client";
 
 import L, { LatLngBoundsExpression } from "leaflet"
-import { MapContainer, TileLayer, Marker, Popup, Polygon, Rectangle } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, Rectangle } from "react-leaflet";
 import useSWR from 'swr'
 import { JobSite, User } from '@/user-api-types';
 import "leaflet/dist/leaflet.css";
@@ -52,10 +52,10 @@ export default function JobsiteMapClient() {
 
   const { data: sites } = useSWR<JobSite[]>("/api/sites/all", jobSiteFetcher)
   const { data: users } = useSWR<User[]>("/api/user/all", userFetcher)
+  const { data: tokenData, error: error2 } = useSWR(['/api/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
 
   if (!token) { return (<p className='flex items-center justify-center w-screen h-screen'>Invalid Token</p>) }
 
-  const { data: tokenData, error: error2 } = useSWR(['/api/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
 
   if (error2) { return (<p className='flex items-center justify-center w-screen h-screen'>{error2.message}</p>) }
 
