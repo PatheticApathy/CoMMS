@@ -1,8 +1,8 @@
-import { StyleSheet, Button, Image, View } from 'react-native';
+import { StyleSheet, Button, Image } from 'react-native';
 import { Link } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { getToken, delToken } from '@/components/securestore'
+import { getToken, delTokenNIdentity } from '@/components/securestore'
 import useSWR from 'swr'
 import { User } from '@/user-api-types'
 import { useRouter } from 'expo-router'
@@ -10,13 +10,19 @@ import { useRouter } from 'expo-router'
 async function getProfileArgs(url: string, arg: string) {
   return fetch(url, {
     method: 'POST',
-    headers: {'Content-Type': 'application/json'},
+    headers: { 'Content-Type': 'application/json' },
     body: arg
   }).then(res => res.json())
 }
 
 const fetcher = async (url: string) => {
-  const res = await fetch(url)
+  const res = await fetch(url, {
+    headers: {
+      'CF-Access-Client-Id': process.env.EXPO_PUBLIC_API_CF_CLIENT_ID!,
+      'CF-Access-Client-Secret': process.env.EXPO_PUBLIC_API_CF_ACCESS_CLIENT_SECRET!,
+      'Authorization': getToken()!,
+    },
+  })
   if (!res.ok) {
     throw new Error("Failed to fetch");
   }
@@ -30,16 +36,16 @@ export default function ProfileComp() {
   let token = getToken()
   let id = 1
 
-  const { data: tokenData, error: error2 } = useSWR(['https://4ba1-138-47-128-9.ngrok-free.app/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
+  const { data: tokenData, error: error2 } = useSWR([`${process.env.EXPO_PUBLIC_API_URL}/api/user/decrypt`, token], ([url, token]) => getProfileArgs(url, token))
   if (tokenData)
     id = tokenData.id
 
-  const { data: user, error: error3 } = useSWR<User, string>(`https://4ba1-138-47-128-9.ngrok-free.app/user/search?id=${id}`, fetcher)
+  const { data: user, error: error3 } = useSWR<User, string>(`${process.env.API}/api/user/search?id=${id}`, fetcher)
 
-  if (!user) return <ThemedText>Loading...</ThemedText>;    
+  if (!user) return <ThemedText>Loading...</ThemedText>;
 
   async function logoutSubmit() {
-    delToken()
+    delTokenNIdentity()
     router.navigate('/')
   }
 
@@ -50,16 +56,16 @@ export default function ProfileComp() {
         <ThemedText type="subtitle" style={styles.subtitle}>View your profile here</ThemedText>
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
-        <Image 
-            source={{
-                uri: 'https://static.vecteezy.com/system/resources/thumbnails/009/734/564/small/default-avatar-profile-icon-of-social-media-user-vector.jpg'
-            }} 
+        <Image
+          source={{
+            uri: 'https://static.vecteezy.com/system/resources/thumbnails/009/734/564/small/default-avatar-profile-icon-of-social-media-user-vector.jpg'
+          }}
         />
         <ThemedText>
           Username: {user.username}
         </ThemedText>
         <ThemedText>
-          Name: {user.firstname.Valid? user.firstname.String : "N/A"} {user.lastname.Valid? user.lastname.String : "N/A"}
+          Name: {user.firstname.Valid ? user.firstname.String : "N/A"} {user.lastname.Valid ? user.lastname.String : "N/A"}
         </ThemedText>
         <ThemedText>
           Email: {user.email}
@@ -70,14 +76,14 @@ export default function ProfileComp() {
       </ThemedView>
       <ThemedView style={styles.buttons}>
         <ThemedView style={styles.logoutButton}>
-            <Button title="Logout" onPress={logoutSubmit}></Button>
+          <Button title="Logout" onPress={logoutSubmit}></Button>
         </ThemedView>
         <ThemedView style={styles.editButton}>
-            <Link href="/editProfile" asChild>
-                <Button title="Edit Profile"></Button>
-            </Link>
+          <Link href="/editProfile" asChild>
+            <Button title="Edit Profile"></Button>
+          </Link>
         </ThemedView>
-    </ThemedView>
+      </ThemedView>
     </ThemedView>
   );
 }
