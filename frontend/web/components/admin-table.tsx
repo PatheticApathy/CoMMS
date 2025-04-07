@@ -36,7 +36,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import InitAddFormDialougeAdmin from "@/components/add-jobsite-form/jobsite-add-admin";
-
 import useSWR from "swr";
 import { User, UserJoin, Company, JobSite, Token } from "@/user-api-types";
 import Loading from "@/components/loading";
@@ -311,10 +310,10 @@ export function UserTable() {
   //const identity = useIdentity();
   //const { data: user } = useSWR(identity ? `/api/user/search?id=${identity.id}` : null, fetchUser,)
   const { data: currentuser, error: error3 } = useSWR<User, string>(tokenData ? `/api/user/search?id=${tokenData?.id}` : null, fetchUser);
-  //const { data, error } = useSWR<UserJoin[]>(identity && user ? `/api/user/subordinates?user=${identity.id}&company=${user?.company_id.Int64}&site=${user?.jobsite_id.Int64}` : null, fetcher);
+  const { data: subordinates, error: error4 } = useSWR<UserJoin[]>(currentuser ? `/api/user/subordinates?user=${currentuser.id}&company=${currentuser?.company_id.Int64}&site=${currentuser?.jobsite_id.Int64}` : null, fetcher);
   console.log(tokenData ? `/api/user/coworkers?user=${tokenData.id}&company=${currentuser?.company_id.Int64}&site=${currentuser?.jobsite_id.Int64}` : null) 
   const table = useReactTable({
-    data: data || [],
+    data: subordinates || [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
