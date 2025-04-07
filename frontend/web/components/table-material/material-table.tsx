@@ -23,7 +23,8 @@ export default function MTable({ materials, route }: { materials: Material[], ro
       quantity: material.quantity,
       status: material.status,
       type: material.type.Valid ? material.type.String : undefined,
-      unit: material.unit
+      unit: material.unit,
+      picture: material.picture.Valid ? material.picture.String : undefined
     }
   })
 

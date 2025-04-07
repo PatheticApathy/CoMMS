@@ -10,12 +10,14 @@ import (
 )
 
 type CheckoutLog struct {
-	ID           int64        `json:"id"`
-	ItemID       int64        `json:"item_id"`
-	UserID       int64        `json:"user_id"`
-	CheckinTime  sql.NullTime `json:"checkin_time"`
-	CheckoutTime time.Time    `json:"checkout_time"`
-	Amount       interface{}  `json:"amount"`
+	ID              int64        `json:"id"`
+	ItemID          int64        `json:"item_id"`
+	UserID          int64        `json:"user_id"`
+	CheckinTime     sql.NullTime `json:"checkin_time"`
+	CheckoutTime    time.Time    `json:"checkout_time"`
+	Amount          interface{}  `json:"amount"`
+	CheckoutPicture interface{}  `json:"checkout_picture"`
+	CheckinPicture  interface{}  `json:"checkin_picture"`
 }
 
 type Material struct {
@@ -29,6 +31,7 @@ type Material struct {
 	LocationLng    sql.NullFloat64 `json:"location_lng"`
 	LastCheckedOut sql.NullTime    `json:"last_checked_out"`
 	JobSite        int64           `json:"job_site"`
+	Picture        sql.NullString  `json:"picture"`
 }
 
 type MaterialLog struct {

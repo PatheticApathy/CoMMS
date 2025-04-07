@@ -15,6 +15,7 @@ import { Material, AddMaterial } from "@/material-api-types"
 import FormInput from "../form-maker/form-input"
 import { JobSite } from "@/user-api-types"
 import { toast } from "sonner"
+import FormFileInput from "../form-maker/form-dropzone"
 import { getToken } from "@/components/identity-provider"
 
 // Schema for form
@@ -24,11 +25,13 @@ const AddMaterialSchema = z.object({
   quantity: z.coerce.number().nonnegative({ message: "Quantity can't be negative" }),
   status: z.enum(["In Stock", "Out of Stock", "Low Stock"]),
   type: z.string().min(2, { message: "Type must be more than 2 characters" }),
-  unit: z.string().min(1, { message: "Unit must be greater than 1" })
+  unit: z.string().min(1, { message: "Unit must be greater than 1" }),
+  picture: z.instanceof(FileList).optional(),
 });
 
 // Fetcher
 const PostAddMaterial = async (url: string, { arg }: { arg: AddMaterial }) => await fetch(url, { headers: { 'Authorization': getToken() }, method: 'POST', body: JSON.stringify(arg) });
+const PostPicture = async (url: string, { arg }: { arg: { type: string, file: Blob } }) => await fetch(url, { headers: { 'Content-Type': `image/${arg.type}` }, method: 'POST', body: arg.file });
 const fetchJobsites = async (url: string): Promise<JobSite[]> => {
   const res = await fetch(url, {
     headers: { 'Authorization': getToken() },
@@ -49,7 +52,8 @@ export default function MaterialForm({ route }: { route: string | undefined }) {
       quantity: 0,
       status: "In Stock",
       type: "",
-      unit: ""
+      unit: "",
+      picture: undefined
     }
   });
 
@@ -61,26 +65,11 @@ export default function MaterialForm({ route }: { route: string | undefined }) {
     { label: "Out of Stock", value: "Out of Stock" },
   ];
 
-  const { trigger, isMutating } = useSWRMutation('/api/material/material/add', PostAddMaterial, {
-    onError(err) {
-      console.log(err);
-      toast.error(err.message || "Error has occurred");
-    },
-    onSuccess(data) {
-      if (!data.ok) {
-        toast.error(data.text() || "Error has occured");
-        return
-      }
-      data.json().then((resp: Material) => {
-        console.log("success");
-        toast.success(`Material ${resp.name.String} Added!`);
-        mutate(route)
-      });
-    },
-  });
+  const { trigger, isMutating } = useSWRMutation('/api/material/material/add', PostAddMaterial);
+  const { trigger: download, isMutating: isDownloading } = useSWRMutation('/api/picture', PostPicture);
 
-  const SendAddMaterialRequest = (values: z.infer<typeof AddMaterialSchema>) => {
-    const payload: AddMaterial = {
+  const SendAddMaterialRequest = async (values: z.infer<typeof AddMaterialSchema>) => {
+    let payload: AddMaterial = {
       job_site: values.job_site,
       location_lat: {
         Valid: false,
@@ -100,9 +89,43 @@ export default function MaterialForm({ route }: { route: string | undefined }) {
         Valid: true,
         String: values.type
       },
-      unit: values.unit
+      unit: values.unit,
+      picture: { Valid: true, String: "/file.svg" }
     };
-    trigger(payload);
+
+    try {
+
+      if (values.picture && values.picture?.length > 0) {
+        toast.message("Sending picture")
+        const extension = values.picture[0].name.split('.').pop()
+        if (!extension) {
+          toast.error("Invald file extension");
+          return
+        }
+        const resp = await download({ type: extension, file: values.picture[0] })
+        if (!resp.ok) {
+          const message = await resp.json() as { message: string }
+          toast.error(message.message || "Error has occured");
+          return
+        }
+        const name = await resp.json() as { name: string }
+        payload.picture.String = `/${name.name}`
+      }
+
+      console.log(`File name is ${payload.picture.String}`)
+      const resp = await trigger(payload)
+      if (!resp.ok) {
+        toast.error(await resp.text() || "Error has occured");
+        return
+      }
+      const data = await resp.json() as Material
+      toast.success(`Material ${data.name.String} Added!`);
+      mutate(route)
+
+    } catch (err: any) {
+      console.log(err);
+      toast.error(err.message || "Error has occurred");
+    }
   };
 
   const DisplayJobSites = () => {
@@ -135,7 +158,8 @@ export default function MaterialForm({ route }: { route: string | undefined }) {
         <ComboboxFormField form_attr={{ name: "status", description: "Initial status of item", form: form }} default_label={"In Stock"} options={status} />
         <FormInput name="type" placeholder="Type" description="Type of item" form={form} />
         <FormInput name="unit" placeholder="Unit" description="Unit of measurement of item" form={form} />
-        {isMutating ? <Button variant={'ghost'}>Sending</Button> : <Button type="submit">Send Request</Button>}
+        <FormFileInput name="picture" placeholder="Add picture" description="Add picture here" form={form} />
+        {isMutating || isDownloading ? <Button variant={'ghost'}>Sending</Button> : <Button type="submit">Send Request</Button>}
       </form>
     </Form>
   );
