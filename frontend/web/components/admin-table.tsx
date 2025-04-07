@@ -41,9 +41,12 @@ import useSWR from "swr";
 import { User, UserJoin, Company, JobSite, Token } from "@/user-api-types";
 import Loading from "@/components/loading";
 import { getToken } from "./localstorage";
+//import { getToken, useIdentity } from '@/hooks/useToken';
 
 const fetcher = async (url: string): Promise<UserJoin[]> => {
-  const res = await fetch(url);
+  const res = await fetch(url,
+    { headers: { 'authorization': getToken() || 'bruh' } }
+  );
   if (!res.ok) {
     throw new Error("Failed to fetch data");
   }
@@ -51,7 +54,9 @@ const fetcher = async (url: string): Promise<UserJoin[]> => {
 };
 
 const fetchUser = async  (url: string): Promise<User> => {
-  const res = await fetch(url)
+  const res = await fetch(url,
+    { headers: { 'authorization': getToken() || 'bruh' } }
+  )
   if (!res.ok) {
     throw new Error("Failed to fetch data");
   }
@@ -302,9 +307,11 @@ export function UserTable() {
 
   if (!token) { return (<p className='flex items-center justify-center w-screen h-screen'>Invalid Token</p>) }
 
-  const { data: tokenData, error: error2 } = useSWR(['/api/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
-  const { data: currentuser, error: error3 } = useSWR<User, string>(tokenData ? `/api/user/search?id=${tokenData?.id}` : null, fetchUser);
-  const { data, error } = useSWR<UserJoin[]>(tokenData && currentuser ? `/api/user/subordinates?user=${tokenData.id}&company=${currentuser?.company_id.Int64}&site=${currentuser?.jobsite_id.Int64}` : null, fetcher);
+  //const { data: tokenData, error: error2 } = useSWR(['/api/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
+  const identity = useIdentity();
+  const { data: user } = useSWR(identity ? `/api/user/search?id=${identity.id}` : null, fetchUser,)
+  //const { data: currentuser, error: error3 } = useSWR<User, string>(tokenData ? `/api/user/search?id=${tokenData?.id}` : null, fetchUser);
+  const { data, error } = useSWR<UserJoin[]>(identity && user ? `/api/user/subordinates?user=${identity.id}&company=${user?.company_id.Int64}&site=${user?.jobsite_id.Int64}` : null, fetcher);
   //console.log(tokenData ? `/api/user/coworkers?user=${tokenData.id}&company=${currentuser?.company_id.Int64}&site=${currentuser?.jobsite_id.Int64}` : null) 
   const table = useReactTable({
     data: data || [],
@@ -325,7 +332,8 @@ export function UserTable() {
     },
   });
 
-  if (error || error2 || error3) return <p>Invalid User.</p>;
+  if (!identity) { return (<div className='flex items-center justify-center w-screen h-screen'>Loading <Loading /></div>) }
+  if (error) return <p>Invalid User.</p>;
   if (!data) return <p>Loading...</p>;
 
   if (error) {

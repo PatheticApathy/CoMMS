@@ -1,100 +1,151 @@
 "use client";
 
-import L, { LatLngBoundsExpression } from "leaflet"
-import { MapContainer, TileLayer, Marker, Popup, Polygon, Rectangle  } from "react-leaflet";
-import useSWR from 'swr'
-import { JobSite, User } from '@/user-api-types';
-import Loading from '@/components/loading';
+import L, { LatLngBoundsExpression } from "leaflet";
+import { MapContainer, TileLayer, Marker, Popup, Rectangle, GeoJSON } from "react-leaflet";
+import useSWR, {Fetcher} from "swr";
+import { JobSite, User } from "@/user-api-types";
+import { getToken } from "@/components/localstorage";
+import { Token } from "@/user-api-types";
+import { Material } from '@/material-api-types';
+import { useEffect, useState } from "react";
 import "leaflet/dist/leaflet.css";
-import Link from "next/link";
-import { getToken } from '@/components/localstorage'
-import { Token } from '@/user-api-types';
 
 const defaultIcon = new L.Icon({
-    iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
-    iconSize: [25, 41], // Size of the icon
-    iconAnchor: [12, 41], // Anchor point of the icon (where the tip is placed)
-    popupAnchor: [1, -34], // Position of the popup relative to the icon
+  iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
 });
 
-const jobSiteFetcher = async (url:string): Promise<JobSite[]> => {
+const jobSiteFetcher = async (url: string): Promise<JobSite[]> => {
   const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error("Failed to fetch data");
-  }
+  if (!res.ok) throw new Error("Failed to fetch job sites");
   return res.json();
-}
+};
 
-const userFetcher = async (url:string): Promise<User[]> => {
+const materialFetcher: Fetcher<Material[], string> = async (...args) => fetch(...args,).then(res => res.json())
+
+const userFetcher = async (url: string): Promise<User[]> => {
   const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error("Failed to fetch data");
-  }
+  if (!res.ok) throw new Error("Failed to fetch users");
   return res.json();
-}
+};
 
 async function getProfileArgs(url: string, arg: string) {
   return fetch(url, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: arg
-  }).then(res => res.json() as Promise<Token>)
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: arg,
+  }).then((res) => res.json() as Promise<Token>);
 }
 
-const token = getToken()
-console.log("Token: ")
-console.log(token)
+async function fetchNominatimZone(lat: number, lon: number) {
+  const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&polygon_geojson=1`;
+  const res = await fetch(url, {
+    headers: {
+      "User-Agent": "CoMMS (mjl036@gmail.com)", // Required by Nominatim TOS
+    },
+  });
+  if (!res.ok) throw new Error("Failed to fetch from Nominatim");
+  return res.json();
+}
 
-const bounds : LatLngBoundsExpression = [
-  [32.5260072, -92.6440465],
-  [32.5266895, -92.6427248]
-]
+function createFixedBoundingBox(lat: number, lon: number, meters: number): LatLngBoundsExpression {
+  const offset = meters / 111320; // ~degrees per meter
+  return [
+    [lat - offset, lon - offset],
+    [lat + offset, lon + offset],
+  ];
+}
 
 export default function JobsiteMapClient() {
+  const token = getToken();
 
-  const { data: sites } = useSWR<JobSite[]>("/api/sites/all", jobSiteFetcher)
-  const { data: users } = useSWR<User[]>("/api/user/all", userFetcher)
+  const { data: sites } = useSWR<JobSite[]>("/api/sites/all", jobSiteFetcher);
+  const { data: users } = useSWR<User[]>("/api/user/all", userFetcher);
+  const { data: tokenData, error: error2 } = useSWR( token ? ["/api/user/decrypt", token] : null, ([url, token]) => getProfileArgs(url, token));
 
-  if (!token) { return (<p className='flex items-center justify-center w-screen h-screen'>Invalid Token</p>) }
+  const [bboxZone, setBboxZone] = useState<LatLngBoundsExpression | null>(null);
+  const [zonePolygon, setZonePolygon] = useState<any | null>(null);
 
-  const { data: tokenData, error: error2 } = useSWR(['/api/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
+  const userID = tokenData?.id;
+  const user = userID ? users?.[userID - 1] : null;
+  const site = user?.jobsite_id?.Int64 ? sites?.[user.jobsite_id.Int64 - 1] : null;
 
-  if (error2) { return (<p className='flex items-center justify-center w-screen h-screen'>{error2.message}</p>) }
+  const { data: materials, error, isLoading } = useSWR(user ? `/api/material/material/search?site=${user.jobsite_id.Valid ? user.jobsite_id.Int64 : undefined}` : null, materialFetcher)
 
-  const userID = tokenData?.id
+  const lat = site?.location_lat?.Float64;
+  const lng = site?.location_lng?.Float64;
 
-  if (!sites || !users || !userID){
-    return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>)
+  useEffect(() => {
+    if (lat && lng) {
+      fetchNominatimZone(lat, lng)
+        .then((data) => {
+          if (data.geojson && data.geojson.type === "Polygon") {
+            setZonePolygon(data.geojson);
+            setBboxZone(null);
+          } else if (data.boundingbox) {
+            const [south, north, west, east] = data.boundingbox.map(parseFloat);
+            setBboxZone([
+              [south, west],
+              [north, east],
+            ]);
+            setZonePolygon(null);
+          } else {
+            setBboxZone(createFixedBoundingBox(lat, lng, 50)); // 50m fallback
+            setZonePolygon(null);
+          }
+        })
+        .catch((err) => {
+          console.error("Nominatim error:", err);
+          setBboxZone(createFixedBoundingBox(lat, lng, 50));
+          setZonePolygon(null);
+        });
+    }
+  }, [lat, lng]);
+
+  if (!token) {
+    return <p className="flex items-center justify-center w-screen h-screen">Invalid Token</p>;
   }
 
-  if (sites && users && userID){
-    const user = users[userID-1]
-    if (!user.jobsite_id) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
-    const userJobsite = user.jobsite_id.Int64
-    const site = sites[userJobsite-1]
-
-    if (!site) {return (<p className='flex items-center justify-center w-screen h-screen'>No Jobsite Found</p>)}
-
-    const siteName = site.name
-
-    return (
-      <MapContainer
-        style={{ height: "100%", width: "100%" }}
-        center={[site.location_lat.Float64, site.location_lng.Float64]}
-        zoom={15}
-        scrollWheelZoom={false}
-      >
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; OpenStreetMap contributors'
-        />
-        <Marker position={[site.location_lat.Valid ? site.location_lat.Float64 : 0.0, site.location_lng.Valid ? site.location_lng.Float64 : 0.0]} icon={defaultIcon}>
-          <Popup>
-            {siteName}
-          </Popup>
-        </Marker>
-        <Rectangle pathOptions={{color: "purple"}} bounds={bounds}/>      
-      </MapContainer>
-    );
+  if (error) {
+    return <p className="flex items-center justify-center w-screen h-screen">{error.message}</p>;
   }
+
+  if (error2) {
+    return <p className="flex items-center justify-center w-screen h-screen">{error2.message}</p>;
+  }
+
+  if (!sites || !users || !userID || !site || !lat || !lng || isLoading) {
+    return <p className="flex items-center justify-center w-screen h-screen">Loading...</p>;
+  }
+
+  return (
+    <MapContainer
+      style={{ height: "100%", width: "100%" }}
+      center={[lat, lng]}
+      zoom={17}
+      scrollWheelZoom={false}
+    >
+      <TileLayer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution="&copy; OpenStreetMap contributors"
+      />
+
+      {/* Marker is optional */}
+      <Marker position={[lat, lng]} icon={defaultIcon}>
+        <Popup>{site.name}</Popup>
+      </Marker>
+
+      {/* Preferred: GeoJSON shape (if available) */}
+      {zonePolygon && (
+        <GeoJSON data={zonePolygon} style={{ color: "purple", weight: 2 }} />
+      )}
+
+      {/* Fallback: bounding box or fixed square */}
+      {!zonePolygon && bboxZone && (
+        <Rectangle pathOptions={{ color: "purple" }} bounds={bboxZone} />
+      )}
+    </MapContainer>
+  );
 }
