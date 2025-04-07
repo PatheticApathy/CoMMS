@@ -44,8 +44,10 @@ done
 OG=$PWD
 
 ##########setup frontend#################
-cd ./frontend/
-npm update --save
+cd ./frontend/web/
+npm install
+cd ../mobile
+npm install
 cd $OG
 
 ###########setup backend#################

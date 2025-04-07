@@ -12,6 +12,7 @@ import (
 // getJobSite hanlder returns a jobsite based on given parameters godoc
 //
 //	@Summary		fetches job_site based on given paremeters
+//	@Security identity
 //	@Description	Gets jobsites using id(may add more parameters later)
 //	@Tags			sites
 //	@Produce		json
@@ -50,6 +51,7 @@ func (e *Env) getJobSiteHandler(w http.ResponseWriter, r *http.Request) {
 // addJobSite handler that adds a jobsite to the the db  godoc
 //
 //	@Summary		post job_site to database
+//	@Security identity
 //	@Description	Adds job_site to the database using valid json structure
 //	@Tags			sites
 //	@Accept			json
@@ -85,6 +87,7 @@ func (e *Env) addJobSiteHandler(w http.ResponseWriter, r *http.Request) {
 // getAllJobSite handler returns all jobsites godoc
 //
 //	@Summary		fetches all job_sites
+//	@Security identity
 //	@Description	Get all jobsites
 //	@Tags			sites
 //	@Produce		json

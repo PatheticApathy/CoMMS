@@ -17,12 +17,14 @@ import (
 // getUser hanlder returns a user based on given parameters godoc
 //
 //	@Summary		fetches user based on given paremeters
+//	@Security identity
 //	@Description	Gets user using id(may add more parameters later)
 //	@Tags			users
 //	@Produce		json
-//	@Param			id	query		int				false	"user's identification number"
+//	@Param			id	query		[]int				false	"user's identification number"
 //	@Param			username	query		string				false	"user's username"
-//	@Success		200	{object}	userdb.User		"users"
+//	@Success		200	{object}	[]userdb.GetUserRow		"the ids query can take multiple id's"
+//	@Success		200	{object}	userdb.GetUserRow		"users"
 //	@Failure		400	{string}	string			"Invalid id"
 //	@Failure		500	{string}	string			"Internal Server Error"
 //	@Router			/user/search [get]
@@ -30,24 +32,29 @@ func (e *Env) getUser(w http.ResponseWriter, r *http.Request) {
 	log.Println("Handling getUser request")
 	query := r.URL.Query()
 	if query.Has("id") {
-		id, err := strconv.Atoi(query.Get("id"))
-		log.Printf("Received request with id: %d", id)
-		if err != nil {
-			log.Printf("Invalid id, reason: %e", err)
-			http.Error(w, "Invalid id", http.StatusBadRequest)
-			return
-		}
+		users := make([]userdb.GetUserRow, 0)
+		ids := query["id"]
+		for _, id := range ids {
+			id, err := strconv.Atoi(id)
+			log.Printf("Received request with id: %d", id)
+			if err != nil {
+				log.Printf("Invalid id, reason: %e", err)
+				http.Error(w, "Invalid id", http.StatusBadRequest)
+				return
+			}
 
-		log.Printf("Fetching user with id: %d", id)
-		user, err := e.Queries.GetUser(r.Context(), int64(id))
-		if err != nil {
-			log.Printf("Could not find user, reason: %e", err)
-			http.Error(w, "Invalid id", http.StatusBadRequest)
-			return
-		}
+			log.Printf("Fetching user with id: %d", id)
+			user, err := e.Queries.GetUser(r.Context(), int64(id))
+			if err != nil {
+				log.Printf("Could not find user, reason: %e", err)
+				http.Error(w, "Invalid id", http.StatusBadRequest)
+				return
+			}
 
-		log.Printf("User found: %+v", user)
-		if err := json.NewEncoder(w).Encode(&user); err != nil {
+			users = append(users, user)
+			log.Printf("User found: %s", user.Username)
+		}
+		if err := json.NewEncoder(w).Encode(&users); err != nil {
 			log.Printf("Could not encode json user, reason: %e", err)
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
@@ -80,6 +87,7 @@ func (e *Env) getUser(w http.ResponseWriter, r *http.Request) {
 // getUsers hanlder returns all users godoc
 //
 //	@Summary		fetches all users
+//	@Security identity
 //	@Description	Gets users
 //	@Tags			users
 //	@Produce		json
@@ -108,6 +116,7 @@ func (e *Env) getUsers(w http.ResponseWriter, r *http.Request) {
 // Get handler that gets coworkers for contacts
 //
 //	@Summary		post user to database
+//	@Security identity
 //	@Description	Adds user to the database using valid json structure
 //	@Tags			users
 //	@Produce		json
@@ -153,6 +162,7 @@ func (e *Env) getCoworkers(w http.ResponseWriter, r *http.Request) {
 // SignUp handler that adds a user to the the db  godoc
 //
 //	@Summary		post user to database
+//	@Security identity
 //	@Description	Adds user to the database using valid json structure
 //	@Tags			users
 //	@Accept			json
@@ -256,6 +266,7 @@ func (e *Env) createUser(w http.ResponseWriter, r *http.Request) {
 // updateUser handler returns an updated user based on given parameters godoc
 //
 //	@Summary		updates user based on given parameters
+//	@Security identity
 //	@Description	Updates user using id(may add more parameters later)
 //	@Tags			users
 //	@Produce		json
@@ -294,6 +305,7 @@ func (e *Env) updateUser(w http.ResponseWriter, r *http.Request) {
 // deleteUser hanlder removes a user based on given parameters godoc
 //
 //	@Summary		removes user based on given paremeters
+//	@Security identity
 //	@Description	Deletes user using id(may add more parameters later)
 //	@Tags			users
 //	@Produce		json
@@ -332,6 +344,7 @@ func (e *Env) deleteUser(w http.ResponseWriter, r *http.Request) {
 // getUsersWithCompanyAndJobsite handler returns all users with their associated company and jobsite names godoc
 //
 //	@Summary		fetches all users with their associated company and jobsite names
+//	@Security identity
 //	@Description	Gets users with company and jobsite names
 //	@Tags			users
 //	@Produce		json

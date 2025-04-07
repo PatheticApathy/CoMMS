@@ -11,9 +11,9 @@ import { ComboboxFormField } from "@/components/form-maker/form-combobox"
 import { Material, AddMaterialLog, MaterialLog } from "@/material-api-types"
 import FormInput from "../form-maker/form-input"
 import { toast } from "sonner"
-import useSWR, { Fetcher, mutate } from "swr"
-import Loading from "../loading"
+import { mutate } from "swr"
 import FormTextInput from "../form-maker/form-textbox"
+import { getToken } from "@/components/identity-provider"
 
 
 //Schema for form
@@ -26,7 +26,10 @@ const AddMaterialLogSchema = z.object({
 
 
 //fetcher
-const PostAddMaterialLog = async (url: string, { arg }: { arg: AddMaterialLog }) => await fetch(url, { method: 'POST', body: JSON.stringify(arg) })
+const PostAddMaterialLog = async (url: string, { arg }: { arg: AddMaterialLog }) => await fetch(url, {
+  headers: { 'Authorization': getToken() },
+  method: 'POST', body: JSON.stringify(arg)
+})
 
 export default function AddMaterialLogForm({ materials }: { materials: Material[] }) {
 
@@ -96,6 +99,6 @@ export default function AddMaterialLogForm({ materials }: { materials: Material[
         <ComboboxFormField form_attr={{ name: "status", description: "Initial status of item", form: form }} default_label={"In Stock"} options={status} />
         {isMutating ? <Button variant={'ghost'}>Sending</Button> : <Button type="submit">Send Request</Button>}
       </form>
-    </Form>
+    </Form >
   );
 }

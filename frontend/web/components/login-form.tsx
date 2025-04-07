@@ -16,8 +16,8 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { setToken } from '@/components/localstorage'
 import { LogInUser } from "@/user-api-types"
+import { setToken } from "@/components/identity-provider"
 
 const formSchema = z.object({
   username: z.string(),
@@ -38,7 +38,7 @@ async function logIn(url: string, { arg }: { arg: LogInUser }) {
 
 export default function LoginForm() {
 
-  const { data, trigger, error, isMutating } = useSWRMutation('api/user/login', logIn, {throwOnError: false})
+  const { data, trigger, error, isMutating } = useSWRMutation('api/user/login', logIn, { throwOnError: false })
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -51,13 +51,12 @@ export default function LoginForm() {
   if (isMutating) { return (<div className='flex items-center justify-center w-screen h-screen'>Loading <Loading /></div>) }
   if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
   if (data) {
-    console.log(`Le Token is gooda ${data}`);
     setToken(data)
     redirect('/dashboard')
   }
 
   //validate form data(data is safe at this point)
-  async function onSubmit(values: z.infer<typeof formSchema>) {    
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     trigger(values)
   }
 
@@ -91,7 +90,7 @@ export default function LoginForm() {
         <div className="flex justify-center">
           <Button disabled={isMutating} className="flex justify-center" type="submit">Login</Button>
         </div>
-        <div className="flex justify-center">Don't Have an Account?</div>
+        <div className="flex justify-center">Don &apos;t Have an Account?</div>
         <Link href="/signup" className="flex justify-center hover:text-blue-500 hover:underline">Sign up!</Link>
       </form>
     </Form>

@@ -5,7 +5,7 @@ WHEN (old.quantity != new.quantity)
 BEGIN
     INSERT 
     INTO MaterialLogs(material_id, note, status, quantity_change,timestamp)
-    VALUES (new.id,'Quantity change',new.status,new.quantity,datetime('now'));
+    VALUES (new.id,'Quantity change',new.status,new.quantity - old.quantity,datetime('now'));
 END;
 -- +goose StatementEnd
 

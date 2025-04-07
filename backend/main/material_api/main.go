@@ -29,24 +29,24 @@ import (
 // @externalDocs.description	OpenAPI
 // @externalDocs.url			https://app.swaggerhub.com/apis/CJW041/material-tracker_api/1.0
 func main() {
-	//TODO: Integration test for adding materials and checkoutlogs for a jobsite/user
+	// TODO: Integration test for adding materials and checkoutlogs for a jobsite/user
 	if err := godotenv.Load(); err != nil {
-		log.Fatalf("No .env file found LOL: %e", err)
+		log.Printf("WARNING: .env file found LOL: %s", err)
 	}
 
 	url, err := url.Parse(os.Getenv("MATERIAL_HOST"))
 	if err != nil {
-		log.Fatalf("Error in material host .env declaration: %e", err)
+		log.Fatalf("Error in material host env variable declaration: %s", err)
 	}
 
 	db_path := os.Getenv("MATERIALDB")
 	if db_path == "" {
-		log.Fatal("No database path set in environment variable")
+		log.Fatal("No database path set as environment variable")
 	}
 
 	user_host := os.Getenv("USER_HOST")
 	if err != nil {
-		log.Printf("Warning: user api host not set: %e", err)
+		log.Printf("Warning: user api host not set as env variable: %s", err)
 	}
 
 	db, err := sql.Open("sqlite", db_path)
@@ -64,8 +64,12 @@ func main() {
 		http.Redirect(w, r, "/swagger", http.StatusPermanentRedirect)
 	})
 
+	port := url.Port()
+	if port == "" {
+		port = "8080"
+	}
 	serv := http.Server{
-		Addr:    ":" + url.Port(),
+		Addr:    ":" + port,
 		Handler: middleware.Middlewares(middleware.Json, middleware.Logger)(router),
 	}
 

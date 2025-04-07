@@ -186,6 +186,11 @@ const docTemplate = `{
         },
         "/company/all": {
             "get": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Gets companies",
                 "produces": [
                     "application/json"
@@ -212,6 +217,11 @@ const docTemplate = `{
         },
         "/company/create": {
             "post": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Adds company to the database and assigns the user as a company admin",
                 "consumes": [
                     "application/json"
@@ -258,6 +268,11 @@ const docTemplate = `{
         },
         "/company/search": {
             "get": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Gets company using id",
                 "produces": [
                     "application/json"
@@ -749,6 +764,11 @@ const docTemplate = `{
         },
         "/sites/add": {
             "post": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Adds job_site to the database using valid json structure",
                 "consumes": [
                     "application/json"
@@ -795,6 +815,11 @@ const docTemplate = `{
         },
         "/sites/all": {
             "get": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Get all jobsites",
                 "produces": [
                     "application/json"
@@ -824,6 +849,11 @@ const docTemplate = `{
         },
         "/sites/search": {
             "get": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Gets jobsites using id(may add more parameters later)",
                 "produces": [
                     "application/json"
@@ -865,6 +895,11 @@ const docTemplate = `{
         },
         "/user/all": {
             "get": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Gets users",
                 "produces": [
                     "application/json"
@@ -891,6 +926,11 @@ const docTemplate = `{
         },
         "/user/coworkers": {
             "get": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Adds user to the database using valid json structure",
                 "produces": [
                     "application/json"
@@ -1043,6 +1083,11 @@ const docTemplate = `{
         },
         "/user/delete": {
             "delete": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Deletes user using id(may add more parameters later)",
                 "produces": [
                     "application/json"
@@ -1084,6 +1129,11 @@ const docTemplate = `{
         },
         "/user/join": {
             "get": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Gets users with company and jobsite names",
                 "produces": [
                     "application/json"
@@ -1179,6 +1229,11 @@ const docTemplate = `{
         },
         "/user/search": {
             "get": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Gets user using id(may add more parameters later)",
                 "produces": [
                     "application/json"
@@ -1189,7 +1244,11 @@ const docTemplate = `{
                 "summary": "fetches user based on given paremeters",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "collectionFormat": "csv",
                         "description": "user's identification number",
                         "name": "id",
                         "in": "query"
@@ -1205,7 +1264,7 @@ const docTemplate = `{
                     "200": {
                         "description": "users",
                         "schema": {
-                            "$ref": "#/definitions/userdb.User"
+                            "$ref": "#/definitions/userdb.GetUserRow"
                         }
                     },
                     "400": {
@@ -1225,6 +1284,11 @@ const docTemplate = `{
         },
         "/user/signup": {
             "post": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Adds user to the database using valid json structure",
                 "consumes": [
                     "application/json"
@@ -1271,6 +1335,11 @@ const docTemplate = `{
         },
         "/user/update": {
             "put": {
+                "security": [
+                    {
+                        "identity": []
+                    }
+                ],
                 "description": "Updates user using id(may add more parameters later)",
                 "produces": [
                     "application/json"
@@ -1357,6 +1426,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "amount": {},
+                "checkout_picture": {},
                 "item_id": {
                     "type": "integer"
                 },
@@ -1395,6 +1465,9 @@ const docTemplate = `{
                     "$ref": "#/definitions/sql.NullFloat64"
                 },
                 "name": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "picture": {
                     "$ref": "#/definitions/sql.NullString"
                 },
                 "quantity": {
@@ -1437,9 +1510,11 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "amount": {},
+                "checkin_picture": {},
                 "checkin_time": {
                     "$ref": "#/definitions/sql.NullTime"
                 },
+                "checkout_picture": {},
                 "checkout_time": {
                     "type": "string"
                 },
@@ -1473,6 +1548,9 @@ const docTemplate = `{
                     "$ref": "#/definitions/sql.NullFloat64"
                 },
                 "name": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "picture": {
                     "$ref": "#/definitions/sql.NullString"
                 },
                 "quantity": {
@@ -1648,6 +1726,41 @@ const docTemplate = `{
                     "$ref": "#/definitions/sql.NullFloat64"
                 },
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "userdb.GetUserRow": {
+            "type": "object",
+            "properties": {
+                "company_id": {
+                    "$ref": "#/definitions/sql.NullInt64"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "firstname": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "jobsite_id": {
+                    "$ref": "#/definitions/sql.NullInt64"
+                },
+                "lastname": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "profilepicture": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "role": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "username": {
                     "type": "string"
                 }
             }
