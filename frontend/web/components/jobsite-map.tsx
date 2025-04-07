@@ -92,13 +92,13 @@ export default function JobsiteMapClient() {
             ]);
             setZonePolygon(null);
           } else {
-            setBboxZone(createFixedBoundingBox(lat, lng, 50)); // 50m fallback
+            setBboxZone(createFixedBoundingBox(lat, lng, 150)); // 50m fallback
             setZonePolygon(null);
           }
         })
         .catch((err) => {
           console.error("Nominatim error:", err);
-          setBboxZone(createFixedBoundingBox(lat, lng, 50));
+          setBboxZone(createFixedBoundingBox(lat, lng, 150));
           setZonePolygon(null);
         });
     }
