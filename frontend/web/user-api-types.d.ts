@@ -29,7 +29,7 @@ export interface GetUserRow {
   username: string
   firstname: { Valid: boolean, String: string }
   lastname: { Valid: boolean, String: string }
-  company_id: { Valid: boolean, String: string }
+  company_id: { Valid: boolean, Int64: number }
   jobsite_id: { Valid: boolean, Int64: number }
   role: { Valid: boolean, String: string }
   email: string
@@ -157,6 +157,6 @@ export interface UserJoin {
   jobsite_id: JobSiteID
   username: string
   profilepicture: Profilepicture
-  company_name: string
-  jobsite_name: string
+  company_name: { String: string; Valid: boolean }
+  jobsite_name: { String: string; Valid: boolean }
 }

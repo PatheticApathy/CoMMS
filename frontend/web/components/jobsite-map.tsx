@@ -1,35 +1,42 @@
 "use client";
 
-import L, { LatLngBoundsExpression } from "leaflet"
-import { MapContainer, TileLayer, Marker, Popup, Rectangle } from "react-leaflet";
-import useSWR from 'swr'
-import { JobSite, User } from '@/user-api-types';
+import L, { LatLngBoundsExpression } from "leaflet";
+import { MapContainer, TileLayer, Marker, Popup, Rectangle, GeoJSON } from "react-leaflet";
+import useSWR, {Fetcher} from "swr";
+import { GetUserRow, JobSite } from "@/user-api-types";
+import { getToken, IdentityContext } from "@/components/identity-provider";
+//import { getToken } from "@/components/localstorage";
+import { Token } from "@/user-api-types";
+import { Material } from '@/material-api-types';
+import { useContext, useEffect, useState } from "react";
 import "leaflet/dist/leaflet.css";
-import { Token } from '@/user-api-types';
-import { getToken } from "@/components/identity-provider";
 
 const defaultIcon = new L.Icon({
   iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
-  iconSize: [25, 41], // Size of the icon
-  iconAnchor: [12, 41], // Anchor point of the icon (where the tip is placed)
-  popupAnchor: [1, -34], // Position of the popup relative to the icon
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
 });
 
-const jobSiteFetcher = async (url: string): Promise<JobSite[]> => {
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error("Failed to fetch data");
-  }
+const jobSiteFetcher = async (url: string): Promise<JobSite> => {
+  const res = await fetch(url, {
+    headers: { 'Authorization': getToken()}
+  });
+  if (!res.ok) throw new Error("Failed to fetch job sites");
   return res.json();
-}
+};
 
-const userFetcher = async (url: string): Promise<User[]> => {
-  const res = await fetch(url);
+const materialFetcher: Fetcher<Material[], string> = async (...args) => fetch(...args, {headers: { 'Authorization': getToken()}}).then(res => res.json())
+
+const fetchUser = async  (url: string): Promise<GetUserRow[]> => {
+  const res = await fetch(url,
+    { headers: { 'authorization': getToken() || 'bruh' } }
+  )
   if (!res.ok) {
     throw new Error("Failed to fetch data");
   }
   return res.json();
-}
+};
 
 async function getProfileArgs(url: string, arg: string) {
   return fetch(url, {
@@ -39,60 +46,115 @@ async function getProfileArgs(url: string, arg: string) {
   }).then(res => res.json() as Promise<Token>)
 }
 
-const token = getToken()
-console.log("Token: ")
-console.log(token)
+async function fetchNominatimZone(lat: number, lon: number) {
+  const url = `${process.env.NOMIN}/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&polygon_geojson=1`;
+  const res = await fetch(url, {
+    headers: {
+      "User-Agent": "CoMMS (mjl036@gmail.com)", // Required by Nominatim TOS
+    },
+  });
+  if (!res.ok) throw new Error("Failed to fetch from Nominatim");
+  return res.json();
+}
 
-const bounds: LatLngBoundsExpression = [
-  [32.5260072, -92.6440465],
-  [32.5266895, -92.6427248]
-]
+function createFixedBoundingBox(lat: number, lon: number, meters: number): LatLngBoundsExpression {
+  const offset = meters / 111320; // ~degrees per meter
+  return [
+    [lat - offset, lon - offset],
+    [lat + offset, lon + offset],
+  ];
+}
 
 export default function JobsiteMapClient() {
+  const identity = useContext(IdentityContext)
 
-  const { data: sites } = useSWR<JobSite[]>("/api/sites/all", jobSiteFetcher)
-  const { data: users } = useSWR<User[]>("/api/user/all", userFetcher)
-  const { data: tokenData, error: error2 } = useSWR(['/api/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
+  const { data: currentUser, error: error } = useSWR<GetUserRow[]>(identity ? `/api/user/search?id=${identity?.id}` : null, fetchUser);
+  const currentUserId = currentUser && currentUser[0].jobsite_id.Int64
+  const { data: currentSite, error: error2 } = useSWR<JobSite>(currentUser && currentUser[0].jobsite_id.Valid ? `/api/sites/search?id=${currentUser[0].jobsite_id.Int64}` : null, jobSiteFetcher);
 
-  if (!token) { return (<p className='flex items-center justify-center w-screen h-screen'>Invalid Token</p>) }
+  //const { data: tokenData, error: error2 } = useSWR( token ? ['/api/user/decrypt', token] : null, ([url, token]) => getProfileArgs(url, token));
 
+  const [bboxZone, setBboxZone] = useState<LatLngBoundsExpression | null>(null);
+  const [zonePolygon, setZonePolygon] = useState<any | null>(null);
 
-  if (error2) { return (<p className='flex items-center justify-center w-screen h-screen'>{error2.message}</p>) }
+  const { data: materials, error: error3, isLoading } = useSWR(currentUser ? `/api/material/material/search?site=${currentUser[0].jobsite_id.Valid ? currentUser[0].jobsite_id.Int64 : undefined}` : null, materialFetcher)
 
-  const userID = tokenData?.id
+  const lat = currentSite?.location_lat?.Float64;
+  const lng = currentSite?.location_lng?.Float64;
 
-  if (!sites || !users || !userID) {
-    return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>)
+  useEffect(() => {
+    if (lat && lng) {
+      fetchNominatimZone(lat, lng)
+        .then((data) => {
+          if (data.geojson && data.geojson.type === "Polygon") {
+            setZonePolygon(data.geojson);
+            setBboxZone(null);
+          } else if (data.boundingbox) {
+            const [south, north, west, east] = data.boundingbox.map(parseFloat);
+            setBboxZone([
+              [south, west],
+              [north, east],
+            ]);
+            setZonePolygon(null);
+          } else {
+            setBboxZone(createFixedBoundingBox(lat, lng, 100)); // 50m fallback
+            setZonePolygon(null);
+          }
+        })
+        .catch((err) => {
+          console.error("Nominatim error:", err);
+          setBboxZone(createFixedBoundingBox(lat, lng, 100));
+          setZonePolygon(null);
+        });
+    }
+  }, [lat, lng]);
+
+  if (!identity) {
+    return <p className="flex items-center justify-center w-screen h-screen">Invalid Token</p>;
   }
 
-  if (sites && users && userID) {
-    const user = users[userID - 1]
-    if (!user.jobsite_id) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
-    const userJobsite = user.jobsite_id.Int64
-    const site = sites[userJobsite - 1]
-
-    if (!site) { return (<p className='flex items-center justify-center w-screen h-screen'>No Jobsite Found</p>) }
-
-    const siteName = site.name
-
-    return (
-      <MapContainer
-        style={{ height: "100%", width: "100%" }}
-        center={[site.location_lat.Float64, site.location_lng.Float64]}
-        zoom={15}
-        scrollWheelZoom={false}
-      >
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; OpenStreetMap contributors'
-        />
-        <Marker position={[site.location_lat.Valid ? site.location_lat.Float64 : 0.0, site.location_lng.Valid ? site.location_lng.Float64 : 0.0]} icon={defaultIcon}>
-          <Popup>
-            {siteName}
-          </Popup>
-        </Marker>
-        <Rectangle pathOptions={{ color: "purple" }} bounds={bounds} />
-      </MapContainer>
-    );
+  if (error) {
+    return <p className="flex items-center justify-center w-screen h-screen">{error.message}</p>;
   }
+
+  if (error2) {
+    return <p className="flex items-center justify-center w-screen h-screen">{error2.message}</p>;
+  }
+
+  if (error3) {
+    return <p className="flex items-center justify-center w-screen h-screen">{error3.message}</p>;
+  }
+
+  if (!currentUser || !currentSite || !lat || !lng || isLoading) {
+    return <p className="flex items-center justify-center w-screen h-screen">Loading...</p>;
+  }
+
+  return (
+    <MapContainer
+      style={{ height: "100%", width: "100%" }}
+      center={[lat, lng]}
+      zoom={17}
+      scrollWheelZoom={false}
+    >
+      <TileLayer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution="&copy; OpenStreetMap contributors"
+      />
+
+      {/* Marker is optional */}
+      <Marker position={[lat, lng]} icon={defaultIcon}>
+        <Popup>{currentSite.name}</Popup>
+      </Marker>
+
+      {/* Preferred: GeoJSON shape (if available) */}
+      {zonePolygon && (
+        <GeoJSON data={zonePolygon} style={{ color: "purple", weight: 2 }} />
+      )}
+
+      {/* Fallback: bounding box or fixed square */}
+      {!zonePolygon && bboxZone && (
+        <Rectangle pathOptions={{ color: "purple" }} bounds={bboxZone} />
+      )}
+    </MapContainer>
+  );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -34,16 +34,27 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import InitAddFormDialougeAdmin from "@/components/add-jobsite-form/jobsite-add-admin";
-
 import useSWR from "swr";
-import { User, UserJoin, Company, JobSite } from "@/user-api-types";
+import { User, UserJoin, Company, JobSite, Token, GetUserRow } from "@/user-api-types";
 import Loading from "@/components/loading";
+import { getToken, IdentityContext } from '@/components/identity-provider';
 import { cn } from "@/lib/utils";
-import AdminDropDown from "./admin-dropdown";
-
+import AdminDropDown from "./admin-dropdown";;
 
 const fetcher = async (url: string): Promise<UserJoin[]> => {
-  const res = await fetch(url);
+  const res = await fetch(url,
+    { headers: { 'authorization': getToken() || 'bruh' } }
+  );
+  if (!res.ok) {
+    throw new Error("Failed to fetch data");
+  }
+  return res.json();
+};
+
+const fetchUser = async  (url: string): Promise<GetUserRow[]> => {
+  const res = await fetch(url,
+    { headers: { 'authorization': getToken() || 'bruh' } }
+  )
   if (!res.ok) {
     throw new Error("Failed to fetch data");
   }
@@ -119,12 +130,26 @@ const Columns = (companies: Company[] | undefined, jobsites: JobSite[] | undefin
   {
     accessorKey: "company_name",
     header: "Company",
-    cell: ({ row }) => <div className=""> {row.getValue("company_name")}</div>,
+    cell: ({ row }) => {
+      const company_name = row.getValue("company_name") as { String: string; Valid: boolean };
+    return (
+      <div className="">
+        {company_name.String}
+      </div>
+    );
+  }
   },
   {
     accessorKey: "jobsite_name",
     header: "Jobsite",
-    cell: ({ row }) => <div className="">{row.getValue("jobsite_name")}</div>,
+    cell: ({ row }) => {
+        const jobsite_name = row.getValue("jobsite_name") as { String: string; Valid: boolean };
+      return (
+        <div className="">
+          {jobsite_name.String}
+        </div>
+      );
+    }
   },
   {
     accessorKey: "role",
@@ -155,6 +180,16 @@ const Columns = (companies: Company[] | undefined, jobsites: JobSite[] | undefin
   },
 ]);
 
+async function getProfileArgs(url: string, arg: string) {
+  return fetch(url, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: arg
+  }).then(res => res.json() as Promise<Token>)
+}
+
+//const token = getToken()
+
 export function UserTable() {
   const { data, error } = useSWR<UserJoin[]>("/api/user/join", fetcher);
   const { data: companies } = useSWR<Company[]>("/api/company/all", fetchCompanies);
@@ -165,9 +200,16 @@ export function UserTable() {
     useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
   const columns = Columns(companies, jobsites)
+  const identity = useContext(IdentityContext)
 
+  if (!identity) { return (<p className='flex items-center justify-center w-screen h-screen'>Invalid Token</p>) }
+
+  //const { data: tokenData, error: error2 } = useSWR(['/api/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
+  const { data: currentuser, error: error2 } = useSWR<GetUserRow[], string>(identity ? `/api/user/search?id=${identity?.id}` : null, fetchUser);
+  const { data: subordinates, error: error4 } = useSWR<UserJoin[]>(currentuser ? `/api/user/subordinates?user=${currentuser[0].id}&company=${currentuser[0]?.company_id.Int64}&site=${currentuser[0]?.jobsite_id.Int64}` : null, fetcher);
+  console.log(currentuser ? `/api/user/coworkers?user=${currentuser[0].id}&company=${currentuser[0]?.company_id.Int64}&site=${currentuser[0]?.jobsite_id.Int64}` : null) 
   const table = useReactTable({
-    data: data || [],
+    data: subordinates || [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -185,6 +227,10 @@ export function UserTable() {
     },
   });
 
+  //if (!identity) { return (<div className='flex items-center justify-center w-screen h-screen'>Loading <Loading /></div>) }
+  if (error) return <p>Invalid User.</p>;
+  if (!data) return <p>Loading...</p>;
+
   if (error) {
     return <div>Error loading data</div>;
   }
@@ -192,6 +238,7 @@ export function UserTable() {
   if (!data) {
     return <Loading />;
   }
+  console.log(data)
 
   return (
     <div className="w-full">

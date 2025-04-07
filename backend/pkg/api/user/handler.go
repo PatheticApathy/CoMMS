@@ -115,9 +115,9 @@ func (e *Env) getUsers(w http.ResponseWriter, r *http.Request) {
 
 // Get handler that gets coworkers for contacts
 //
-//	@Summary		post user to database
+//	@Summary		gets coworkers for contacts
 //	@Security identity
-//	@Description	Adds user to the database using valid json structure
+//	@Description	pulls users that match either jobsite or company ID with the current user, excluding the current user
 //	@Tags			users
 //	@Produce		json
 //	@Param			user	query		int	true	"user id"
@@ -137,6 +137,51 @@ func (e *Env) getCoworkers(w http.ResponseWriter, r *http.Request) {
 		site_id, err := strconv.Atoi(query.Get("site"))
 
 		users, err := e.Queries.GetUsersByJobsiteAndCompany(r.Context(), userdb.GetUsersByJobsiteAndCompanyParams{
+			CompanyID: sql.NullInt64{Int64: int64(company_id), Valid: true},
+			ID:        int64(user_id),
+			JobsiteID: sql.NullInt64{Int64: int64(site_id), Valid: true},
+		})
+		if err != nil {
+			log.Printf("Failed to get users, reason: %v", err)
+			http.Error(w, "Failed to get users", http.StatusInternalServerError)
+			return
+		}
+		log.Printf("Successfully retrieved %d users", len(users))
+		if err := json.NewEncoder(w).Encode(&users); err != nil {
+			log.Printf("Failed to encode users response, reason: %v", err)
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		log.Println("Users response successfully sent")
+		return
+	}
+	log.Printf("Invalid input")
+	http.Error(w, "Bad request", http.StatusBadRequest)
+}
+
+// Get handler that gets subordinates for contacts
+//
+//	@Summary		gets subordinates for contacts
+//	@Description	pulls users that match either jobsite or company ID with the current user, including the current user
+//	@Tags			users
+//	@Produce		json
+//	@Param			user	query		int	true	"user id"
+//	@Param			company	query		int	true	"company id"
+//	@Param			site	query		int	true	"jobsite id"
+//	@Success		200		{array}	userdb.GetUsersByJobsiteAndCompanyRow		"User login token"
+//	@Failure		500		{string}	string										"Internal server error"
+//	@Failure		400		{string}	string										"Bad request"
+//	@Router			/user/subordinates [get]
+func (e *Env) getSubordinates(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+
+	if query.Has("user") && query.Has("company") && query.Has("site") {
+		log.Println("Fetching all subordinates from the database")
+		company_id, err := strconv.Atoi(query.Get("company"))
+		user_id, err := strconv.Atoi(query.Get("user"))
+		site_id, err := strconv.Atoi(query.Get("site"))
+
+		users, err := e.Queries.GetSubordinatesByJobsiteAndCompany(r.Context(), userdb.GetSubordinatesByJobsiteAndCompanyParams{
 			CompanyID: sql.NullInt64{Int64: int64(company_id), Valid: true},
 			ID:        int64(user_id),
 			JobsiteID: sql.NullInt64{Int64: int64(site_id), Valid: true},

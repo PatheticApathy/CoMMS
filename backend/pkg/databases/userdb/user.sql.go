@@ -105,6 +105,71 @@ func (q *Queries) GetAllUsers(ctx context.Context) ([]User, error) {
 	return items, nil
 }
 
+const getSubordinatesByJobsiteAndCompany = `-- name: GetSubordinatesByJobsiteAndCompany :many
+SELECT u.username, u.firstname, u.lastname, u.company_id, u.jobsite_id, u.role, u.email, u.phone, u.profilepicture,
+       c.name as company_name, j.name as jobsite_name
+FROM Users u 
+LEFT JOIN Companies c ON u.company_id = c.id 
+LEFT JOIN JobSites j ON u.jobsite_id = j.id
+WHERE ((? = u.company_id OR u.jobsite_id = ?) OR (u.company_id IS NULL OR u.jobsite_id IS NULL))
+    AND u.id != ?
+`
+
+type GetSubordinatesByJobsiteAndCompanyParams struct {
+	CompanyID sql.NullInt64 `json:"company_id"`
+	JobsiteID sql.NullInt64 `json:"jobsite_id"`
+	ID        int64         `json:"id"`
+}
+
+type GetSubordinatesByJobsiteAndCompanyRow struct {
+	Username       string         `json:"username"`
+	Firstname      sql.NullString `json:"firstname"`
+	Lastname       sql.NullString `json:"lastname"`
+	CompanyID      sql.NullInt64  `json:"company_id"`
+	JobsiteID      sql.NullInt64  `json:"jobsite_id"`
+	Role           sql.NullString `json:"role"`
+	Email          string         `json:"email"`
+	Phone          string         `json:"phone"`
+	Profilepicture sql.NullString `json:"profilepicture"`
+	CompanyName    sql.NullString `json:"company_name"`
+	JobsiteName    sql.NullString `json:"jobsite_name"`
+}
+
+func (q *Queries) GetSubordinatesByJobsiteAndCompany(ctx context.Context, arg GetSubordinatesByJobsiteAndCompanyParams) ([]GetSubordinatesByJobsiteAndCompanyRow, error) {
+	rows, err := q.db.QueryContext(ctx, getSubordinatesByJobsiteAndCompany, arg.CompanyID, arg.JobsiteID, arg.ID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetSubordinatesByJobsiteAndCompanyRow
+	for rows.Next() {
+		var i GetSubordinatesByJobsiteAndCompanyRow
+		if err := rows.Scan(
+			&i.Username,
+			&i.Firstname,
+			&i.Lastname,
+			&i.CompanyID,
+			&i.JobsiteID,
+			&i.Role,
+			&i.Email,
+			&i.Phone,
+			&i.Profilepicture,
+			&i.CompanyName,
+			&i.JobsiteName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getUser = `-- name: GetUser :one
 SELECT id, username, firstname, lastname, company_id, jobsite_id, role, email, phone, profilepicture FROM Users WHERE id = ?
 `
@@ -181,8 +246,7 @@ SELECT u.username, u.firstname, u.lastname, u.company_id, u.jobsite_id, u.role, 
 FROM Users u 
 JOIN Companies c ON u.company_id = c.id 
 JOIN JobSites j ON u.jobsite_id = j.id
-WHERE ? = u.company_id 
-    OR  u.jobsite_id = ?
+WHERE (? = u.company_id OR u.jobsite_id = ?)
     AND u.id != ?
 `
 
