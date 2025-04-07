@@ -132,7 +132,7 @@ export function EditProfile() {
           </DialogHeader>
           <form onSubmit={form.handleSubmit(profileSubmit)} className="space-y-8">
             <div className="rounded-full overflow-hidden h-28 w-28">
-              <Image alt='Profile picture' src="https://static.vecteezy.com/system/resources/thumbnails/009/734/564/small/default-avatar-profile-icon-of-social-media-user-vector.jpg" />
+              <Image alt='Profile picture' src="/default-avatar-profile-icon-of-social-media-user-vector.jpg" width={120} height={120} />
             </div>
             <FormField
               control={form.control}
