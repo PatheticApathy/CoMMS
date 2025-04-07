@@ -18,21 +18,25 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import useSWR from "swr";
-import { Token, User, UserJoin } from "@/user-api-types";
-import { getToken } from "@/components/identity-provider";
-import { useEffect } from "react";
+import { GetUserRow, Token, User, UserJoin } from "@/user-api-types";
+import { getToken, IdentityContext } from "@/components/identity-provider";
+import { useContext, useEffect } from "react";
 import Image from "next/image";
 
 const fetcher = async (url: string): Promise<UserJoin[]> => {
-  const res = await fetch(url);
+  const res = await fetch(url, {
+    headers: { 'Authorization': getToken()}
+  });
   if (!res.ok) {
     throw new Error("Failed to fetch data");
   }
   return res.json();
 };
 
-const fetcher3 = async (url: string): Promise<User> => {
-  const res = await fetch(url)
+const fetcher3 = async (url: string): Promise<GetUserRow[]> => {
+  const res = await fetch(url, {
+    headers: { 'Authorization': getToken()}
+  });
   if (!res.ok) {
     throw new Error("Failed to fetch data");
   }
@@ -47,12 +51,13 @@ async function getProfileArgs(url: string, arg: string) {
   }).then(res => res.json() as Promise<Token>)
 }
 
-const token = getToken()
+//const token = getToken()
 
 export default function ContactsTable({ searchQuery, tableData, tableAction }: { searchQuery: string, tableData: UserJoin[], tableAction: (data: UserJoin[]) => void }) {
-  const { data: tokenData, error: error2 } = useSWR(['/api/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
-  const { data: currentuser, error: error3 } = useSWR<User, string>(tokenData ? `/api/user/search?id=${tokenData?.id}` : null, fetcher3);
-  const { data, error } = useSWR<UserJoin[]>(tokenData && currentuser ? `/api/user/coworkers?user=${tokenData.id}&company=${currentuser?.company_id.Int64}&site=${currentuser?.jobsite_id.Int64}` : null, fetcher);
+  const identity = useContext(IdentityContext)
+  //const { data: tokenData, error: error2 } = useSWR(['/api/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
+  const { data: currentuser, error: error2 } = useSWR<GetUserRow[], string>(identity ? `/api/user/search?id=${identity?.id}` : null, fetcher3);
+  const { data, error } = useSWR<UserJoin[]>(identity && currentuser ? `/api/user/coworkers?user=${identity.id}&company=${currentuser[0]?.company_id.Int64}&site=${currentuser[0]?.jobsite_id.Int64}` : null, fetcher);
 
   useEffect(() => {
     const filteredData = (data ?? []).filter((user: UserJoin) => {
@@ -64,8 +69,8 @@ export default function ContactsTable({ searchQuery, tableData, tableAction }: {
         user.phone.toLowerCase().includes(searchLower) ||
         (user.firstname.Valid && user.firstname.String.toLowerCase().includes(searchLower)) ||
         (user.lastname.Valid && user.lastname.String.toLowerCase().includes(searchLower)) ||
-        (user.company_name.toLowerCase().includes(searchLower)) ||
-        (user.jobsite_name.toLowerCase().includes(searchLower)) ||
+        (user.company_name.String.toLowerCase().includes(searchLower)) ||
+        (user.jobsite_name.String.toLowerCase().includes(searchLower)) ||
         (user.role.Valid && user.role.String.toLowerCase().includes(searchLower))
       );
     });
@@ -73,10 +78,10 @@ export default function ContactsTable({ searchQuery, tableData, tableAction }: {
   }
     , [tableData, tableAction, data, searchQuery])
 
-  if (!token) { return (<p className='flex items-center justify-center w-screen h-screen'>Invalid Token</p>) }
+  if (!identity) { return (<p className='flex items-center justify-center w-screen h-screen'>Invalid Token</p>) }
 
 
-  if (error || error2 || error3) return <p>Invalid User.</p>;
+  if (error || error2) return <p>Invalid User.</p>;
   if (!data) return <p>Loading...</p>;
 
   return (

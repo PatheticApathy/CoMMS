@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -35,13 +35,11 @@ import {
 } from "@/components/ui/table";
 import InitAddFormDialougeAdmin from "@/components/add-jobsite-form/jobsite-add-admin";
 import useSWR from "swr";
-import { User, UserJoin, Company, JobSite, Token } from "@/user-api-types";
+import { User, UserJoin, Company, JobSite, Token, GetUserRow } from "@/user-api-types";
 import Loading from "@/components/loading";
-//import { getToken } from "./localstorage";
-import { getToken } from '@/components/identity-provider';
+import { getToken, IdentityContext } from '@/components/identity-provider';
 import { cn } from "@/lib/utils";
-import AdminDropDown from "./admin-dropdown";
-//import { getToken, useIdentity } from '@/hooks/useToken';
+import AdminDropDown from "./admin-dropdown";;
 
 const fetcher = async (url: string): Promise<UserJoin[]> => {
   const res = await fetch(url,
@@ -53,7 +51,7 @@ const fetcher = async (url: string): Promise<UserJoin[]> => {
   return res.json();
 };
 
-const fetchUser = async  (url: string): Promise<User> => {
+const fetchUser = async  (url: string): Promise<GetUserRow[]> => {
   const res = await fetch(url,
     { headers: { 'authorization': getToken() || 'bruh' } }
   )
@@ -190,7 +188,7 @@ async function getProfileArgs(url: string, arg: string) {
   }).then(res => res.json() as Promise<Token>)
 }
 
-const token = getToken()
+//const token = getToken()
 
 export function UserTable() {
   const { data, error } = useSWR<UserJoin[]>("/api/user/join", fetcher);
@@ -202,15 +200,14 @@ export function UserTable() {
     useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
   const columns = Columns(companies, jobsites)
+  const identity = useContext(IdentityContext)
 
-  if (!token) { return (<p className='flex items-center justify-center w-screen h-screen'>Invalid Token</p>) }
+  if (!identity) { return (<p className='flex items-center justify-center w-screen h-screen'>Invalid Token</p>) }
 
-  const { data: tokenData, error: error2 } = useSWR(['/api/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
-  //const identity = useIdentity();
-  //const { data: user } = useSWR(identity ? `/api/user/search?id=${identity.id}` : null, fetchUser,)
-  const { data: currentuser, error: error3 } = useSWR<User, string>(tokenData ? `/api/user/search?id=${tokenData?.id}` : null, fetchUser);
-  const { data: subordinates, error: error4 } = useSWR<UserJoin[]>(currentuser ? `/api/user/subordinates?user=${currentuser.id}&company=${currentuser?.company_id.Int64}&site=${currentuser?.jobsite_id.Int64}` : null, fetcher);
-  console.log(tokenData ? `/api/user/coworkers?user=${tokenData.id}&company=${currentuser?.company_id.Int64}&site=${currentuser?.jobsite_id.Int64}` : null) 
+  //const { data: tokenData, error: error2 } = useSWR(['/api/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
+  const { data: currentuser, error: error2 } = useSWR<GetUserRow[], string>(identity ? `/api/user/search?id=${identity?.id}` : null, fetchUser);
+  const { data: subordinates, error: error4 } = useSWR<UserJoin[]>(currentuser ? `/api/user/subordinates?user=${currentuser[0].id}&company=${currentuser[0]?.company_id.Int64}&site=${currentuser[0]?.jobsite_id.Int64}` : null, fetcher);
+  console.log(currentuser ? `/api/user/coworkers?user=${currentuser[0].id}&company=${currentuser[0]?.company_id.Int64}&site=${currentuser[0]?.jobsite_id.Int64}` : null) 
   const table = useReactTable({
     data: subordinates || [],
     columns,

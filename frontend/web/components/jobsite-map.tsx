@@ -3,12 +3,12 @@
 import L, { LatLngBoundsExpression } from "leaflet";
 import { MapContainer, TileLayer, Marker, Popup, Rectangle, GeoJSON } from "react-leaflet";
 import useSWR, {Fetcher} from "swr";
-import { JobSite, User } from "@/user-api-types";
-import { getToken } from "@/components/identity-provider";
+import { GetUserRow, JobSite } from "@/user-api-types";
+import { getToken, IdentityContext } from "@/components/identity-provider";
 //import { getToken } from "@/components/localstorage";
 import { Token } from "@/user-api-types";
 import { Material } from '@/material-api-types';
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import "leaflet/dist/leaflet.css";
 
 const defaultIcon = new L.Icon({
@@ -18,17 +18,23 @@ const defaultIcon = new L.Icon({
   popupAnchor: [1, -34],
 });
 
-const jobSiteFetcher = async (url: string): Promise<JobSite[]> => {
-  const res = await fetch(url);
+const jobSiteFetcher = async (url: string): Promise<JobSite> => {
+  const res = await fetch(url, {
+    headers: { 'Authorization': getToken()}
+  });
   if (!res.ok) throw new Error("Failed to fetch job sites");
   return res.json();
 };
 
-const materialFetcher: Fetcher<Material[], string> = async (...args) => fetch(...args,).then(res => res.json())
+const materialFetcher: Fetcher<Material[], string> = async (...args) => fetch(...args, {headers: { 'Authorization': getToken()}}).then(res => res.json())
 
-const userFetcher = async (url: string): Promise<User[]> => {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("Failed to fetch users");
+const fetchUser = async  (url: string): Promise<GetUserRow[]> => {
+  const res = await fetch(url,
+    { headers: { 'authorization': getToken() || 'bruh' } }
+  )
+  if (!res.ok) {
+    throw new Error("Failed to fetch data");
+  }
   return res.json();
 };
 
@@ -41,7 +47,7 @@ async function getProfileArgs(url: string, arg: string) {
 }
 
 async function fetchNominatimZone(lat: number, lon: number) {
-  const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&polygon_geojson=1`;
+  const url = `${process.env.NOMIN}/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&polygon_geojson=1`;
   const res = await fetch(url, {
     headers: {
       "User-Agent": "CoMMS (mjl036@gmail.com)", // Required by Nominatim TOS
@@ -60,23 +66,21 @@ function createFixedBoundingBox(lat: number, lon: number, meters: number): LatLn
 }
 
 export default function JobsiteMapClient() {
-  const token = getToken();
+  const identity = useContext(IdentityContext)
 
-  const { data: sites } = useSWR<JobSite[]>("/api/sites/all", jobSiteFetcher);
-  const { data: users } = useSWR<User[]>("/api/user/all", userFetcher);
-  const { data: tokenData, error: error2 } = useSWR( token ? ['/api/user/decrypt', token] : null, ([url, token]) => getProfileArgs(url, token));
+  const { data: currentUser, error: error } = useSWR<GetUserRow[]>(identity ? `/api/user/search?id=${identity?.id}` : null, fetchUser);
+  const currentUserId = currentUser && currentUser[0].jobsite_id.Int64
+  const { data: currentSite, error: error2 } = useSWR<JobSite>(currentUser && currentUser[0].jobsite_id.Valid ? `/api/sites/search?id=${currentUser[0].jobsite_id.Int64}` : null, jobSiteFetcher);
+
+  //const { data: tokenData, error: error2 } = useSWR( token ? ['/api/user/decrypt', token] : null, ([url, token]) => getProfileArgs(url, token));
 
   const [bboxZone, setBboxZone] = useState<LatLngBoundsExpression | null>(null);
   const [zonePolygon, setZonePolygon] = useState<any | null>(null);
 
-  const userID = tokenData?.id;
-  const user = userID ? users?.[userID - 1] : null;
-  const site = user?.jobsite_id?.Int64 ? sites?.[user.jobsite_id.Int64 - 1] : null;
+  const { data: materials, error: error3, isLoading } = useSWR(currentUser ? `/api/material/material/search?site=${currentUser[0].jobsite_id.Valid ? currentUser[0].jobsite_id.Int64 : undefined}` : null, materialFetcher)
 
-  const { data: materials, error, isLoading } = useSWR(user ? `/api/material/material/search?site=${user.jobsite_id.Valid ? user.jobsite_id.Int64 : undefined}` : null, materialFetcher)
-
-  const lat = site?.location_lat?.Float64;
-  const lng = site?.location_lng?.Float64;
+  const lat = currentSite?.location_lat?.Float64;
+  const lng = currentSite?.location_lng?.Float64;
 
   useEffect(() => {
     if (lat && lng) {
@@ -93,19 +97,19 @@ export default function JobsiteMapClient() {
             ]);
             setZonePolygon(null);
           } else {
-            setBboxZone(createFixedBoundingBox(lat, lng, 150)); // 50m fallback
+            setBboxZone(createFixedBoundingBox(lat, lng, 100)); // 50m fallback
             setZonePolygon(null);
           }
         })
         .catch((err) => {
           console.error("Nominatim error:", err);
-          setBboxZone(createFixedBoundingBox(lat, lng, 150));
+          setBboxZone(createFixedBoundingBox(lat, lng, 100));
           setZonePolygon(null);
         });
     }
   }, [lat, lng]);
 
-  if (!token) {
+  if (!identity) {
     return <p className="flex items-center justify-center w-screen h-screen">Invalid Token</p>;
   }
 
@@ -117,7 +121,11 @@ export default function JobsiteMapClient() {
     return <p className="flex items-center justify-center w-screen h-screen">{error2.message}</p>;
   }
 
-  if (!sites || !users || !userID || !site || !lat || !lng || isLoading) {
+  if (error3) {
+    return <p className="flex items-center justify-center w-screen h-screen">{error3.message}</p>;
+  }
+
+  if (!currentUser || !currentSite || !lat || !lng || isLoading) {
     return <p className="flex items-center justify-center w-screen h-screen">Loading...</p>;
   }
 
@@ -135,7 +143,7 @@ export default function JobsiteMapClient() {
 
       {/* Marker is optional */}
       <Marker position={[lat, lng]} icon={defaultIcon}>
-        <Popup>{site.name}</Popup>
+        <Popup>{currentSite.name}</Popup>
       </Marker>
 
       {/* Preferred: GeoJSON shape (if available) */}
