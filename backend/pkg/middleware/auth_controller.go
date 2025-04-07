@@ -62,8 +62,6 @@ func AuthController(next http.Handler, e *handler.Env, config routeConfig) http.
 						next.ServeHTTP(w, r)
 						return
 					}
-					log.Print("User role invalid for this route")
-					http.Error(w, "Invalid Credentials", http.StatusBadRequest)
 				}
 
 			}

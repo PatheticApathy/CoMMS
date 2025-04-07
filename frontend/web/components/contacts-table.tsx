@@ -96,7 +96,7 @@ export default function ContactsTable({ searchQuery, tableData, tableAction }: {
       </TableHeader>
       <TableBody>
         {tableData.map((user: UserJoin) => (
-          <Dialog key={user.id}>
+          <Dialog key={user.username}>
             <DialogTrigger asChild>
               <TableRow>
                 <TableCell>{user.username}</TableCell>
