@@ -81,6 +81,7 @@ export default function ContactsTable({ searchQuery }: { searchQuery: string }) 
       (user.role.Valid && user.role.String.toLowerCase().includes(searchLower))
     );
   });
+  
 
   return (
     <Table>
@@ -99,7 +100,7 @@ export default function ContactsTable({ searchQuery }: { searchQuery: string }) 
       </TableHeader>
       <TableBody>
         {filteredData.map((user: UserJoin) => (
-          <Dialog key={user.id}>
+          <Dialog key={user.username}>
             <DialogTrigger asChild>
               <TableRow>
                 <TableCell>{user.username}</TableCell>
