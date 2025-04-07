@@ -295,7 +295,7 @@ async function getProfileArgs(url: string, arg: string) {
 const token = getToken()
 
 export function UserTable() {
-  //const { data, error } = useSWR<UserJoin[]>("/api/user/join", fetcher);
+  const { data, error } = useSWR<UserJoin[]>("/api/user/join", fetcher);
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -307,12 +307,12 @@ export function UserTable() {
 
   if (!token) { return (<p className='flex items-center justify-center w-screen h-screen'>Invalid Token</p>) }
 
-  //const { data: tokenData, error: error2 } = useSWR(['/api/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
-  const identity = useIdentity();
-  const { data: user } = useSWR(identity ? `/api/user/search?id=${identity.id}` : null, fetchUser,)
-  //const { data: currentuser, error: error3 } = useSWR<User, string>(tokenData ? `/api/user/search?id=${tokenData?.id}` : null, fetchUser);
-  const { data, error } = useSWR<UserJoin[]>(identity && user ? `/api/user/subordinates?user=${identity.id}&company=${user?.company_id.Int64}&site=${user?.jobsite_id.Int64}` : null, fetcher);
-  //console.log(tokenData ? `/api/user/coworkers?user=${tokenData.id}&company=${currentuser?.company_id.Int64}&site=${currentuser?.jobsite_id.Int64}` : null) 
+  const { data: tokenData, error: error2 } = useSWR(['/api/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
+  //const identity = useIdentity();
+  //const { data: user } = useSWR(identity ? `/api/user/search?id=${identity.id}` : null, fetchUser,)
+  const { data: currentuser, error: error3 } = useSWR<User, string>(tokenData ? `/api/user/search?id=${tokenData?.id}` : null, fetchUser);
+  //const { data, error } = useSWR<UserJoin[]>(identity && user ? `/api/user/subordinates?user=${identity.id}&company=${user?.company_id.Int64}&site=${user?.jobsite_id.Int64}` : null, fetcher);
+  console.log(tokenData ? `/api/user/coworkers?user=${tokenData.id}&company=${currentuser?.company_id.Int64}&site=${currentuser?.jobsite_id.Int64}` : null) 
   const table = useReactTable({
     data: data || [],
     columns,
@@ -332,7 +332,7 @@ export function UserTable() {
     },
   });
 
-  if (!identity) { return (<div className='flex items-center justify-center w-screen h-screen'>Loading <Loading /></div>) }
+  //if (!identity) { return (<div className='flex items-center justify-center w-screen h-screen'>Loading <Loading /></div>) }
   if (error) return <p>Invalid User.</p>;
   if (!data) return <p>Loading...</p>;
 
