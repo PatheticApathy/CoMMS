@@ -39,5 +39,5 @@ export default function AdminPage() {
       </div>
     );
   }
-  else { return (<p className='flex items-center justify-center w-screen h-screen'>Not and Admin</p>) }
+  else { return (<p className='flex items-center justify-center w-screen h-screen'>Not an Admin</p>) }
 }

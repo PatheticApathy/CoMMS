@@ -46,8 +46,7 @@ export function Profile() {
   const identity = useContext(IdentityContext)
   const { data: user, error: error3, isLoading } = useSWR<GetUserRow[], string>(identity ? `/api/user/search?id=${identity.id}` : null, fetcher);
 
-  if (error3 || !user) return <p>Error loading Profile.</p>;
-  if (isLoading) return <p>Loading...</p>;
+
 
   async function logoutSubmit() {
     delTokenNIdentity()
@@ -55,6 +54,8 @@ export function Profile() {
   }
   console.log(identity)
 
+  if (error3 || !user) return <p>Error loading Profile.</p>;
+  if (isLoading) return <p>Loading...</p>;
   return (
     <Dialog>
       <DropdownMenu modal={false}>
@@ -83,7 +84,7 @@ export function Profile() {
           <DialogDescription>View your profile here. Click Edit Profile to edit your profile.</DialogDescription>
         </DialogHeader>
         <div className="rounded-full overflow-hidden h-28 w-28">
-          <Image alt='Yapper' className="" src="https://static.vecteezy.com/system/resources/thumbnails/009/734/564/small/default-avatar-profile-icon-of-social-media-user-vector.jpg" />
+          <Image alt='Yapper' className="" src="/default-avatar-profile-icon-of-social-media-user-vector.jpg" width={120} height={120} />
         </div>
         <div>Username: {user[0].username}</div>
         <div>Name: {user[0].firstname.Valid ? user[0].firstname.String : "N/A"} {user[0].lastname.Valid ? user[0].lastname.String : "N/A"}</div>

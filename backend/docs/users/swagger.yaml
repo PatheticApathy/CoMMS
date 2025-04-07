@@ -473,7 +473,8 @@ paths:
       - users
   /user/coworkers:
     get:
-      description: Adds user to the database using valid json structure
+      description: pulls users that match either jobsite or company ID with the current
+        user, excluding the current user
       parameters:
       - description: user id
         in: query
@@ -509,7 +510,7 @@ paths:
             type: string
       security:
       - identity: []
-      summary: post user to database
+      summary: gets coworkers for contacts
       tags:
       - users
   /user/create:
@@ -732,6 +733,46 @@ paths:
       security:
       - identity: []
       summary: post user to database
+      tags:
+      - users
+  /user/subordinates:
+    get:
+      description: pulls users that match either jobsite or company ID with the current
+        user, including the current user
+      parameters:
+      - description: user id
+        in: query
+        name: user
+        required: true
+        type: integer
+      - description: company id
+        in: query
+        name: company
+        required: true
+        type: integer
+      - description: jobsite id
+        in: query
+        name: site
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User login token
+          schema:
+            items:
+              $ref: '#/definitions/userdb.GetUsersByJobsiteAndCompanyRow'
+            type: array
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: gets subordinates for contacts
       tags:
       - users
   /user/update:

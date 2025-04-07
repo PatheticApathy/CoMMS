@@ -157,6 +157,6 @@ export interface UserJoin {
   jobsite_id: JobSiteID
   username: string
   profilepicture: Profilepicture
-  company_name: string
-  jobsite_name: string
+  company_name: { String: string; Valid: boolean }
+  jobsite_name: { String: string; Valid: boolean }
 }
