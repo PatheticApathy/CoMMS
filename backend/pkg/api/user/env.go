@@ -57,5 +57,6 @@ func (e *Env) jobSiteHandlers() http.Handler {
 	mux.HandleFunc("GET /search", e.getJobSiteHandler)
 	mux.HandleFunc("GET /all", e.getAllJobSitesHandler)
 	mux.HandleFunc("POST /add", e.addJobSiteHandler)
+	mux.HandleFunc("GET /company", e.getJobSitesByCompany)
 	return mux
 }

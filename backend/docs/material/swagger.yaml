@@ -177,7 +177,7 @@ definitions:
       addr:
         $ref: '#/definitions/sql.NullString'
       company_id:
-        $ref: '#/definitions/sql.NullInt64'
+        type: integer
       location_lat:
         $ref: '#/definitions/sql.NullFloat64'
       location_lng:
@@ -278,7 +278,7 @@ definitions:
       addr:
         $ref: '#/definitions/sql.NullString'
       company_id:
-        $ref: '#/definitions/sql.NullInt64'
+        type: integer
       id:
         type: integer
       location_lat:
@@ -889,6 +889,25 @@ paths:
           schema:
             type: string
       summary: fetches all job_sites
+      tags:
+      - sites
+  /sites/company:
+    get:
+      description: Get all jobsites for a specific company
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: job site
+          schema:
+            items:
+              $ref: '#/definitions/userdb.JobSite'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: fetches job_sites for a specific company
       tags:
       - sites
   /sites/search:

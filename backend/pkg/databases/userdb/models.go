@@ -22,7 +22,7 @@ type JobSite struct {
 	Addr        sql.NullString  `json:"addr"`
 	LocationLat sql.NullFloat64 `json:"location_lat"`
 	LocationLng sql.NullFloat64 `json:"location_lng"`
-	CompanyID   sql.NullInt64   `json:"company_id"`
+	CompanyID   int64           `json:"company_id"`
 }
 
 type User struct {

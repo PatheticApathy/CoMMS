@@ -4,32 +4,29 @@ import { useState } from 'react';
 import { UserTable } from '@/components/admin-table';
 import { MaterialTable } from '@/components/admin-material';
 import { Button } from '@/components/ui/button';
-import useSWR from 'swr'
-import { Token } from '@/user-api-types';
-import { getToken } from '@/hooks/usetoken';
+import useSWR, { Fetcher } from 'swr';
+import { User } from '@/user-api-types';
+import { getToken, IdentityContext } from '@/components/identity-provider';
+import { useContext } from 'react';
 
-async function getProfileArgs(url: string, arg: string) {
-  return fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: arg
-  }).then(res => res.json() as Promise<Token>)
-}
 
-const token = getToken()
+const fetchUser: Fetcher<User, string> = async (...args) => fetch(...args, { headers: { Authorization: getToken() } }).then((res) => res.json());
+
+
 
 export default function AdminPage() {
+  
   const [showFirstTable, setShowFirstTable] = useState(true);
-  const { data: tokenData, error: error2 } = useSWR([token ? '/api/user/decrypt' : null, token], ([url, token]) => getProfileArgs(url, token))
+  
+  const identity = useContext(IdentityContext);
+  const { data: user, error } = useSWR(identity ? `/api/user/search?id=${identity.id}` : null, fetchUser);
 
 
-  if (!token) { return (<p className='flex items-center justify-center w-screen h-screen'>Invalid Token</p>) }
+  if (!identity) { return (<p className='flex items-center justify-center w-screen h-screen'>Invalid Token</p>) }
 
+  if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>{error.message}</p>) }
 
-  if (error2) { return (<p className='flex items-center justify-center w-screen h-screen'>{error2.message}</p>) }
-
-  console.log(tokenData)
-  if (tokenData?.role.Valid && tokenData?.role.String === 'admin') {
+  if (user?.role.Valid && user?.role.String === 'admin') {
     return (
       <div className="flex flex-col justify-center items-center w-screen">
         <h1 className="font-bold text-5xl mb-4">Admin</h1>
