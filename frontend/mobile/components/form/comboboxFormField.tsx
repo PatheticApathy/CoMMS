@@ -1,11 +1,12 @@
 import { Key, useState } from "react";
 import { Controller, UseFormReturn } from "react-hook-form";
 import { Button, Modal, View } from "react-native";
+import { ScreenHeight, ScreenWidth } from "../global-style";
 
 export default function ComboboxFormField({ form_attr, default_label, options }: { form_attr: { name: string, form: UseFormReturn<any> }, default_label: string, options: { label: string, value: Key }[] }) {
   const [modalVisible, setModalVisible] = useState(false);
   return (
-    <View>
+    <View style={{ justifyContent: 'center', }}>
       <Modal
         animationType="slide"
         transparent={true}

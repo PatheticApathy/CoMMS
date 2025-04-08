@@ -7,7 +7,7 @@ import { AddMaterial, Material } from '@/material-api-types';
 import { JobSite } from '@/user-api-types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { ActivityIndicator } from 'react-native';
+import { ActivityIndicator, Text } from 'react-native';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/dist/mutation';
 import { Button } from 'react-native';
@@ -23,7 +23,7 @@ const AddMaterialSchema = z.object({
   status: z.enum(["In Stock", "Out of Stock", "Low Stock"]),
   type: z.string().min(2, { message: "Type must be more than 2 characters" }),
   unit: z.string().min(1, { message: "Unit must be greater than 1" }),
-  picture: z.instanceof(FileList).optional(),
+  picture: z.instanceof(File).optional(),
 });
 
 // Fetcher
@@ -39,7 +39,7 @@ const fetchJobsites = async (url: string): Promise<JobSite[]> => {
   return res.json();
 };
 
-export default function AddMaterialForm() {
+const AddMaterials = () => {
   // Form controller
   const form = useForm<z.infer<typeof AddMaterialSchema>>({
     resolver: zodResolver(AddMaterialSchema),
@@ -94,13 +94,13 @@ export default function AddMaterialForm() {
     };
 
     try {
-      if (values.picture && values.picture?.length > 0) {
-        const extension = values.picture[0].name.split('.').pop()
+      if (values.picture) {
+        const extension = values.picture.name.split('.').pop()
         if (!extension) {
           Notify.error("Invald file extension");
           return
         }
-        const resp = await download({ type: extension, file: values.picture[0] })
+        const resp = await download({ type: extension, file: values.picture })
         if (!resp.ok) {
           const message = await resp.json() as { message: string }
           Notify.error(message.message || "Error has occured");
@@ -128,7 +128,7 @@ export default function AddMaterialForm() {
   const DisplayJobSites = () => {
 
     if (jobsitesError) {
-      return <div className="text-red-500">Error loading jobsites</div>;
+      return <Text>Error loading jobsites</Text>;
     }
 
     if (loading_jobs) {
@@ -143,7 +143,7 @@ export default function AddMaterialForm() {
       return <ComboboxFormField form_attr={{ name: "job_site", form: form }} default_label="Choose a jobsite" options={jobsiteOptions} />
     }
 
-    return <div className="text-red-500">No Jobites</div>
+    return <Text>No Jobites</Text>
   }
 
   if (loading_jobs) { return (<MainView><ActivityIndicator style={{ justifyContent: 'center', height: ScreenHeight }} /></MainView>) }
@@ -162,3 +162,7 @@ export default function AddMaterialForm() {
     </MainView>
   )
 }
+
+export default AddMaterials
+
+

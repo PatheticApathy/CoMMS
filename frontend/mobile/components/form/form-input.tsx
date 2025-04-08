@@ -7,9 +7,7 @@ export default function FormInput({ name, placeholder, control }: { name: string
       control={control}
       name={name}
       render={({ field }) => (
-        <TextInput>
-          <TextInput placeholder={placeholder} {...field} />
-        </TextInput>
+        <TextInput placeholder={placeholder} {...field} />
       )}
     />
   )
