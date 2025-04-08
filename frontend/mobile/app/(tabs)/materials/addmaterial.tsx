@@ -96,13 +96,13 @@ export default function AddMaterialForm() {
       if (values.picture && values.picture?.length > 0) {
         const extension = values.picture[0].name.split('.').pop()
         if (!extension) {
-          setError(new Error("Invald file extension"));
+          Notify.error("Invald file extension");
           return
         }
         const resp = await download({ type: extension, file: values.picture[0] })
         if (!resp.ok) {
           const message = await resp.json() as { message: string }
-          setError(new Error(message.message || "Error has occured"));
+          Notify.error(message.message || "Error has occured");
           return
         }
         const name = await resp.json() as { name: string }
@@ -112,7 +112,7 @@ export default function AddMaterialForm() {
       console.log(`File name is ${payload.picture.String}`)
       const resp = await trigger(payload)
       if (!resp.ok) {
-        setError(new Error(await resp.text() || "Error has occured"));
+        Notify.error(await resp.text() || "Error has occured");
         return
       }
       const data = await resp.json() as Material
@@ -120,11 +120,30 @@ export default function AddMaterialForm() {
 
     } catch (err: any) {
       console.log(err);
-      setError(new Error(err.message || "Error has occurred"));
+      Notify.error(err.message || "Error has occurred");
     }
   };
 
+  const DisplayJobSites = () => {
 
+    if (jobsitesError) {
+      return <div className="text-red-500">Error loading jobsites</div>;
+    }
+
+    if (loading_jobs) {
+      return <div>Loading jobsites...<Loading /></div>;
+    }
+
+    if (jobsites) {
+      const jobsiteOptions = jobsites.map(jobsite => ({
+        label: jobsite.name,
+        value: jobsite.id
+      }));
+      return <ComboboxFormField form_attr={{ name: "job_site", description: "All known jobsites for this location", form: form }} default_label="Choose a jobsite" options={jobsiteOptions} />
+    }
+
+    return <div className="text-red-500">No Jobites</div>
+  }
 
   if (loading_jobs) { return (<MainView><ActivityIndicator style={{ justifyContent: 'center', height: ScreenHeight }} /></MainView>) }
 
