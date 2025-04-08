@@ -70,6 +70,16 @@ func main() {
 			fmt.Println(err)
 		}
 
+		lat, err := strconv.ParseFloat(row[6], 64)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		lng, err := strconv.ParseFloat(row[7], 64)
+		if err != nil {
+			fmt.Println(err)
+		}
+
 		material := material_db.AddMaterialParams{
 			Name: sql.NullString{
 				String: row[0],
@@ -84,10 +94,12 @@ func main() {
 			Status:   row[4],
 			JobSite:  int64(jobsite),
 			LocationLat: sql.NullFloat64{
-				Valid: false,
+				Float64: float64(lat),
+				Valid:   true,
 			},
 			LocationLng: sql.NullFloat64{
-				Valid: false,
+				Float64: float64(lng),
+				Valid:   true,
 			},
 		}
 

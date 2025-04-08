@@ -5,7 +5,6 @@ import { MapContainer, TileLayer, Marker, Popup, Rectangle, GeoJSON } from "reac
 import useSWR, {Fetcher} from "swr";
 import { GetUserRow, JobSite } from "@/user-api-types";
 import { getToken, IdentityContext } from "@/components/identity-provider";
-//import { getToken } from "@/components/localstorage";
 import { Token } from "@/user-api-types";
 import { Material } from '@/material-api-types';
 import { useContext, useEffect, useState } from "react";
@@ -47,7 +46,9 @@ async function getProfileArgs(url: string, arg: string) {
 }
 
 async function fetchNominatimZone(lat: number, lon: number) {
-  const url = `${process.env.NOMIN}/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&polygon_geojson=1`;
+  const baseUrl = process.env.NOMIN || "https://nominatim.openstreetmap.org";
+  const url = `${baseUrl}/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&polygon_geojson=1`;
+  console.log("Calling Nominatim with:", url);
   const res = await fetch(url, {
     headers: {
       "User-Agent": "CoMMS (mjl036@gmail.com)", // Required by Nominatim TOS
@@ -72,12 +73,11 @@ export default function JobsiteMapClient() {
   const currentUserId = currentUser && currentUser[0].jobsite_id.Int64
   const { data: currentSite, error: error2 } = useSWR<JobSite>(currentUser && currentUser[0].jobsite_id.Valid ? `/api/sites/search?id=${currentUser[0].jobsite_id.Int64}` : null, jobSiteFetcher);
 
-  //const { data: tokenData, error: error2 } = useSWR( token ? ['/api/user/decrypt', token] : null, ([url, token]) => getProfileArgs(url, token));
-
   const [bboxZone, setBboxZone] = useState<LatLngBoundsExpression | null>(null);
   const [zonePolygon, setZonePolygon] = useState<any | null>(null);
 
   const { data: materials, error: error3, isLoading } = useSWR(currentUser ? `/api/material/material/search?site=${currentUser[0].jobsite_id.Valid ? currentUser[0].jobsite_id.Int64 : undefined}` : null, materialFetcher)
+  console.log(materials)
 
   const lat = currentSite?.location_lat?.Float64;
   const lng = currentSite?.location_lng?.Float64;
@@ -141,12 +141,6 @@ export default function JobsiteMapClient() {
         attribution="&copy; OpenStreetMap contributors"
       />
 
-      {/* Marker is optional */}
-      <Marker position={[lat, lng]} icon={defaultIcon}>
-        <Popup>{currentSite.name}</Popup>
-      </Marker>
-
-      {/* Preferred: GeoJSON shape (if available) */}
       {zonePolygon && (
         <GeoJSON data={zonePolygon} style={{ color: "purple", weight: 2 }} />
       )}
@@ -155,6 +149,36 @@ export default function JobsiteMapClient() {
       {!zonePolygon && bboxZone && (
         <Rectangle pathOptions={{ color: "purple" }} bounds={bboxZone} />
       )}
+
+      {materials?.map((mat) => {
+        const hasCoords =
+          mat.location_lat?.Valid &&
+          mat.location_lng?.Valid &&
+          typeof mat.location_lat.Float64 === "number" &&
+          typeof mat.location_lng.Float64 === "number";
+
+        if (!hasCoords) return null;
+
+        return (
+          <Marker
+            key={mat.id}
+            position={[mat.location_lat.Float64, mat.location_lng.Float64]}
+            icon={defaultIcon}
+          >
+            <Popup>
+              <strong>{mat.name?.Valid ? mat.name.String : "Unnamed Material"}</strong>
+              <br />
+              ID: {mat.id}
+              <br />
+              Type: {mat.type?.Valid ? mat.type.String : "Unknown"}
+              <br />
+              Qty: {mat.quantity} {mat.unit}
+            </Popup>
+          </Marker>
+        );
+      })}
+
+
     </MapContainer>
   );
 }
