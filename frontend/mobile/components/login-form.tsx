@@ -56,7 +56,7 @@ export default function LoginForm() {
     }
   }
 
-  if (error) { <Text>error.message</Text> }
+  if (error) { <Text>{error.message}</Text> }
   return (
     <ThemedView>
       <ThemedView style={styles.titleContainer}>

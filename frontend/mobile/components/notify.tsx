@@ -18,5 +18,15 @@ export const Notify = {
       }
     ])
 
+  },
+
+  success: (msg: string) => {
+    Alert.alert('Success', msg, [
+      {
+        text: 'Ok',
+        style: 'default'
+      }
+    ])
+
   }
 }
