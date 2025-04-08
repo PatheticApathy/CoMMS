@@ -37,7 +37,7 @@ export default function Materials() {
         padding: 10,
         marginBottom: 10,
         gap: 10,
-      }} href={'/materials/addmaterials'}>Add a new Material</Link>
+      }} href={'/materials/add_material'}>Add a new Material</Link>
       <View style={{ flex: 7 }}>
         <MaterialList materials={materials} />
       </View>

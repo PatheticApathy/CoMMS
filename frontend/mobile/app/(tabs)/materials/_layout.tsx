@@ -12,7 +12,7 @@ export default function Layout() {
         }}
       />
       <Stack.Screen
-        name='add_material_log'
+        name='add_log'
         options={{
           presentation: 'modal'
         }}

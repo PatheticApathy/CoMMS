@@ -6,13 +6,14 @@ import { Notify } from '@/components/notify';
 import { AddMaterial, Material } from '@/material-api-types';
 import { JobSite } from '@/user-api-types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/dist/mutation';
 import { Button } from 'react-native';
 import { z } from 'zod'
+import FormPictueInput from '@/components/form/FormPictureInput';
+import ComboboxFormField from '@/components/form/comboboxFormField';
 
 // Schema for form
 const AddMaterialSchema = z.object({
@@ -40,7 +41,7 @@ const fetchJobsites = async (url: string): Promise<JobSite[]> => {
 
 export default function AddMaterialForm() {
   // Form controller
-  const { control, handleSubmit, formState: { errors } } = useForm<z.infer<typeof AddMaterialSchema>>({
+  const form = useForm<z.infer<typeof AddMaterialSchema>>({
     resolver: zodResolver(AddMaterialSchema),
     defaultValues: {
       job_site: 0,
@@ -131,7 +132,7 @@ export default function AddMaterialForm() {
     }
 
     if (loading_jobs) {
-      return <div>Loading jobsites...<Loading /></div>;
+      return <ActivityIndicator style={{ justifyContent: 'center', height: ScreenHeight }} />;
     }
 
     if (jobsites) {
@@ -139,7 +140,7 @@ export default function AddMaterialForm() {
         label: jobsite.name,
         value: jobsite.id
       }));
-      return <ComboboxFormField form_attr={{ name: "job_site", description: "All known jobsites for this location", form: form }} default_label="Choose a jobsite" options={jobsiteOptions} />
+      return <ComboboxFormField form_attr={{ name: "job_site", form: form }} default_label="Choose a jobsite" options={jobsiteOptions} />
     }
 
     return <div className="text-red-500">No Jobites</div>
@@ -149,15 +150,15 @@ export default function AddMaterialForm() {
 
   //make button change colores on submission
   return (
-    <View>
+    <MainView>
       <DisplayJobSites />
-      <FormInput name="name" placeholder="Name" control={control} />
-      <FormInput name="quantity" placeholder="Quantity" control={control} />
-      <ComboboxFormField form_attr={{ name: "status", control: control }} default_label={"In Stock"} options={status} />
-      <FormInput name="type" placeholder="Type" control={control} />
-      <FormInput name="unit" placeholder="Unit" control={control} />
-      <FormFileInput name="picture" placeholder="Add picture" control={control} />
-      {isMutating || isDownloading ? <Button onPress={handleSubmit(SendAddMaterialRequest)} title='sending' /> : <Button title='Add Materterial' />}
-    </View>
-  );
+      <FormInput name="name" placeholder="Name" control={form.control} />
+      <FormInput name="quantity" placeholder="Quantity" control={form.control} />
+      <ComboboxFormField form_attr={{ name: "status", form: form }} default_label={"In Stock"} options={status} />
+      <FormInput name="type" placeholder="Type" control={form.control} />
+      <FormInput name="unit" placeholder="Unit" control={form.control} />
+      <FormPictueInput name="picture" placeholder="Add picture" form={form} />
+      {isMutating || isDownloading ? <Button onPress={form.handleSubmit(SendAddMaterialRequest)} title='sending' /> : <Button title='Add Material' />}
+    </MainView>
+  )
 }
