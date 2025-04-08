@@ -76,7 +76,7 @@ export default function ContactsTable({ searchQuery, tableData, tableAction }: {
     });
     tableAction(filteredData)
   }
-    , [tableData, tableAction, data, searchQuery])
+    , [data, searchQuery])
 
   if (!identity) { return (<p className='flex items-center justify-center w-screen h-screen'>Invalid Token</p>) }
 
@@ -101,7 +101,7 @@ export default function ContactsTable({ searchQuery, tableData, tableAction }: {
       </TableHeader>
       <TableBody>
         {tableData.map((user: UserJoin) => (
-          <Dialog key={user.username}>
+          <Dialog key={user.id}>
             <DialogTrigger asChild>
               <TableRow>
                 <TableCell>{user.username}</TableCell>
@@ -120,7 +120,7 @@ export default function ContactsTable({ searchQuery, tableData, tableAction }: {
                 <DialogDescription>View {user.username}&apos;s Profile</DialogDescription>
               </DialogHeader>
               <div className="rounded-full overflow-hidden h-28 w-28">
-                <Image alt='What?' src="https://static.vecteezy.com/system/resources/thumbnails/009/734/564/small/default-avatar-profile-icon-of-social-media-user-vector.jpg" />
+                  <Image alt='Yapper' className="" src="/default-avatar-profile-icon-of-social-media-user-vector.jpg" width={120} height={120} />
               </div>
               <div>Username: {user.username}</div>
               <div>Name: {user.firstname.Valid ? user.firstname.String : "N/A"} {user.lastname.Valid ? user.lastname.String : "N/A"}</div>

@@ -64,7 +64,7 @@ func (e *Env) getJobSiteHandler(w http.ResponseWriter, r *http.Request) {
 func (e *Env) addJobSiteHandler(w http.ResponseWriter, r *http.Request) {
 	var args userdb.AddJobSiteParams
 	if err := json.NewDecoder(r.Body).Decode(&args); err != nil {
-		log.Printf("Could not decode json jobsite, reason: %e", err)
+		log.Printf("Could not decode json jobsite, reason: %s", err)
 		http.Error(w, "Invalid Request", http.StatusBadRequest)
 		return
 	}

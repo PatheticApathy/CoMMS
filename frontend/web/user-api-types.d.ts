@@ -142,7 +142,7 @@ export interface AddJobSiteParams {
   addr: { String: string, Valid: boolean }
   location_lat: LocationLat
   location_lng: LocationLng
-  company_id: CompanyID
+  company_id: number
 }
 
 export interface UserJoin {

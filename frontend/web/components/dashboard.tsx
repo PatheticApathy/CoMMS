@@ -11,6 +11,7 @@ import {
 
 import { JobSite } from "@/user-api-types";
 import { MaterialWithLogs } from "@/material-api-types";
+import Link from "next/link";
 
 export default function Dashboard({jobsite, jobsites, materials, }: { jobsite: JobSite | undefined; jobsites: JobSite[] | undefined; materials: MaterialWithLogs[] | undefined;}) {
   
@@ -29,29 +30,31 @@ export default function Dashboard({jobsite, jobsites, materials, }: { jobsite: J
     <div className="flex flex-col gap-8 w-full px-4 lg:px-6">
       <h2 className="text-xl font-semibold mb-4">Your Job Site</h2>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-4">
-        <Card className="@container/card">
-          <CardHeader className="relative">
-            <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
-              {jobsite?.name || "No Jobsite Available"}
-            </CardTitle>
-            <div className="absolute right-4 top-4">
-              <Badge variant="outline" className="flex gap-1 rounded-lg text-xs">
-                <TrendingUpIcon className="size-3" />
-                Active
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardFooter className="flex-col items-start gap-1 text-sm">
-            <div className="line-clamp-1 flex gap-2 font-medium">
-              Address: {jobsite?.addr?.Valid ? jobsite.addr.String : "No Address Available"}
-            </div>
-            <div className="text-muted-foreground">
-              {mainJobsiteMaterial
-                ? `Most Recent Material: ${mainJobsiteMaterial.name.String} (${mainJobsiteMaterial.quantity})`
-                : "No Materials Available"}
-            </div>
-          </CardFooter>
-        </Card>
+        <Link href="dashboard/jobsite">
+          <Card className="@container/card cursor-pointer hover:shadow-lg transition-shadow">
+            <CardHeader className="relative">
+              <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
+                {jobsite?.name || "No Jobsite Available"}
+              </CardTitle>
+              <div className="absolute right-4 top-4">
+                <Badge variant="outline" className="flex gap-1 rounded-lg text-xs">
+                  <TrendingUpIcon className="size-3" />
+                  Active
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardFooter className="flex-col items-start gap-1 text-sm">
+              <div className="line-clamp-1 flex gap-2 font-medium">
+                Address: {jobsite?.addr?.Valid ? jobsite.addr.String : "No Address Available"}
+              </div>
+              <div className="text-muted-foreground">
+                {mainJobsiteMaterial
+                  ? `Most Recent Material: ${mainJobsiteMaterial.name.String} (${mainJobsiteMaterial.quantity})`
+                  : "No Materials Available"}
+              </div>
+            </CardFooter>
+          </Card>
+        </Link>
       </div>
 
       <div>
