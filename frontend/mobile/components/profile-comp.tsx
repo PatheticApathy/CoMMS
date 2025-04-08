@@ -6,22 +6,20 @@ import { getToken, delTokenNIdentity } from '@/components/securestore'
 import useSWR from 'swr'
 import { User } from '@/user-api-types'
 import { useRouter } from 'expo-router'
+import { Headers } from '@/constants/header-options';
 
 async function getProfileArgs(url: string, arg: string) {
   return fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: Headers,
+    redirect: 'follow',
     body: arg
   }).then(res => res.json())
 }
 
 const fetcher = async (url: string) => {
   const res = await fetch(url, {
-    headers: {
-      'CF-Access-Client-Id': process.env.EXPO_PUBLIC_API_CF_CLIENT_ID!,
-      'CF-Access-Client-Secret': process.env.EXPO_PUBLIC_API_CF_ACCESS_CLIENT_SECRET!,
-      'Authorization': getToken()!,
-    },
+    headers: Headers,
   })
   if (!res.ok) {
     throw new Error("Failed to fetch");

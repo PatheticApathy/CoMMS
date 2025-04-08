@@ -8,13 +8,14 @@ export const IdentityContext = createContext<Token | undefined>(undefined)
 
 export function getToken() {
   const tkn = SecureStore.getItem('token')
-  return tkn
+  if (!tkn) { throw new Error('no token found') }
+  return JSON.parse(tkn)
 
 }
-export function setToken(token: string) {
-  SecureStore.setItem('token', token)
+export async function setToken(token: string) {
+  SecureStore.setItemAsync('token', token)
 }
-export function delTokenNIdentity() {
+export async function delTokenNIdentity() {
   SecureStore.deleteItemAsync('token')
 }
 
@@ -22,7 +23,7 @@ export default function IdentityProvider({ children }: { children: ReactNode }) 
   const [identity, setIdentity] = useState<Token | undefined>(undefined);
   const token = getToken()
   const curr = SecureStore.getItem('identity')
-  if (!token) { <Redirect href={'/login'} /> }
+  if (!token) { router.push('/login') }
 
   useEffect(() => {
     if (curr) {
@@ -31,7 +32,7 @@ export default function IdentityProvider({ children }: { children: ReactNode }) 
       if (!tkn) { return router.push('/login') }
       setIdentity(tkn)
     } else {
-      fetch(`${process.env.EXPO_PUBLIC_API_URL}/user/decrypt`, {
+      fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/user/decrypt`, {
         headers: {
           'CF-Access-Client-Id': process.env.EXPO_PUBLIC_API_CF_CLIENT_ID!,
           'CF-Access-Client-Secret': process.env.EXPO_PUBLIC_API_CF_ACCESS_CLIENT_SECRET!,

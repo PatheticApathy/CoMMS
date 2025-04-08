@@ -1,5 +1,5 @@
-import { StyleSheet, Button, TextInput } from 'react-native';
-import { Link, Redirect } from 'expo-router';
+import { StyleSheet, Button, TextInput, Text } from 'react-native';
+import { Link, Redirect, router } from 'expo-router';
 import React from 'react';
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -8,7 +8,7 @@ import useSWRMutation from 'swr/mutation'
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { LogInUser } from "@/user-api-types"
-import { setToken, getToken } from "@/components/securestore"
+import { setToken } from "@/components/securestore"
 
 const formSchema = z.object({
   username: z.string().nonempty(),
@@ -23,13 +23,12 @@ async function logIn(url: string, { arg }: { arg: LogInUser }) {
     },
     method: 'POST',
     body: JSON.stringify(arg)
-  }).then(res => res.text())
+  }).then((res) => { if (res.ok) { return res.text() } else { return undefined } })
 }
 
 export default function LoginForm() {
 
-  const { data, trigger, error, isMutating } = useSWRMutation(`${process.env.EXPO_PUBLIC_API_URL}/api/user/login`, logIn, { throwOnError: false })
-  console.log(`${process.env.EXPO_PUBLIC_API_URL}/api/user/login`)
+  const { trigger, error, isMutating } = useSWRMutation(`${process.env.EXPO_PUBLIC_API_URL}/api/user/login`, logIn)
 
   const {
     control,
@@ -43,21 +42,21 @@ export default function LoginForm() {
     },
   })
 
-  if (error) { console.log("Error: ", String(error)) }
-
-  if (data) {
-    setToken(data)
-  }
-
-  let token = getToken()
-  if (token) {
-    return <Redirect href={'/home'} />
-  }
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    trigger(values)
+    try {
+      const token = await trigger(values)
+      if (token) {
+        await setToken(token)
+        console.log(token)
+        router.push('/home')
+
+      }
+    } catch (err) {
+      console.error(err)
+    }
   }
 
+  if (error) { <Text>error.message</Text> }
   return (
     <ThemedView>
       <ThemedView style={styles.titleContainer}>

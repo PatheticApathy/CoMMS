@@ -7,16 +7,12 @@ import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import IdentityProvider from '@/components/securestore';
 
 export default function TabLayout({ children }: { children: ReactNode }) {
   const colorScheme = useColorScheme();
 
   return (
     <>
-      <IdentityProvider>
-        {children}
-      </IdentityProvider>
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
@@ -76,12 +72,6 @@ export default function TabLayout({ children }: { children: ReactNode }) {
         />
         <Tabs.Screen
           name="(tabs)"
-          options={{
-            href: null,
-          }}
-        />
-        <Tabs.Screen
-          name="dashboard"
           options={{
             href: null,
           }}
