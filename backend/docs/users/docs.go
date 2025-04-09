@@ -232,6 +232,35 @@ const docTemplate = `{
                 }
             }
         },
+        "/sites/company": {
+            "get": {
+                "description": "Get all jobsites for a specific company",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sites"
+                ],
+                "summary": "fetches job_sites for a specific company",
+                "responses": {
+                    "200": {
+                        "description": "job site",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/userdb.JobSite"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/sites/search": {
             "get": {
                 "security": [
@@ -925,7 +954,7 @@ const docTemplate = `{
                     "$ref": "#/definitions/sql.NullString"
                 },
                 "company_id": {
-                    "$ref": "#/definitions/sql.NullInt64"
+                    "type": "integer"
                 },
                 "location_lat": {
                     "$ref": "#/definitions/sql.NullFloat64"
@@ -1114,7 +1143,7 @@ const docTemplate = `{
                     "$ref": "#/definitions/sql.NullString"
                 },
                 "company_id": {
-                    "$ref": "#/definitions/sql.NullInt64"
+                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"

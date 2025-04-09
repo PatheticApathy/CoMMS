@@ -32,7 +32,7 @@ WHERE (? = u.company_id OR u.jobsite_id = ?)
 
 
 -- name: GetSubordinatesByJobsiteAndCompany :many
-SELECT u.username, u.firstname, u.lastname, u.company_id, u.jobsite_id, u.role, u.email, u.phone, u.profilepicture,
+SELECT u.id, u.username, u.firstname, u.lastname, u.company_id, u.jobsite_id, u.role, u.email, u.phone, u.profilepicture,
        c.name as company_name, j.name as jobsite_name
 FROM Users u 
 LEFT JOIN Companies c ON u.company_id = c.id 

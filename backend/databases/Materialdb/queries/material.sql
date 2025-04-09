@@ -41,3 +41,8 @@ RETURNING *;
 DELETE FROM Materials
 WHERE id = ?
 RETURNING *;
+
+-- name: GetMaterialsWithLogs :many
+SELECT m.id, m.name, m.type, m.quantity, m.unit, m.status, m.location_lat, m.location_lng, m.job_site, m.last_checked_out, m.picture, 
+l.timestamp
+FROM Materials m JOIN MaterialLogs l ON m.id = l.material_id;

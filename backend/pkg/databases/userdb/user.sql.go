@@ -106,7 +106,7 @@ func (q *Queries) GetAllUsers(ctx context.Context) ([]User, error) {
 }
 
 const getSubordinatesByJobsiteAndCompany = `-- name: GetSubordinatesByJobsiteAndCompany :many
-SELECT u.username, u.firstname, u.lastname, u.company_id, u.jobsite_id, u.role, u.email, u.phone, u.profilepicture,
+SELECT u.id, u.username, u.firstname, u.lastname, u.company_id, u.jobsite_id, u.role, u.email, u.phone, u.profilepicture,
        c.name as company_name, j.name as jobsite_name
 FROM Users u 
 LEFT JOIN Companies c ON u.company_id = c.id 
@@ -122,6 +122,7 @@ type GetSubordinatesByJobsiteAndCompanyParams struct {
 }
 
 type GetSubordinatesByJobsiteAndCompanyRow struct {
+	ID             int64          `json:"id"`
 	Username       string         `json:"username"`
 	Firstname      sql.NullString `json:"firstname"`
 	Lastname       sql.NullString `json:"lastname"`
@@ -145,6 +146,7 @@ func (q *Queries) GetSubordinatesByJobsiteAndCompany(ctx context.Context, arg Ge
 	for rows.Next() {
 		var i GetSubordinatesByJobsiteAndCompanyRow
 		if err := rows.Scan(
+			&i.ID,
 			&i.Username,
 			&i.Firstname,
 			&i.Lastname,

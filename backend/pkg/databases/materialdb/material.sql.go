@@ -8,6 +8,7 @@ package materialdb
 import (
 	"context"
 	"database/sql"
+	"time"
 )
 
 const addMaterial = `-- name: AddMaterial :one
@@ -457,6 +458,63 @@ func (q *Queries) GetMaterialsByType(ctx context.Context, type_ sql.NullString) 
 			&i.JobSite,
 			&i.LastCheckedOut,
 			&i.Picture,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMaterialsWithLogs = `-- name: GetMaterialsWithLogs :many
+SELECT m.id, m.name, m.type, m.quantity, m.unit, m.status, m.location_lat, m.location_lng, m.job_site, m.last_checked_out, m.picture, 
+l.timestamp
+FROM Materials m JOIN MaterialLogs l ON m.id = l.material_id
+`
+
+type GetMaterialsWithLogsRow struct {
+	ID             int64           `json:"id"`
+	Name           sql.NullString  `json:"name"`
+	Type           sql.NullString  `json:"type"`
+	Quantity       int64           `json:"quantity"`
+	Unit           string          `json:"unit"`
+	Status         string          `json:"status"`
+	LocationLat    sql.NullFloat64 `json:"location_lat"`
+	LocationLng    sql.NullFloat64 `json:"location_lng"`
+	JobSite        int64           `json:"job_site"`
+	LastCheckedOut sql.NullTime    `json:"last_checked_out"`
+	Picture        sql.NullString  `json:"picture"`
+	Timestamp      time.Time       `json:"timestamp"`
+}
+
+func (q *Queries) GetMaterialsWithLogs(ctx context.Context) ([]GetMaterialsWithLogsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMaterialsWithLogs)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetMaterialsWithLogsRow
+	for rows.Next() {
+		var i GetMaterialsWithLogsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Type,
+			&i.Quantity,
+			&i.Unit,
+			&i.Status,
+			&i.LocationLat,
+			&i.LocationLng,
+			&i.JobSite,
+			&i.LastCheckedOut,
+			&i.Picture,
+			&i.Timestamp,
 		); err != nil {
 			return nil, err
 		}

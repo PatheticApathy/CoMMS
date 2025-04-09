@@ -47,15 +47,8 @@ import { User } from '@/user-api-types';
 import { useContext } from 'react';
 
 const fetchUser: Fetcher<User, string> = async (...args) => fetch(...args, { headers: { Authorization: getToken() } }).then((res) => res.json());
+const fetchMaterial: Fetcher<Material[], string> = async (...args) => fetch(...args, { headers: { Authorization: getToken() } }).then((res) => res.json());
 
-
-const fetcher = async (url: string): Promise<Material[]> => {
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error("Failed to fetch data");
-  }
-  return res.json();
-};
 
 const deleteMaterial = async (id: number) => {
   const res = await fetch(`/api/material/material/delete?id=${id}`, {
@@ -191,7 +184,7 @@ export const columns: ColumnDef<Material>[] = [
 export function MaterialTable() {
   const identity = useContext(IdentityContext);
   const { data: user } = useSWR(identity ? `/api/user/search?id=${identity.id}` : null, fetchUser,)
-  const { data, error } = useSWR<Material[]>("/api/material/material/all", fetcher);
+  const { data, error } = useSWR<Material[]>("/api/material/material/all", fetchMaterial);
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
