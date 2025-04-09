@@ -44,6 +44,9 @@ services:
       - user_api
     ports:
       - 3000:3000
+    volumes:
+      - images:/app/public
 volumes:
   materialdb:
   userdb:
+  images:
