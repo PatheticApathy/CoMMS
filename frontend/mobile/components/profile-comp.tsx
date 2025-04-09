@@ -6,17 +6,20 @@ import { getToken, delToken } from '@/components/securestore'
 import useSWR from 'swr'
 import { User } from '@/user-api-types'
 import { useRouter } from 'expo-router'
+import { Headers } from './header-options';
 
 async function getProfileArgs(url: string, arg: string) {
   return fetch(url, {
     method: 'POST',
-    headers: {'Content-Type': 'application/json'},
+    headers: Headers,
     body: arg
   }).then(res => res.json())
 }
 
 const fetcher = async (url: string) => {
-  const res = await fetch(url)
+  const res = await fetch(url, {
+    headers: Headers,
+  })
   if (!res.ok) {
     throw new Error("Failed to fetch");
   }
@@ -30,11 +33,11 @@ export default function ProfileComp() {
   let token = getToken()
   let id = 1
 
-  const { data: tokenData, error: error2 } = useSWR(['https://4ba1-138-47-128-9.ngrok-free.app/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
+  const { data: tokenData, error: error2 } = useSWR([`${process.env.EXPO_PUBLIC_API_URL}/user/decrypt`, token], ([url, token]) => getProfileArgs(url, token))
   if (tokenData)
     id = tokenData.id
 
-  const { data: user, error: error3 } = useSWR<User, string>(`https://4ba1-138-47-128-9.ngrok-free.app/user/search?id=${id}`, fetcher)
+  const { data: user, error: error3 } = useSWR<User, string>(`${process.env.EXPO_PUBLIC_API_URL}/user/search?id=${id}`, fetcher)
 
   if (!user) return <ThemedText>Loading...</ThemedText>;    
 

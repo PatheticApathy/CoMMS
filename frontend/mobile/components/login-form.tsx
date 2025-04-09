@@ -28,7 +28,7 @@ export default function LoginForm() {
 
     const router = useRouter()
 
-    const { data, trigger, error, isMutating } = useSWRMutation('https://4ba1-138-47-128-9.ngrok-free.app/user/login', logIn, { throwOnError: false })
+    const { data, trigger, error, isMutating } = useSWRMutation(`${process.env.EXPO_PUBLIC_API_URL}/user/login`, logIn, { throwOnError: false })
 
     const {
         control,
