@@ -18,6 +18,7 @@ import { JobSite } from "@/user-api-types"
 import { toast } from "sonner"
 import FormFileInput from "../form-maker/form-dropzone"
 import { getToken } from "@/components/identity-provider"
+import AddMaterialMap from "./material-add-map"
 
 // Schema for form
 const AddMaterialSchema = z.object({
@@ -28,6 +29,8 @@ const AddMaterialSchema = z.object({
   type: z.string().min(2, { message: "Type must be more than 2 characters" }),
   unit: z.string().min(1, { message: "Unit must be greater than 1" }),
   picture: z.instanceof(FileList).optional(),
+  location_lat: z.coerce.number(),
+  location_lng: z.coerce.number()
 });
 
 // Fetcher
@@ -73,12 +76,12 @@ export default function MaterialForm({ route }: { route: string | undefined }) {
     const payload: AddMaterial = {
       job_site: values.job_site,
       location_lat: {
-        Valid: false,
-        Float64: 0
+        Valid: true,
+        Float64: values.location_lat
       },
       location_lng: {
-        Valid: false,
-        Float64: 0
+        Valid: true,
+        Float64: values.location_lng
       },
       name: {
         Valid: true,
@@ -153,14 +156,16 @@ export default function MaterialForm({ route }: { route: string | undefined }) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(SendAddMaterialRequest)}>
-        <DisplayJobSites />
-        <FormInput name="name" placeholder="Name" description="Name of Item" form={form} />
-        <FormInput name="quantity" placeholder="Quantity" description="Quantity of item" form={form} />
-        <ComboboxFormField form_attr={{ name: "status", description: "Initial status of item", form: form }} default_label={"In Stock"} options={status} />
-        <FormInput name="type" placeholder="Type" description="Type of item" form={form} />
-        <FormInput name="unit" placeholder="Unit" description="Unit of measurement of item" form={form} />
-        <FormFileInput name="picture" placeholder="Add picture" description="Add picture here" form={form} />
         {isMutating || isDownloading ? <Button variant={'ghost'}>Sending</Button> : <Button type="submit">Send Request</Button>}
+        <FormInput name="name" placeholder="Name" description="" form={form} />
+        <FormInput name="quantity" placeholder="Quantity" description="Quantity" form={form} />
+        <ComboboxFormField form_attr={{ name: "status", description: "Initial status of item", form: form }} default_label={"In Stock"} options={status} />
+        <FormInput name="type" placeholder="Type" description="" form={form} />
+        <FormInput name="unit" placeholder="Unit" description="" form={form} />
+        <FormFileInput name="picture" placeholder="Add picture" description="" form={form} />
+        <div style={{ height: "200px", width: "100%" }}>
+        <AddMaterialMap form={form} />
+        </div>
       </form>
     </Form>
   );

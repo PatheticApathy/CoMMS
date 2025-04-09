@@ -37,9 +37,7 @@ export function ComboboxFormField({ form_attr, default_label, options }: { form_
       control={form.control}
       name={name}
       render={({ field }) => (<FormItem className="flex flex-col gap-2">
-        <FormDescription>
-          {description}
-        </FormDescription>
+        <FormDescription>{description}</FormDescription>
         <Popover>
           <PopoverTrigger asChild>
             <FormControl>
