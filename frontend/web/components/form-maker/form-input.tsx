@@ -9,10 +9,10 @@ export default function FormInput({ name, placeholder, description, form }: { na
       name={name}
       render={({ field }) => (
         <FormItem>
+          <FormDescription>{description}</FormDescription>
           <FormControl>
             <Input placeholder={placeholder} {...field} />
           </FormControl>
-          <FormDescription>{description}</FormDescription>
           <FormMessage />
         </FormItem>
       )}

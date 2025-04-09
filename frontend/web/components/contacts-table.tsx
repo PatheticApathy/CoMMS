@@ -18,7 +18,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import useSWR from "swr";
-import { Coworker, GetUserRow, Token } from "@/user-api-types";
+import { Coworker, GetUserRow } from "@/user-api-types";
 import { getToken, IdentityContext } from "@/components/identity-provider";
 import { useContext, useEffect } from "react";
 import Image from "next/image";
@@ -43,16 +43,6 @@ const fetcher3 = async (url: string): Promise<GetUserRow[]> => {
   return res.json();
 };
 
-async function getProfileArgs(url: string, arg: string) {
-  return fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: arg
-  }).then(res => res.json() as Promise<Token>)
-}
-
-//const token = getToken()
-
 export default function ContactsTable({ searchQuery, tableData, tableAction }: { searchQuery: string, tableData: Coworker[], tableAction: (data: Coworker[]) => void }) {
   const identity = useContext(IdentityContext)
   //const { data: tokenData, error: error2 } = useSWR(['/api/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
@@ -76,7 +66,7 @@ export default function ContactsTable({ searchQuery, tableData, tableAction }: {
     });
     tableAction(filteredData)
   }
-    , [data, searchQuery])
+    , [data, searchQuery, tableAction])
 
   if (!identity) { return (<p className='flex items-center justify-center w-screen h-screen'>Invalid Token</p>) }
 

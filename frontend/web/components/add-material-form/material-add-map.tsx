@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import L, { LatLngBoundsExpression } from "leaflet";
-import { MapContainer, TileLayer, Marker, Popup, Rectangle, GeoJSON } from "react-leaflet";
-import useSWR, {Fetcher} from "swr";
+import { MapContainer, TileLayer, Marker, Popup, Rectangle, GeoJSON, useMapEvents } from "react-leaflet";
+import useSWR from "swr";
 import { GetUserRow, JobSite } from "@/user-api-types";
 import { getToken, IdentityContext } from "@/components/identity-provider";
-import { Material } from '@/material-api-types';
 import { useContext, useEffect, useState } from "react";
 import "leaflet/dist/leaflet.css";
+import { UseFormReturn } from "react-hook-form";
 
 const defaultIcon = new L.Icon({
   iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
@@ -23,8 +23,6 @@ const jobSiteFetcher = async (url: string): Promise<JobSite> => {
   if (!res.ok) throw new Error("Failed to fetch job sites");
   return res.json();
 };
-
-const materialFetcher: Fetcher<Material[], string> = async (...args) => fetch(...args, {headers: { 'Authorization': getToken()}}).then(res => res.json())
 
 const fetchUser = async  (url: string): Promise<GetUserRow[]> => {
   const res = await fetch(url,
@@ -57,7 +55,31 @@ function createFixedBoundingBox(lat: number, lon: number, meters: number): LatLn
   ];
 }
 
-export default function JobsiteMapClient() {
+
+function ClickToPlaceMarker({form} : {form: UseFormReturn<any>}) {
+    const [markerPos, setMarkerPos] = useState<[number, number] | null>(null);
+  
+    useMapEvents({
+      click(e) {
+        setMarkerPos([e.latlng.lat, e.latlng.lng]);
+        console.log(e.latlng.lat)
+        form.setValue('location_lat', e.latlng.lat)
+        console.log(e.latlng.lng)
+        form.setValue('location_lng', e.latlng.lng)
+      },
+    });
+  
+    return markerPos ? (
+      <Marker position={markerPos} icon={defaultIcon}>
+        <Popup>
+          Marker placed at<br />
+          Lat: {markerPos[0].toFixed(5)}, Lng: {markerPos[1].toFixed(5)}
+        </Popup>
+      </Marker>
+    ) : null;
+}
+
+export default function AddMaterialMap({form} : {form: UseFormReturn<any>}) {
   const identity = useContext(IdentityContext)
 
   const { data: currentUser, error: error } = useSWR<GetUserRow[]>(identity ? `/api/user/search?id=${identity?.id}` : null, fetchUser);
@@ -66,11 +88,11 @@ export default function JobsiteMapClient() {
   const [bboxZone, setBboxZone] = useState<LatLngBoundsExpression | null>(null);
   const [zonePolygon, setZonePolygon] = useState<any | null>(null);
 
-  const { data: materials, error: error3, isLoading } = useSWR(currentUser ? `/api/material/material/search?site=${currentUser[0].jobsite_id.Valid ? currentUser[0].jobsite_id.Int64 : undefined}` : null, materialFetcher)
-  console.log(materials)
-
   const lat = currentSite?.location_lat?.Float64;
   const lng = currentSite?.location_lng?.Float64;
+
+  console.log(currentSite?.id)
+  form.setValue('job_site', currentSite?.id)
 
   useEffect(() => {
     if (lat && lng) {
@@ -111,11 +133,7 @@ export default function JobsiteMapClient() {
     return <p className="flex items-center justify-center w-screen h-screen">{error2.message}</p>;
   }
 
-  if (error3) {
-    return <p className="flex items-center justify-center w-screen h-screen">{error3.message}</p>;
-  }
-
-  if (!currentUser || !currentSite || !lat || !lng || isLoading) {
+  if (!currentUser || !currentSite || !lat || !lng) {
     return <p className="flex items-center justify-center w-screen h-screen">Loading...</p>;
   }
 
@@ -123,14 +141,13 @@ export default function JobsiteMapClient() {
     <MapContainer
       style={{ height: "100%", width: "100%" }}
       center={[lat, lng]}
-      zoom={17}
+      zoom={18}
       scrollWheelZoom={false}
     >
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution="&copy; OpenStreetMap contributors"
       />
-
       {zonePolygon && (
         <GeoJSON data={zonePolygon} style={{ color: "purple", weight: 2 }} />
       )}
@@ -139,36 +156,7 @@ export default function JobsiteMapClient() {
       {!zonePolygon && bboxZone && (
         <Rectangle pathOptions={{ color: "purple" }} bounds={bboxZone} />
       )}
-
-      {materials?.map((mat) => {
-        const hasCoords =
-          mat.location_lat?.Valid &&
-          mat.location_lng?.Valid &&
-          typeof mat.location_lat.Float64 === "number" &&
-          typeof mat.location_lng.Float64 === "number";
-
-        if (!hasCoords) return null;
-
-        return (
-          <Marker
-            key={mat.id}
-            position={[mat.location_lat.Float64, mat.location_lng.Float64]}
-            icon={defaultIcon}
-          >
-            <Popup>
-              <strong>{mat.name?.Valid ? mat.name.String : "Unnamed Material"}</strong>
-              <br />
-              ID: {mat.id}
-              <br />
-              Type: {mat.type?.Valid ? mat.type.String : "Unknown"}
-              <br />
-              Qty: {mat.quantity} {mat.unit}
-            </Popup>
-          </Marker>
-        );
-      })}
-
-
+        <ClickToPlaceMarker form={form} />
     </MapContainer>
   );
 }
