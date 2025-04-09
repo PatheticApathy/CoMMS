@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 import { Button } from "@/components//ui/button"
-import Loading from "@/components/loading"
 import {
   Form,
 } from "@/components/ui/form"
@@ -10,11 +9,9 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import useSWRMutation from "swr/mutation"
 import { mutate } from "swr"
-import useSWR from "swr"
 import { ComboboxFormField } from "@/components/form-maker/form-combobox"
 import { Material, AddMaterial } from "@/material-api-types"
 import FormInput from "../form-maker/form-input"
-import { JobSite } from "@/user-api-types"
 import { toast } from "sonner"
 import FormFileInput from "../form-maker/form-dropzone"
 import { getToken } from "@/components/identity-provider"
@@ -36,15 +33,6 @@ const AddMaterialSchema = z.object({
 // Fetcher
 const PostAddMaterial = async (url: string, { arg }: { arg: AddMaterial }) => await fetch(url, { headers: { 'Authorization': getToken() }, method: 'POST', body: JSON.stringify(arg) });
 const PostPicture = async (url: string, { arg }: { arg: { type: string, file: Blob } }) => await fetch(url, { headers: { 'Content-Type': `image/${arg.type}` }, method: 'POST', body: arg.file });
-const fetchJobsites = async (url: string): Promise<JobSite[]> => {
-  const res = await fetch(url, {
-    headers: { 'Authorization': getToken() },
-  });
-  if (!res.ok) {
-    throw new Error("Failed to fetch jobsites");
-  }
-  return res.json();
-};
 
 export default function MaterialForm({ route }: { route: string | undefined }) {
   // Form controller
@@ -60,8 +48,6 @@ export default function MaterialForm({ route }: { route: string | undefined }) {
       picture: undefined
     }
   });
-
-  const { data: jobsites, error: jobsitesError, isLoading: loading_jobs } = useSWR<JobSite[]>("/api/sites/all", fetchJobsites);
 
   const status = [
     { label: "In Stock", value: "In Stock" },
@@ -131,27 +117,6 @@ export default function MaterialForm({ route }: { route: string | undefined }) {
       toast.error(err.message || "Error has occurred");
     }
   };
-
-  const DisplayJobSites = () => {
-
-    if (jobsitesError) {
-      return <div className="text-red-500">Error loading jobsites</div>;
-    }
-
-    if (loading_jobs) {
-      return <div>Loading jobsites...<Loading /></div>;
-    }
-
-    if (jobsites) {
-      const jobsiteOptions = jobsites.map(jobsite => ({
-        label: jobsite.name,
-        value: jobsite.id
-      }));
-      return <ComboboxFormField form_attr={{ name: "job_site", description: "All known jobsites for this location", form: form }} default_label="Choose a jobsite" options={jobsiteOptions} />
-    }
-
-    return <div className="text-red-500">No Jobites</div>
-  }
 
   return (
     <Form {...form}>

@@ -1,11 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-
 import L, { LatLngBoundsExpression } from "leaflet";
 import { MapContainer, TileLayer, Marker, Popup, Rectangle, GeoJSON } from "react-leaflet";
 import useSWR, {Fetcher} from "swr";
 import { GetUserRow, JobSite } from "@/user-api-types";
 import { getToken, IdentityContext } from "@/components/identity-provider";
-import { Token } from "@/user-api-types";
 import { Material } from '@/material-api-types';
 import { useContext, useEffect, useState } from "react";
 import "leaflet/dist/leaflet.css";
@@ -37,14 +36,6 @@ const fetchUser = async  (url: string): Promise<GetUserRow[]> => {
   return res.json();
 };
 
-async function getProfileArgs(url: string, arg: string) {
-  return fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: arg
-  }).then(res => res.json() as Promise<Token>)
-}
-
 async function fetchNominatimZone(lat: number, lon: number) {
   const baseUrl = process.env.NOMIN || "https://nominatim.openstreetmap.org";
   const url = `${baseUrl}/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&polygon_geojson=1`;
@@ -70,7 +61,6 @@ export default function JobsiteMapClient() {
   const identity = useContext(IdentityContext)
 
   const { data: currentUser, error: error } = useSWR<GetUserRow[]>(identity ? `/api/user/search?id=${identity?.id}` : null, fetchUser);
-  const currentUserId = currentUser && currentUser[0].jobsite_id.Int64
   const { data: currentSite, error: error2 } = useSWR<JobSite>(currentUser && currentUser[0].jobsite_id.Valid ? `/api/sites/search?id=${currentUser[0].jobsite_id.Int64}` : null, jobSiteFetcher);
 
   const [bboxZone, setBboxZone] = useState<LatLngBoundsExpression | null>(null);

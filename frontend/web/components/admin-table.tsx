@@ -35,7 +35,7 @@ import {
 } from "@/components/ui/table";
 import InitAddFormDialougeAdmin from "@/components/add-jobsite-form/jobsite-add-admin";
 import useSWR from "swr";
-import { User, UserJoin, Company, JobSite, Token, GetUserRow } from "@/user-api-types";
+import { User, UserJoin, Company, JobSite, GetUserRow } from "@/user-api-types";
 import Loading from "@/components/loading";
 import { getToken, IdentityContext } from '@/components/identity-provider';
 import { cn } from "@/lib/utils";
@@ -184,16 +184,6 @@ const Columns = (companies: Company[] | undefined, jobsites: JobSite[] | undefin
   },
 ]);
 
-async function getProfileArgs(url: string, arg: string) {
-  return fetch(url, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: arg
-  }).then(res => res.json() as Promise<Token>)
-}
-
-//const token = getToken()
-
 export function UserTable() {
   const { data, error } = useSWR<UserJoin[]>("/api/user/join", fetcher);
   const { data: companies } = useSWR<Company[]>("/api/company/all", fetchCompanies);
@@ -206,9 +196,6 @@ export function UserTable() {
   const columns = Columns(companies, jobsites)
   const identity = useContext(IdentityContext)
 
-  if (!identity) { return (<p className='flex items-center justify-center w-screen h-screen'>Invalid Token</p>) }
-
-  //const { data: tokenData, error: error2 } = useSWR(['/api/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
   const { data: currentuser, error: error2 } = useSWR<GetUserRow[], string>(identity ? `/api/user/search?id=${identity?.id}` : null, fetchUser);
   const { data: subordinates, error: error4 } = useSWR<UserJoin[]>(currentuser ? `/api/user/subordinates?user=${currentuser[0].id}&company=${currentuser[0]?.company_id.Int64}&site=${currentuser[0]?.jobsite_id.Int64}` : null, fetcher);
   console.log(currentuser ? `/api/user/coworkers?user=${currentuser[0].id}&company=${currentuser[0]?.company_id.Int64}&site=${currentuser[0]?.jobsite_id.Int64}` : null) 
@@ -231,8 +218,9 @@ export function UserTable() {
     },
   });
 
-  //if (!identity) { return (<div className='flex items-center justify-center w-screen h-screen'>Loading <Loading /></div>) }
-  if (error) return <p>Invalid User.</p>;
+  if (!identity) { return (<p className='flex items-center justify-center w-screen h-screen'>Invalid Token</p>) }
+
+  if (error || error2 || error4) return <p>Invalid User.</p>;
   if (!data) return <p>Loading...</p>;
 
   if (error) {

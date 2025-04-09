@@ -1,5 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-
 import L from "leaflet";
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import { useEffect, useState } from "react";
@@ -66,10 +66,12 @@ export default function AddJobsiteMap({form} : {form: UseFormReturn<any>}) {
             setAddress(e.target.value)
             console.log(address)
             form.setValue('addr', address)
-            console.log(coords[0])
-            form.setValue('location_lat', coords[0])
-            console.log(coords[1])
-            form.setValue('location_lng', coords[1])
+            if (coords && coords.length > 0){
+              console.log(coords[0])
+              form.setValue('location_lat', coords[0])
+              console.log(coords[1])
+              form.setValue('location_lng', coords[1])
+            }
         }}
       />
       {coords && (

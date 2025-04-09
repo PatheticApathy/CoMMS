@@ -1,8 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-
 import L, { LatLngBoundsExpression } from "leaflet";
 import { MapContainer, TileLayer, Marker, Popup, Rectangle, GeoJSON, useMapEvents } from "react-leaflet";
-import useSWR, {Fetcher} from "swr";
+import useSWR from "swr";
 import { GetUserRow, JobSite } from "@/user-api-types";
 import { getToken, IdentityContext } from "@/components/identity-provider";
 import { useContext, useEffect, useState } from "react";

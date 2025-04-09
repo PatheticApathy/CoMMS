@@ -3,7 +3,7 @@
 import { useState } from "react";
 import ContactsTable from "@/components/contacts-table";
 import InputWithButton from "@/components/search-button";
-import { UserJoin } from "@/user-api-types";
+import { Coworker } from "@/user-api-types";
 import { Button, buttonVariants } from "@/components/ui/button";
 import CsvDownloadButton from "react-json-to-csv"
 import { cn } from "@/lib/utils";
@@ -12,7 +12,7 @@ import { FileSpreadsheet, Printer } from "lucide-react";
 
 export default function Contacts() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [table_data, setTableData] = useState<UserJoin[]>([]);
+  const [table_data, setTableData] = useState<Coworker[]>([]);
 
 
   const handlePrint = () => {
