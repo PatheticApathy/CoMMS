@@ -64,7 +64,7 @@ func (e *Env) getJobSiteHandler(w http.ResponseWriter, r *http.Request) {
 func (e *Env) addJobSiteHandler(w http.ResponseWriter, r *http.Request) {
 	var args userdb.AddJobSiteParams
 	if err := json.NewDecoder(r.Body).Decode(&args); err != nil {
-		log.Printf("Could not decode json jobsite, reason: %e", err)
+		log.Printf("Could not decode json jobsite, reason: %s", err)
 		http.Error(w, "Invalid Request", http.StatusBadRequest)
 		return
 	}
@@ -107,5 +107,41 @@ func (e *Env) getAllJobSitesHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Could not encode any jobsites to json, reason %e", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
+	}
+}
+
+// getJobSitesByCompany handler returns all jobsites godoc
+//
+//	@Summary		fetches job_sites for a specific company
+//	@Description	Get all jobsites for a specific company
+//	@Tags			sites
+//	@Produce		json
+//	@Success		200	 {array} 	userdb.JobSite	"job site"
+//	@Failure		500	 {string} 	"Internal Server Error"
+//	@Router			/sites/company [get]
+func (e *Env) getJobSitesByCompany(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+
+	if query.Has("id") {
+		id, err := strconv.Atoi(query.Get("id"))
+		if err != nil {
+			log.Printf("Invalid id, reason: %e", err)
+			http.Error(w, "Invalid id", http.StatusBadRequest)
+			return
+		}
+
+		jobsites, err := e.Queries.GetAllJobSitesByCompany(r.Context(), int64(id))
+		if err != nil {
+			log.Printf("Could not get any jobsites, reason %e", err)
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		log.Printf("Fetching all JobSites for company %d", id)
+		if err = json.NewEncoder(w).Encode(&jobsites); err != nil {
+			log.Printf("Could not encode any jobsites to json, reason %e", err)
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
 	}
 }

@@ -96,6 +96,33 @@ definitions:
       user_id:
         type: integer
     type: object
+  materialdb.GetMaterialsWithLogsRow:
+    properties:
+      id:
+        type: integer
+      job_site:
+        type: integer
+      last_checked_out:
+        $ref: '#/definitions/sql.NullTime'
+      location_lat:
+        $ref: '#/definitions/sql.NullFloat64'
+      location_lng:
+        $ref: '#/definitions/sql.NullFloat64'
+      name:
+        $ref: '#/definitions/sql.NullString'
+      picture:
+        $ref: '#/definitions/sql.NullString'
+      quantity:
+        type: integer
+      status:
+        type: string
+      timestamp:
+        type: string
+      type:
+        $ref: '#/definitions/sql.NullString'
+      unit:
+        type: string
+    type: object
   materialdb.Material:
     properties:
       id:
@@ -184,7 +211,7 @@ definitions:
       addr:
         $ref: '#/definitions/sql.NullString'
       company_id:
-        $ref: '#/definitions/sql.NullInt64'
+        type: integer
       location_lat:
         $ref: '#/definitions/sql.NullFloat64'
       location_lng:
@@ -308,7 +335,7 @@ definitions:
       addr:
         $ref: '#/definitions/sql.NullString'
       company_id:
-        $ref: '#/definitions/sql.NullInt64'
+        type: integer
       id:
         type: integer
       location_lat:
@@ -657,6 +684,27 @@ paths:
       summary: adjust quantity based on the requested amount
       tags:
       - material
+  /material/created:
+    get:
+      description: Gets materials with their created at time
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: materials with created at time
+          schema:
+            items:
+              $ref: '#/definitions/materialdb.GetMaterialsWithLogsRow'
+            type: array
+        "500":
+          description: Failed to get materials
+          schema:
+            type: string
+      security:
+      - identity: []
+      summary: fetches all materials with their created at time
+      tags:
+      - material
   /material/delete:
     delete:
       description: deltes material from database
@@ -929,6 +977,25 @@ paths:
       security:
       - identity: []
       summary: fetches all job_sites
+      tags:
+      - sites
+  /sites/company:
+    get:
+      description: Get all jobsites for a specific company
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: job site
+          schema:
+            items:
+              $ref: '#/definitions/userdb.JobSite'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: fetches job_sites for a specific company
       tags:
       - sites
   /sites/search:

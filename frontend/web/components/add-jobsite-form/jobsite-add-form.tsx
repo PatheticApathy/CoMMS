@@ -4,12 +4,13 @@ import { Form } from "@/components/ui/form";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import useSWR from "swr";
+import useSWR, { Fetcher } from "swr";
 import useSWRMutation from "swr/mutation";
 import { ComboboxFormField } from "@/components/form-maker/form-combobox";
 import FormInput from "../form-maker/form-input";
 import { toast } from "sonner";
 import { JobSite, AddJobSiteParams, Company } from "@/user-api-types";
+import { getToken } from "@/components/identity-provider";
 
 // Schema for form
 const AddJobsiteSchema = z.object({
@@ -21,15 +22,9 @@ const AddJobsiteSchema = z.object({
 });
 
 // Fetcher
-const PostAddJobsite = async (url: string, { arg }: { arg: AddJobSiteParams }) => await fetch(url, { method: 'POST', body: JSON.stringify(arg) });
+const PostAddJobsite = async (url: string, { arg }: { arg: AddJobSiteParams }) => fetch(url, { headers: { 'Authorization': getToken() }, method: 'POST', body: JSON.stringify(arg) });
 
-const fetchCompanies = async (url: string): Promise<Company[]> => {
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error("Failed to fetch jobsites");
-  }
-  return res.json();
-};
+const fetchCompanies: Fetcher<Company[], string> = async (...args) => fetch(...args, { headers: { 'Authorization': getToken() } }).then((res) => res.json());
 
 export default function JobsiteForm() {
   // Form controller
@@ -44,7 +39,7 @@ export default function JobsiteForm() {
     }
   });
 
-  const { data: companies, error: companiesError } = useSWR<Company[]>("/api/company/all", fetchCompanies);
+  const { data: companies, error: companiesError } = useSWR("/api/company/all", fetchCompanies);
 
   const { trigger, isMutating } = useSWRMutation('/api/sites/add', PostAddJobsite, {
     onError(err) {
@@ -68,22 +63,19 @@ export default function JobsiteForm() {
   const SendAddJobsiteRequest = (values: z.infer<typeof AddJobsiteSchema>) => {
     const payload: AddJobSiteParams = {
       location_lat: {
-        Valid: false,
+        Valid: true,
         Float64: values.location_lat
       },
       location_lng: {
-        Valid: false,
+        Valid: true,
         Float64: values.location_lng
       },
       name: values.name,
       addr: {
-        Valid: false,
+        Valid: true,
         String: values.addr
       },
-      company_id: {
-        Valid: true,
-        Int64: values.company_id
-      }
+      company_id: values.company_id
     };
     console.log(payload);
     trigger(payload);
