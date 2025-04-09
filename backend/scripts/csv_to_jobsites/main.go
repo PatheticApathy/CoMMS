@@ -87,16 +87,13 @@ func main() {
 				}(),
 				Valid: true,
 			},
-			CompanyID: sql.NullInt64{
-				Int64: func() int64 {
-					val, err := strconv.ParseInt(row[4], 10, 64)
-					if err != nil {
-						log.Fatal(err)
-					}
-					return val
-				}(),
-				Valid: true,
-			},
+			CompanyID: func() int64 {
+				val, err := strconv.ParseInt(row[4], 10, 64)
+				if err != nil {
+					log.Fatal(err)
+				}
+				return val
+			}(),
 		}
 
 		jobsite_row, err := queries.AddJobSite(ctxt, jobsite)

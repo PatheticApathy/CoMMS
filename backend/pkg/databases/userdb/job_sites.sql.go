@@ -19,7 +19,7 @@ type AddJobSiteParams struct {
 	Addr        sql.NullString  `json:"addr"`
 	LocationLat sql.NullFloat64 `json:"location_lat"`
 	LocationLng sql.NullFloat64 `json:"location_lng"`
-	CompanyID   sql.NullInt64   `json:"company_id"`
+	CompanyID   int64           `json:"company_id"`
 }
 
 func (q *Queries) AddJobSite(ctx context.Context, arg AddJobSiteParams) (JobSite, error) {
@@ -95,7 +95,7 @@ type GetAllJobSitesByCompanyRow struct {
 	LocationLng sql.NullFloat64 `json:"location_lng"`
 }
 
-func (q *Queries) GetAllJobSitesByCompany(ctx context.Context, companyID sql.NullInt64) ([]GetAllJobSitesByCompanyRow, error) {
+func (q *Queries) GetAllJobSitesByCompany(ctx context.Context, companyID int64) ([]GetAllJobSitesByCompanyRow, error) {
 	rows, err := q.db.QueryContext(ctx, getAllJobSitesByCompany, companyID)
 	if err != nil {
 		return nil, err

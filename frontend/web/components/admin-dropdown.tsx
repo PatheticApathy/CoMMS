@@ -3,18 +3,21 @@ import { useState } from "react";
 import { DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "./ui/button";
-import { DropdownMenuSeparator } from "@radix-ui/react-dropdown-menu";
+import { DropdownMenu, DropdownMenuSeparator } from "@radix-ui/react-dropdown-menu";
 import { Input } from "./ui/input";
 import { mutate } from "swr";
 import { toast } from "sonner";
+import { getToken } from "./identity-provider";
 
 const updateUser = async (id: number, field: string, value: { String: string; Valid: boolean } | { Int64: number; Valid: boolean }) => {
   const res = await fetch(`/api/user/update`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
+      'authorization': getToken() || 'bruh'
+
     },
-    body: JSON.stringify({ id, [field]: value }),
+    body: JSON.stringify({ id, [field] : value }),
   });
   if (!res.ok) {
     throw new Error("Failed to update user");
@@ -24,6 +27,7 @@ const updateUser = async (id: number, field: string, value: { String: string; Va
 
 const deleteUser = async (id: number) => {
   const res = await fetch(`/api/user/delete?id=${id}`, {
+    headers: { 'authorization': getToken() || 'bruh' },
     method: "DELETE",
   });
   if (!res.ok) {
@@ -60,7 +64,7 @@ export default function AdminDropDown({ user, jobsites, companies }: { user: Use
   };
 
   return (
-    <DropdownMenuLabel>
+    <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="h-8 w-8 p-0">
           <span className="sr-only">Open menu</span>
@@ -114,7 +118,7 @@ export default function AdminDropDown({ user, jobsites, companies }: { user: Use
           </Button>
         </DropdownMenuItem>
       </DropdownMenuContent>
-    </DropdownMenuLabel>
+    </DropdownMenu>
   );
 
 }

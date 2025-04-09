@@ -142,7 +142,7 @@ export interface AddJobSiteParams {
   addr: { String: string, Valid: boolean }
   location_lat: LocationLat
   location_lng: LocationLng
-  company_id: CompanyID
+  company_id: number
 }
 
 export interface UserJoin {
@@ -159,4 +159,20 @@ export interface UserJoin {
   profilepicture: Profilepicture
   company_name: { String: string; Valid: boolean }
   jobsite_name: { String: string; Valid: boolean }
+}
+
+export interface Coworker {
+  company_id: CompanyID
+  email: string
+  firstname: Firstname
+  id: number
+  lastname: Lastname
+  password: string
+  phone: string
+  role: Role
+  jobsite_id: JobSiteID
+  username: string
+  profilepicture: Profilepicture
+  company_name: string
+  jobsite_name: string
 }

@@ -8,6 +8,7 @@ import useSWRMutation from "swr/mutation";
 import FormInput from "../form-maker/form-input";
 import { toast } from "sonner";
 import { AddCompanyParams, Company } from "@/user-api-types";
+import { getToken } from "@/components/identity-provider";
 
 // Schema for form
 const AddCompanySchema = z.object({
@@ -18,7 +19,7 @@ const AddCompanySchema = z.object({
 });
 
 // Fetcher
-const PostAddCompany = async (url: string, { arg }: { arg: AddCompanyParams }) => await fetch(url, { method: 'POST', body: JSON.stringify(arg) });
+const PostAddCompany = async (url: string, { arg }: { arg: AddCompanyParams }) => await fetch(url, { headers: { 'Authorization': getToken() }, method: 'POST', body: JSON.stringify(arg) });
 
 export default function CompanyForm() {
   // Form controller

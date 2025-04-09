@@ -62,7 +62,9 @@ const fetchUser = async  (url: string): Promise<GetUserRow[]> => {
 };
 
 const fetchCompanies = async (url: string): Promise<Company[]> => {
-  const res = await fetch(url);
+  const res = await fetch(url,
+    { headers: { 'authorization': getToken() || 'bruh' } }
+  );
   if (!res.ok) {
     throw new Error("Failed to fetch companies");
   }
@@ -70,7 +72,9 @@ const fetchCompanies = async (url: string): Promise<Company[]> => {
 };
 
 const fetchJobsites = async (url: string): Promise<JobSite[]> => {
-  const res = await fetch(url);
+  const res = await fetch(url,
+    { headers: { 'authorization': getToken() || 'bruh' } }
+  )
   if (!res.ok) {
     throw new Error("Failed to fetch jobsites");
   }

@@ -20,7 +20,9 @@ import {
   getFilteredRowModel,
   getSortedRowModel,
 } from "@tanstack/react-table"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { FileSpreadsheet } from "lucide-react";
 import { Input } from "@/components/ui/input"
 import {
   Table,
@@ -118,7 +120,7 @@ export function DataTable<TData, TValue>({
           }
           className="max-w-sm"
         />
-        <CsvDownloadButton data={data} />
+        <CsvDownloadButton className={cn(buttonVariants({ variant: 'outline' }))} data={data}><FileSpreadsheet /></CsvDownloadButton>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
