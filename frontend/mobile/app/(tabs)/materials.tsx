@@ -1,48 +1,47 @@
-import { StyleSheet, Button } from 'react-native';
+import MainView from '@/components/MainView';
+import { ActivityIndicator, Text, View } from 'react-native';
+import { ScreenHeight, ScreenWidth } from '@/components/global-style';
+import useSWR, { Fetcher } from 'swr';
+import { Material } from '@/material-api-types';
+import { GetUserRow } from '@/user-api-types';
+import { useContext } from 'react';
+import { getToken, IdentityContext } from '@/components/securestore';
+import MaterialList from '@/components/MaterialList';
+import { Headers } from '@/constants/header-options';
 import { Link } from 'expo-router';
 
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+const fetcher: Fetcher<Material[], string> = async (...args) => fetch(...args, {
+  headers: Headers
+}).then(res => res.json())
+const fetchUser: Fetcher<GetUserRow[], string> = async (...args) => fetch(...args, {
+  headers: Headers
+}).then(res => res.json())
 
 export default function Materials() {
+  const identity = useContext(IdentityContext);
+  const { data: user } = useSWR(identity ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${identity.id}` : null, fetchUser,)
+  console.log(Headers)
+  console.log(user)
+  const { data: materials, error, isLoading } = useSWR(user && user[0] ? `${process.env.EXPO_PUBLIC_API_URL}/api/material/material/search?site=${user[0].jobsite_id.Valid ? user[0].jobsite_id.Int64 : undefined}` : null, fetcher)
+  console.log(materials)
+
+  if (isLoading) { return (<MainView><ActivityIndicator style={{ justifyContent: 'center', height: ScreenHeight }} /></MainView>) }
+  if (error) { return (<MainView><Text style={{ color: 'red', justifyContent: 'center', height: '100%' }}>Error occured while trying to load materials</Text></MainView>) }
+  if (!materials) { return (<MainView><Text style={{ justifyContent: 'center', height: '100%' }}>No materials to display</Text></MainView>) }
   return (
-    <ThemedView>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title" style={styles.title}>Materials</ThemedText>
-      </ThemedView>
-    </ThemedView>
+    <MainView>
+      <Text style={{ paddingTop: ScreenHeight * 0.01, color: 'white', flex: 1, alignSelf: 'center', fontSize: 40, textAlign: 'center' }}>{`Materials for Jobsite ${user && user[0] && user[0].jobsite_id.Valid ? user[0].jobsite_id.Int64 : "Unknown"}`} </Text>
+      <Link style={{
+        flex: 0.5, color: 'white', fontSize: 40, backgroundColor: 'gray',
+        width: ScreenWidth * 0.95,
+        padding: 10,
+        marginBottom: 10,
+        gap: 10,
+      }} href={'/add_materials'}>Add a new Material</Link>
+      <View style={{ flex: 7 }}>
+        <MaterialList materials={materials} />
+      </View>
+    </MainView>
   );
 }
 
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: 8,
-    alignSelf: 'center',
-    paddingTop: 75,
-    height: 200,
-    marginLeft: 5,
-    marginRight: 5,
-  },
-  title: {
-    fontSize: 30,
-  },
-  subtitle: {
-    fontSize: 20,
-    textAlign: 'center',
-  },
-  stepContainer: {
-    gap: 8,
-    marginTop: 20,
-    marginBottom: 8,
-    marginLeft: 10,
-    marginRight: 10,
-  },
-  button: {
-    alignSelf: 'center',
-    width: 200,
-    position: 'relative',
-    top: 120
-  }
-});
