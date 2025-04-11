@@ -30,7 +30,7 @@ export default function IdentityProvider({ children }: { children: ReactNode }) 
     if (curr) {
       //get current token 
       const tkn = JSON.parse(curr) as Token
-      if (!tkn) { return router.push('/login') }
+      if (!tkn || !('username' in tkn)) { return router.push('/login') }
       setIdentity(tkn)
     } else {
       fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/user/decrypt`, {
