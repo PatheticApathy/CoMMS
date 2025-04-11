@@ -14,6 +14,7 @@ export function getToken() {
 
 }
 export async function setToken(token: string) {
+  SecureStore.deleteItemAsync('identity')
   SecureStore.setItemAsync('token', token)
 }
 export async function delTokenNIdentity() {
