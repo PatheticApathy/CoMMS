@@ -3,6 +3,7 @@ import { Token } from "@/user-api-types"
 import { createContext, ReactNode, useEffect, useState } from "react"
 import { Redirect, router } from 'expo-router';
 import { Notify } from './notify';
+import { Headers } from '@/constants/header-options';
 
 export const IdentityContext = createContext<Token | undefined>(undefined)
 
@@ -33,10 +34,7 @@ export default function IdentityProvider({ children }: { children: ReactNode }) 
       setIdentity(tkn)
     } else {
       fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/user/decrypt`, {
-        headers: {
-          'CF-Access-Client-Id': process.env.EXPO_PUBLIC_API_CF_CLIENT_ID!,
-          'CF-Access-Client-Secret': process.env.EXPO_PUBLIC_API_CF_ACCESS_CLIENT_SECRET!,
-        },
+        headers: Headers,
         method: 'POST',
         body: String(token)
       }).then((resp => {
@@ -48,8 +46,12 @@ export default function IdentityProvider({ children }: { children: ReactNode }) 
         //if it does not, fetch a new one
         //if no token, redirect to login
         resp.json().then((id) => {
-          setIdentity(id)
-
+          if (id && typeof id === 'object' && 'password' in id && 'username' in id) { // Replace 'property1' and 'property2' with actual Token properties
+            setIdentity(id as Token);
+          } else {
+            Notify.error('Invalid token data received');
+            router.push('/login');
+          }
         })
       })).catch(err => {
         Notify.error(err.message)
