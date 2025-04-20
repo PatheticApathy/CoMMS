@@ -5,7 +5,7 @@ import useSWR, { Fetcher } from 'swr';
 import { Material } from '@/material-api-types';
 import { GetUserRow } from '@/user-api-types';
 import { useContext } from 'react';
-import { getToken, IdentityContext } from '@/components/securestore';
+import { IdentityContext } from '@/components/securestore';
 import MaterialList from '@/components/MaterialList';
 import { Headers } from '@/constants/header-options';
 import { Link } from 'expo-router';
@@ -35,7 +35,7 @@ export default function Materials() {
         padding: 10,
         marginBottom: 10,
         gap: 10,
-      }} href={'/add_materials'}>Add a new Material</Link>
+      }} href={'/materials'}>Add a new Material</Link>
       <View style={{ flex: 7 }}>
         <MaterialList materials={materials} />
       </View>

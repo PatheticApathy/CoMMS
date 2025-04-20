@@ -44,7 +44,7 @@ export default function TabLayout({ children }: { children: ReactNode }) {
             }}
           />
           <Tabs.Screen
-            name="materials"
+            name="material"
             options={{
               title: 'Materials',
               tabBarIcon: ({ color }) => <MaterialCommunityIcons size={28} name="alpha-m-circle" color={color} />,
