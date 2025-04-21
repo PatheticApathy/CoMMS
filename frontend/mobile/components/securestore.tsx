@@ -9,16 +9,20 @@ export const IdentityContext = createContext<Token | undefined>(undefined)
 
 export function getToken() {
   const tkn = SecureStore.getItem('token')
-  if (!tkn) { throw new Error('no token found') }
+  if (!tkn) {
+    Notify.error("No token found");
+    router.push("/login")
+    return;
+  }
   return tkn
 
 }
 export async function setToken(token: string) {
   delTokenNIdentity()
-  SecureStore.setItemAsync('token', token)
+  await SecureStore.setItemAsync('token', token)
 }
 export async function delTokenNIdentity() {
-  SecureStore.deleteItemAsync('token')
+  await SecureStore.deleteItemAsync('token')
 }
 
 export default function IdentityProvider({ children }: { children: ReactNode }) {
@@ -32,8 +36,8 @@ export default function IdentityProvider({ children }: { children: ReactNode }) 
       //get current token 
       const tkn = JSON.parse(curr) as Token
       if (!tkn || !('username' in tkn)) {
-        SecureStore.deleteItemAsync('identity') 
-        return router.push('/login') 
+        SecureStore.deleteItemAsync('identity')
+        return router.push('/login')
       }
       setIdentity(tkn)
     } else {
@@ -50,7 +54,7 @@ export default function IdentityProvider({ children }: { children: ReactNode }) 
         //if it does not, fetch a new one
         //if no token, redirect to login
         resp.json().then((id) => {
-          if (id && typeof id === 'object' && 'password' in id && 'username' in id) { // Replace 'property1' and 'property2' with actual Token properties
+          if (id && 'password' in id && 'username' in id) { // Replace 'property1' and 'property2' with actual Token properties
             setIdentity(id as Token);
           } else {
             Notify.error('Invalid token data received');
