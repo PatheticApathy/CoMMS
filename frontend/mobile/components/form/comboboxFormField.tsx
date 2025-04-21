@@ -3,35 +3,34 @@ import { Controller, UseFormReturn } from "react-hook-form";
 import { Button, Modal, View } from "react-native";
 import { ScreenHeight, ScreenWidth } from "../global-style";
 
-export default function ComboboxFormField({ form_attr, default_label, options }: { form_attr: { name: string, form: UseFormReturn<any> }, default_label: string, options: { label: string, value: Key }[] }) {
+export default function ComboboxFormField({ default_label, options, OnClickSet }: { default_label: string, options: { label: string, value: Key }[], OnClickSet: (key: string) => void }) {
   const [modalVisible, setModalVisible] = useState(false);
   return (
     <View style={{ justifyContent: 'center', }}>
+      <Button title={default_label} onPress={() => setModalVisible(true)} />
       <Modal
         animationType="slide"
+        visible={modalVisible}
         transparent={true}
         onRequestClose={() => setModalVisible(!modalVisible)}
       >
-        <Controller
-          name={form_attr.name}
-          control={form_attr.form.control}
-          render={(() => (
-            <View>
-              {(() =>
-                options.map((option) => (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', }}>
+          <View style={{ backgroundColor: 'yellow', padding: 40, borderRadius: 20 }}>
+            {(() =>
+              options.map((option) => (
+                <View style={{ backgroundColor: 'cyan', margin: '10', borderRadius: 20 }}>
                   <Button
                     title={option.label}
                     onPress={() => {
-                      form_attr.form.setValue(form_attr.name, option.value)
+                      OnClickSet(String(option.value));
                       setModalVisible(!modalVisible)
                     }}
                   />
-                )))()}
-            </View>))
-          }
-        />
-      </Modal>
-      <Button title={default_label} onPress={() => setModalVisible(true)} />
-    </View>
+                </View>
+              )))()}
+          </View>
+        </View>))
+      </Modal >
+    </View >
   )
 }
