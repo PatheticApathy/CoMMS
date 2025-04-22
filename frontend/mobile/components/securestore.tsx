@@ -14,7 +14,7 @@ export function getToken() {
     router.push("/login")
     return;
   }
-  return tkn
+  return tkn.trim().trimEnd()
 
 }
 export async function setToken(token: string) {

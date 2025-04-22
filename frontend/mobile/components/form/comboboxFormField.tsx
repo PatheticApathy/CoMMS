@@ -1,9 +1,7 @@
 import { Key, useState } from "react";
-import { Controller, UseFormReturn } from "react-hook-form";
 import { Button, Modal, View } from "react-native";
-import { ScreenHeight, ScreenWidth } from "../global-style";
 
-export default function ComboboxFormField({ default_label, options, OnClickSet }: { default_label: string, options: { label: string, value: Key }[], OnClickSet: (key: string) => void }) {
+export default function ComboboxFormField({ default_label, options, OnClickSet }: { default_label: string, options: { label: string, value: Key }[], OnClickSet: (key: Key | string) => void }) {
   const [modalVisible, setModalVisible] = useState(false);
   return (
     <View style={{ justifyContent: 'center', }}>
@@ -18,11 +16,11 @@ export default function ComboboxFormField({ default_label, options, OnClickSet }
           <View style={{ backgroundColor: 'yellow', padding: 40, borderRadius: 20 }}>
             {(() =>
               options.map((option) => (
-                <View style={{ backgroundColor: 'cyan', margin: '10', borderRadius: 20 }}>
+                <View key={option.label} style={{ backgroundColor: 'cyan', margin: '10', borderRadius: 20 }}>
                   <Button
                     title={option.label}
                     onPress={() => {
-                      OnClickSet(String(option.value));
+                      OnClickSet(option.value);
                       setModalVisible(!modalVisible)
                     }}
                   />
