@@ -48,7 +48,7 @@ export default function LoginForm() {
       const res = await trigger(values)
       if (res.ok) {
         const token = await res.text();
-        await setToken(token)
+        await setToken(token.trim())
         console.log(token)
         router.push('/home')
         return

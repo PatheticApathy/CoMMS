@@ -5,7 +5,7 @@ import MainView from '@/components/MainView';
 import { Notify } from '@/components/notify';
 import { AddMaterial, Material } from '@/material-api-types';
 import { JobSite } from '@/user-api-types';
-import { ActivityIndicator, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Text } from 'react-native';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/dist/mutation';
 import { Button } from 'react-native';
@@ -18,12 +18,12 @@ import { useState } from 'react';
 // Schema for form
 const AddMaterialSchema = z.object({
   job_site: z.coerce.number().nonnegative({ message: "Job site must have nonnegative value" }),
-  name: z.string().min(1, { message: "Name must be longer than one character" }),
-  quantity: z.coerce.number().nonnegative({ message: "Quantity can't be negative" }),
+  name: z.coerce.string().min(1, { message: "Name must be longer than one character" }),
+  quantity: z.coerce.number({ message: 'Quantity must be a number' }).nonnegative({ message: "Quantity can't be negative" }),
   status: z.enum(["In Stock", "Out of Stock", "Low Stock"]),
-  type: z.string().min(2, { message: "Type must be more than 2 characters" }),
-  unit: z.string().min(1, { message: "Unit must be greater than 1" }),
-  picture: z.instanceof(File).optional(),
+  type: z.coerce.string().min(2, { message: "Type must be more than 2 characters" }),
+  unit: z.coerce.string().min(1, { message: "Unit must be greater than 1" }),
+  picture: z.instanceof(Blob).optional(),
 });
 
 // Fetcher
@@ -43,16 +43,18 @@ const AddMaterials = () => {
   // Form controls
   const [job_site, setJobSite] = useState('');
   const [name, setName] = useState('');
-  const [quantity, setQuantity] = useState('');
+  const [quantity, setQuantity] = useState('')
   const [status, setStatus] = useState('In Stock');
   const [type, setType] = useState('');
   const [unit, setUnit] = useState('');
-  const [picture, setPicture] = useState<File | undefined>(undefined);
+  const [[picture, extension], setPicture] = useState<[Blob | undefined, string]>([undefined, '']);
+
+  const [isDownloading, setDownload] = useState(false);
 
 
   const { data: jobsites, error: jobsitesError, isLoading: loading_jobs } = useSWR<JobSite[]>(`${process.env.EXPO_PUBLIC_API_URL}/api/sites/all`, fetchJobsites);
-  const { trigger, isMutating } = useSWRMutation(`${process.env.EXPO_PUBLIC_API_URL}/api/material/material/add`, PostAddMaterial);
-  const { trigger: download, isMutating: isDownloading } = useSWRMutation(`${process.env.EXPO_PUBLIC_API_URL}/api/picture`, PostPicture);
+  const { trigger } = useSWRMutation(`${process.env.EXPO_PUBLIC_API_URL}/api/material/material/add`, PostAddMaterial);
+  const { trigger: download } = useSWRMutation(`${process.env.EXPO_PUBLIC_API_URL}/api/picture`, PostPicture);
 
   const status_opts = [
     { label: "In Stock", value: "In Stock" },
@@ -62,9 +64,9 @@ const AddMaterials = () => {
 
 
   const SendAddMaterialRequest = async () => {
-
+    setDownload(true)
     const validation = AddMaterialSchema.safeParse({
-      job_site,
+      job_site: 1,//only works with jobsite one for now,
       name,
       quantity,
       status,
@@ -72,7 +74,6 @@ const AddMaterials = () => {
       unit,
       picture
     })
-
 
     if (validation.success) {
       const values = validation.data;
@@ -101,13 +102,13 @@ const AddMaterials = () => {
       };
 
       try {
-        if (values.picture) {
-          const extension = values.picture.name.split('.').pop()
-          if (!extension) {
-            Notify.error("Invald file extension");
+        console.log(picture)
+        if (picture) {
+          if (extension === '') {
+            Notify.error("Invalid file extension");
             return
           }
-          const resp = await download({ type: extension, file: values.picture })
+          const resp = await download({ type: extension, file: picture })
           if (!resp.ok) {
             const message = await resp.json() as { message: string }
             Notify.error(message.message || "Error has occured");
@@ -121,20 +122,25 @@ const AddMaterials = () => {
         const resp = await trigger(payload)
         if (!resp.ok) {
           Notify.error(await resp.text() || "Error has occured");
+          setDownload(false)
           return
         }
         const data = await resp.json() as Material
         Notify.success(`Material ${data.name.String} Added!`);
+        setDownload(false)
 
       } catch (err: any) {
         console.log(err);
         Notify.error(err.message || "Error has occurred");
+        setDownload(false)
       }
     } else {
+      console.log(JSON.stringify(validation.error.format(), null, 2))
       Notify.error(validation.error.issues.map((issue) => {
         return issue.message
       }).join('\n'))
     }
+    setDownload(false)
   };
 
   const DisplayJobSites = () => {
@@ -161,16 +167,16 @@ const AddMaterials = () => {
   if (loading_jobs) { return (<MainView><ActivityIndicator style={{ justifyContent: 'center', height: ScreenHeight }} /></MainView>) }
 
   //make button change colores on submission
-  //<FormPictueInput name="picture" placeholder="Add picture" form={form} />
   return (
     <FormModalView>
       <DisplayJobSites />
-      <FormInput value={name} placeholder="Name" OnChangeText={setName} />
-      <FormInput value={quantity} placeholder="Quantity" OnChangeText={setQuantity} />
-      <FormInput value={type} placeholder="Type" OnChangeText={setType} />
-      <FormInput value={unit} placeholder="Unit" OnChangeText={setUnit} />
+      <FormInput value={name} keyboardtype='default' placeholder="Name" OnChangeText={setName} />
+      <FormInput value={quantity} keyboardtype='number-pad' placeholder="Quantity" OnChangeText={setQuantity} />
+      <FormInput value={type} keyboardtype='default' placeholder="Type" OnChangeText={setType} />
+      <FormInput value={unit} keyboardtype='default' placeholder="Unit" OnChangeText={setUnit} />
       <ComboboxFormField default_label={status} options={status_opts} OnClickSet={setStatus} />
-      {isMutating || isDownloading ? <Button title='sending' /> : <Button onPress={async () => { await SendAddMaterialRequest() }} title='Add Material' />}
+      <FormPictueInput OnPicture={setPicture} />
+      {isDownloading ? <Button title='sending' /> : <Button onPress={async () => { await SendAddMaterialRequest() }} title='Add Material' />}
     </FormModalView>
   )
 }
