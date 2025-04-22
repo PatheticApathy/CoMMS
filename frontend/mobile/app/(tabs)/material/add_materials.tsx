@@ -167,7 +167,6 @@ const AddMaterials = () => {
   if (loading_jobs) { return (<MainView><ActivityIndicator style={{ justifyContent: 'center', height: ScreenHeight }} /></MainView>) }
 
   //make button change colores on submission
-  //<FormPictueInput name="picture" placeholder="Add picture" form={form} />
   return (
     <FormModalView>
       <DisplayJobSites />
@@ -176,6 +175,7 @@ const AddMaterials = () => {
       <FormInput value={type} keyboardtype='default' placeholder="Type" OnChangeText={setType} />
       <FormInput value={unit} keyboardtype='default' placeholder="Unit" OnChangeText={setUnit} />
       <ComboboxFormField default_label={status} options={status_opts} OnClickSet={setStatus} />
+      <FormPictueInput name="picture" placeholder="Add picture" OnPicture={setPicture} />
       {isDownloading ? <Button title='sending' /> : <Button onPress={async () => { await SendAddMaterialRequest() }} title='Add Material' />}
     </FormModalView>
   )

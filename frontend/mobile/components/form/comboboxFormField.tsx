@@ -27,7 +27,7 @@ export default function ComboboxFormField({ default_label, options, OnClickSet }
                 </View>
               )))()}
           </View>
-        </View>))
+        </View>
       </Modal >
     </View >
   )
