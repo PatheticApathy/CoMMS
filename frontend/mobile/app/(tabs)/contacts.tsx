@@ -1,48 +1,75 @@
-import { StyleSheet, Button } from 'react-native';
-import { Link } from 'expo-router';
+import MainView from '@/components/MainView';
+import { ActivityIndicator, Text, View, TextInput, StyleSheet } from 'react-native';
+import { ScreenHeight } from '@/components/global-style';
+import useSWR, { Fetcher } from 'swr';
+import { Coworker, GetUserRow } from '@/user-api-types';
+import { useContext, useState } from 'react';
+import { IdentityContext } from '@/components/securestore';
+import ContactsList from '@/components/ContactsList';
+import { Headers } from '@/constants/header-options';
 
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+const fetcher: Fetcher<Coworker[], string> = async (...args) => fetch(...args, {
+  headers: Headers
+}).then(res => res.json())
+const fetchUser: Fetcher<GetUserRow[], string> = async (...args) => fetch(...args, {
+  headers: Headers
+}).then(res => res.json())
 
-export default function Contacts() {
+export default function Coworkers() {
+  const identity = useContext(IdentityContext);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredCoworkers, setFilteredCoworkers] = useState<Coworker[]>([]);
+  
+  const { data: user } = useSWR(identity ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${identity.id}` : null, fetchUser,)
+  const { data: coworkers, error, isLoading } = useSWR(user && user[0] ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/coworkers?user=${user[0].id}&company=${user[0].company_id.Valid ? user[0].company_id.Int64 : undefined}&site=${user[0].jobsite_id.Valid ? user[0].jobsite_id.Int64 : undefined}` : null, fetcher);
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    if (coworkers) {
+      const filtered = coworkers.filter((coworker) => {
+        const searchLower = query.toLowerCase();
+        return (
+          coworker.username.toLowerCase().includes(searchLower) ||
+          coworker.email.toLowerCase().includes(searchLower) ||
+          coworker.phone.toLowerCase().includes(searchLower) ||
+          (coworker.firstname.Valid && coworker.firstname.String.toLowerCase().includes(searchLower)) ||
+          (coworker.lastname.Valid && coworker.lastname.String.toLowerCase().includes(searchLower)) ||
+          coworker.company_name.toLowerCase().includes(searchLower) ||
+          coworker.jobsite_name.toLowerCase().includes(searchLower) ||
+          (coworker.role.Valid && coworker.role.String.toLowerCase().includes(searchLower))
+        );
+      });
+      setFilteredCoworkers(filtered);
+    }
+  };
+
+  if (isLoading) { return (<MainView><ActivityIndicator style={{ justifyContent: 'center', height: ScreenHeight }} /></MainView>) }
+  if (error) { return (<MainView><Text style={{ color: 'red', justifyContent: 'center', height: '100%' }}>Error occured while trying to load coworkers</Text></MainView>) }
+  if (!coworkers) { return (<MainView><Text style={{ justifyContent: 'center', height: '100%' }}>No coworkers to display</Text></MainView>) }
   return (
-    <ThemedView>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title" style={styles.title}>Contacts</ThemedText>
-      </ThemedView>
-    </ThemedView>
+    <MainView>
+      <Text style={{ paddingTop: ScreenHeight * 0.01, color: 'white', flex: 1, alignSelf: 'center', fontSize: 40, textAlign: 'center' }}>Coworkers</Text>
+      <TextInput 
+        style={styles.searchInput}
+        placeholder="Search coworkers..."
+        placeholderTextColor="#ccc"
+        value={searchQuery}
+        onChangeText={handleSearch}
+      />
+      <View style={{ flex: 7 }}>
+        <ContactsList coworkers={searchQuery ? filteredCoworkers : coworkers} />
+      </View>
+    </MainView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: 8,
-    alignSelf: 'center',
-    paddingTop: 75,
-    height: 200,
-    marginLeft: 5,
-    marginRight: 5,
+  searchInput: {
+    backgroundColor: '#333',
+    color: 'white',
+    padding: 10,
+    margin: 10,
+    borderRadius: 5,
+    fontSize: 18,
   },
-  title: {
-    fontSize: 30,
-  },
-  subtitle: {
-    fontSize: 20,
-    textAlign: 'center',
-  },
-  stepContainer: {
-    gap: 8,
-    marginTop: 20,
-    marginBottom: 8,
-    marginLeft: 10,
-    marginRight: 10,
-  },
-  button: {
-    alignSelf: 'center',
-    width: 200,
-    position: 'relative',
-    top: 120
-  }
 });
