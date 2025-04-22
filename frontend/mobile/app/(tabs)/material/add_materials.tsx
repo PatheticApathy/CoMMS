@@ -5,11 +5,11 @@ import MainView from '@/components/MainView';
 import { Notify } from '@/components/notify';
 import { AddMaterial, Material } from '@/material-api-types';
 import { JobSite } from '@/user-api-types';
-import { ActivityIndicator, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Text } from 'react-native';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/dist/mutation';
 import { Button } from 'react-native';
-import { coerce, z } from 'zod'
+import { z } from 'zod'
 import FormPictueInput from '@/components/form/FormPictureInput';
 import ComboboxFormField from '@/components/form/comboboxFormField';
 import FormModalView from '@/components/FormModalView';
@@ -23,7 +23,7 @@ const AddMaterialSchema = z.object({
   status: z.enum(["In Stock", "Out of Stock", "Low Stock"]),
   type: z.coerce.string().min(2, { message: "Type must be more than 2 characters" }),
   unit: z.coerce.string().min(1, { message: "Unit must be greater than 1" }),
-  picture: z.instanceof(File).optional(),
+  picture: z.instanceof(Blob).optional(),
 });
 
 // Fetcher
@@ -47,7 +47,7 @@ const AddMaterials = () => {
   const [status, setStatus] = useState('In Stock');
   const [type, setType] = useState('');
   const [unit, setUnit] = useState('');
-  const [picture, setPicture] = useState<File | undefined>(undefined);
+  const [[picture, extension], setPicture] = useState<[Blob | undefined, string]>([undefined, '']);
 
   const [isDownloading, setDownload] = useState(false);
 
@@ -102,13 +102,13 @@ const AddMaterials = () => {
       };
 
       try {
-        if (values.picture) {
-          const extension = values.picture.name.split('.').pop()
-          if (!extension) {
-            Notify.error("Invald file extension");
+        console.log(picture)
+        if (picture) {
+          if (extension === '') {
+            Notify.error("Invalid file extension");
             return
           }
-          const resp = await download({ type: extension, file: values.picture })
+          const resp = await download({ type: extension, file: picture })
           if (!resp.ok) {
             const message = await resp.json() as { message: string }
             Notify.error(message.message || "Error has occured");
@@ -175,7 +175,7 @@ const AddMaterials = () => {
       <FormInput value={type} keyboardtype='default' placeholder="Type" OnChangeText={setType} />
       <FormInput value={unit} keyboardtype='default' placeholder="Unit" OnChangeText={setUnit} />
       <ComboboxFormField default_label={status} options={status_opts} OnClickSet={setStatus} />
-      <FormPictueInput name="picture" placeholder="Add picture" OnPicture={setPicture} />
+      <FormPictueInput OnPicture={setPicture} />
       {isDownloading ? <Button title='sending' /> : <Button onPress={async () => { await SendAddMaterialRequest() }} title='Add Material' />}
     </FormModalView>
   )
