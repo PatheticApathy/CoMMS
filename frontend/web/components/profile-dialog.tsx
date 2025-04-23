@@ -84,7 +84,7 @@ export function Profile() {
           <DialogDescription>View your profile here. Click Edit Profile to edit your profile.</DialogDescription>
         </DialogHeader>
         <div className="rounded-full overflow-hidden h-28 w-28">
-          <Image alt='Yapper' className="" src="/default-avatar-profile-icon-of-social-media-user-vector.jpg" width={120} height={120} />
+          <Image alt='Yapper' className="" src={user[0].profilepicture.Valid ? user[0].profilepicture.String : "/test.png"} width={120} height={120} />
         </div>
         <div>Username: {user[0].username}</div>
         <div>Name: {user[0].firstname.Valid ? user[0].firstname.String : "N/A"} {user[0].lastname.Valid ? user[0].lastname.String : "N/A"}</div>
