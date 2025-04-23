@@ -8,7 +8,7 @@ export const IdentityContext = createContext<Token | undefined>(undefined)
 
 export function getToken() {
   const tkn = SecureStore.getItem('token')
-  if (!tkn) { throw new Error('no token found') }
+  if (!tkn) { return "" }
   return JSON.parse(tkn)
 
 }
