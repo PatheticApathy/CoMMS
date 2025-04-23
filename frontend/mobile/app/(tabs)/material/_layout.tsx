@@ -7,7 +7,6 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
-import IdentityProvider from '@/components/securestore';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -15,7 +14,7 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    SpaceMono: require('@/assets/fonts/SpaceMono-Regular.ttf'),
   });
 
   useEffect(() => {
@@ -32,13 +31,11 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="login" options={{ headerShown: false }} />
-        <Stack.Screen name="signup" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="material" options={{ headerShown: false, presentation: 'modal' }} />
-        <Stack.Screen name="+not-found" />
+        <Stack.Screen name="[id]" options={{ headerShown: false }} />
+        <Stack.Screen name="add_materials" options={{ headerShown: false, presentation: 'modal' }} />
+        <Stack.Screen name="add_log_[id]" options={{ headerShown: false, presentation: 'modal' }} />
       </Stack>
-      <StatusBar style="auto" />
     </ThemeProvider>
   );
 }
+

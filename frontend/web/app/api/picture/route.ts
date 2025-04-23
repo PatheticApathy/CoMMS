@@ -10,7 +10,7 @@ export async function POST(
   console.log(extension)
   const file_name = `${new Date().toISOString()}-material.${extension}`
   try {
-    await fs.writeFile(path.join(`${process.cwd()}/public/${file_name}`), Buffer.from(picture), 'utf-8')
+    await fs.writeFile(path.join(`${process.cwd()}/public/${file_name}`), Buffer.from(picture))
     console.log(`Succesfully created ${file_name}`)
     return NextResponse.json({ name: file_name }, { status: 200 });
   } catch (err) {
