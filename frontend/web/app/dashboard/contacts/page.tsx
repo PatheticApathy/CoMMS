@@ -32,8 +32,8 @@ export default function Contacts() {
       <div className="flex flex-col justify-self-end items-center">
         <div className="flex items-center space-x-5">
           <InputWithButton onSearch={setSearchQuery} />
-          <CsvDownloadButton className={cn(buttonVariants({ variant: 'outline' }))} data={table_data}><FileSpreadsheet /></CsvDownloadButton>
-          <Button variant="outline" onClick={handlePrint}>
+          <CsvDownloadButton className={cn(buttonVariants({ variant: 'accent' }))} data={table_data}><FileSpreadsheet /></CsvDownloadButton>
+          <Button variant="accent" onClick={handlePrint}>
             <Printer />
           </Button>
         </div>

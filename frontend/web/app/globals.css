@@ -8,9 +8,9 @@ body {
 
 @layer base {
   :root {
-    --color-primary:#351E29;
-    --color-accent: #FFE74C;
-    --color-secondary: #2176AE;
+    --color-primary: #351E29;
+    --color-accent: #2176AE;
+    --color-secondary: #FFE74C;
     --color-background: #C9ADA7;
     --color-surface: #00272B;
 
@@ -26,11 +26,11 @@ body {
   }
 
   .dark {
-    --color-primary: #FFE74C;
+    --color-primary: #2176AE;
     --color-accent: #351E29;
-    --color-secondary: #2176AE;
+    --color-secondary: #FFE74C;
     --color-background: #00272B;
-    --color-surface:#C9ADA7;
+    --color-surface: #C9ADA7;
 
     /* Existing sidebar stules */
     --sidebar-background: 240 5.9% 10%;

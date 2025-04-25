@@ -6,7 +6,7 @@ import { Material } from '@/material-api-types';
 export default function FilterAndTable({ header, materials, route }: { header: string, materials: Material[] | undefined, route: string | undefined }) {
   return (
     <div className='h-screen'>
-      <h1 className='text-center font-bold  text-7xl'>{header}</h1>
+      {header == "" ?  null: <h1 className='text-center font-bold  text-7xl'>{header}</h1>}
       <div className="flex w-screen ">
         {materials ?
           <MTable materials={materials} route={route} />

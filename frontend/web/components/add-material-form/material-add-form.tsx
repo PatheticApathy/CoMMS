@@ -121,7 +121,7 @@ export default function MaterialForm({ route }: { route: string | undefined }) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(SendAddMaterialRequest)}>
-        {isMutating || isDownloading ? <Button variant={'ghost'}>Sending</Button> : <Button type="submit">Send Request</Button>}
+        {isMutating || isDownloading ? <Button variant={'ghost'}>Sending</Button> : <Button variant="yellow" type="submit">Send Request</Button>}
         <FormInput name="name" placeholder="Name" description="" form={form} />
         <FormInput name="quantity" placeholder="Quantity" description="Quantity" form={form} />
         <ComboboxFormField form_attr={{ name: "status", description: "Initial status of item", form: form }} default_label={"In Stock"} options={status} />

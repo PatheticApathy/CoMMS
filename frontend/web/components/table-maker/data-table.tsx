@@ -120,10 +120,10 @@ export function DataTable<TData, TValue>({
           }
           className="max-w-sm"
         />
-        <CsvDownloadButton className={cn(buttonVariants({ variant: 'outline' }))} data={data}><FileSpreadsheet /></CsvDownloadButton>
+        <CsvDownloadButton className={cn(buttonVariants({ variant: 'accent' }))} data={data}><FileSpreadsheet /></CsvDownloadButton>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
+            <Button variant="accent" className="ml-auto">
               Columns
             </Button>
           </DropdownMenuTrigger>
@@ -196,7 +196,7 @@ export function DataTable<TData, TValue>({
         <div>
           <div className="flex items-center justify-center pr-4 space-x-2 py-4">
             <Button
-              variant="outline"
+              variant="accent"
               size="sm"
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
@@ -204,7 +204,7 @@ export function DataTable<TData, TValue>({
               Previous
             </Button>
             <Button
-              variant="outline"
+              variant="accent"
               size="sm"
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}

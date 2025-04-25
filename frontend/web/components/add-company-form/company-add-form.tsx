@@ -79,7 +79,7 @@ export default function CompanyForm() {
         <FormInput name="addr" placeholder="Address" description="" form={form} />
         <FormInput name="location_lat" placeholder="Latitude Coordinate" description="" form={form} />
         <FormInput name="location_lng" placeholder="Longitude Coordinate" description="" form={form} />
-        {isMutating ? <Button variant={'ghost'}>Sending</Button> : <Button type="submit">Add Company</Button>}
+        {isMutating ? <Button variant={'ghost'}>Sending</Button> : <Button variant="yellow" type="submit">Add Company</Button>}
       </form>
     </Form>
   );
