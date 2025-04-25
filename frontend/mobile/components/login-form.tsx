@@ -8,7 +8,7 @@ import useSWRMutation from 'swr/mutation'
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { LogInUser } from "@/user-api-types"
-import { setToken, delTokenNIdentity } from "@/components/securestore"
+import { setToken, delTokenNIdentity } from "@/app/(tabs)/securestore"
 
 const formSchema = z.object({
   username: z.string().nonempty(),

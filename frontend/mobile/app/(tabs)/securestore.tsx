@@ -2,14 +2,14 @@ import * as SecureStore from 'expo-secure-store';
 import { Token } from "@/user-api-types"
 import { createContext, ReactNode, useEffect, useState } from "react"
 import { Redirect, router } from 'expo-router';
-import { Notify } from './notify';
+import { Notify } from '../../components/notify';
 
 export const IdentityContext = createContext<Token | undefined>(undefined)
 
 export function getToken() {
-  const tkn = SecureStore.getItemAsync('token')
+  const tkn = SecureStore.getItem('token')
   if (!tkn) { throw new Error('no token found') }
-  return tkn
+  return JSON.parse(tkn)
 
 }
 export async function setToken(token: string) {

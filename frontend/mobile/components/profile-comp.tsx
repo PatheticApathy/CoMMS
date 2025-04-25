@@ -2,24 +2,17 @@ import { StyleSheet, Button, Image } from 'react-native';
 import { Link } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { getToken, delTokenNIdentity } from '@/components/securestore'
+import { getToken, delTokenNIdentity, IdentityContext } from '@/app/(tabs)/securestore'
 import useSWR from 'swr'
-import { User } from '@/user-api-types'
+import { GetUserRow } from '@/user-api-types'
 import { useRouter } from 'expo-router'
 import { Headers } from '@/constants/header-options';
+import { useContext } from "react"
 
-async function getProfileArgs(url: string, arg: string) {
-  return fetch(url, {
-    method: 'POST',
-    headers: Headers,
-    redirect: 'follow',
-    body: arg
-  }).then(res => res.json())
-}
 
 const fetcher = async (url: string) => {
   const res = await fetch(url, {
-    headers: Headers,
+    headers: Headers
   })
   if (!res.ok) {
     throw new Error("Failed to fetch");
@@ -29,16 +22,10 @@ const fetcher = async (url: string) => {
 
 export default function ProfileComp() {
 
+  const identity = useContext(IdentityContext)
   const router = useRouter()
 
-  let token = getToken()
-  let id = 1
-
-  const { data: tokenData, error: error2 } = useSWR([`${process.env.EXPO_PUBLIC_API_URL}/api/user/decrypt`, token], ([url, token]) => getProfileArgs(url, token))
-  if (tokenData)
-    id = tokenData.id
-
-  const { data: user, error: error3 } = useSWR<User, string>(`${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${id}`, fetcher)
+  const { data: user, error: error3 } = useSWR<GetUserRow[], string>(identity ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${identity.id}` : null, fetcher)
 
   if (!user) return <ThemedText>Loading...</ThemedText>;
 
@@ -60,16 +47,16 @@ export default function ProfileComp() {
           }}
         />
         <ThemedText>
-          Username: {user.username}
+          Username: {user[0].username}
         </ThemedText>
         <ThemedText>
-          Name: {user.firstname.Valid ? user.firstname.String : "N/A"} {user.lastname.Valid ? user.lastname.String : "N/A"}
+          Name: {user[0].firstname.Valid ? user[0].firstname.String : "N/A"} {user[0].lastname.Valid ? user[0].lastname.String : "N/A"}
         </ThemedText>
         <ThemedText>
-          Email: {user.email}
+          Email: {user[0].email}
         </ThemedText>
         <ThemedText>
-          Phone: {user.phone}
+          Phone: {user[0].phone}
         </ThemedText>
       </ThemedView>
       <ThemedView style={styles.buttons}>

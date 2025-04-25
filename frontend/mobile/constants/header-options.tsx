@@ -1,4 +1,4 @@
-import { getToken } from "@/components/securestore";
+import { getToken } from "@/app/(tabs)/securestore";
 
 export const Headers = {
   'Authorization': getToken()!,

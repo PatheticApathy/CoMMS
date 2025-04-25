@@ -8,7 +8,7 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, Controller } from 'react-hook-form';
 import { User, Firstname, Lastname } from '@/user-api-types'
-import { getToken } from '@/components/securestore'
+import { getToken } from '@/app/(tabs)/securestore'
 
 const formSchema = z.object({
   username: z.string(),

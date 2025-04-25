@@ -9,7 +9,7 @@ import useSWRMutation from 'swr/mutation'
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { SignUpUser } from "@/user-api-types"
-import { setToken } from "@/components/securestore"
+import { setToken } from "@/app/(tabs)/securestore"
 import { useRouter } from 'expo-router'
 
 const formSchema = z.object({

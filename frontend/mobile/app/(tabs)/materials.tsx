@@ -5,7 +5,7 @@ import useSWR, { Fetcher } from 'swr';
 import { Material } from '@/material-api-types';
 import { GetUserRow } from '@/user-api-types';
 import { useContext } from 'react';
-import { getToken, IdentityContext } from '@/components/securestore';
+import { getToken, IdentityContext } from '@/app/(tabs)/securestore';
 import MaterialList from '@/components/MaterialList';
 import { Headers } from '@/constants/header-options';
 import { Link } from 'expo-router';
