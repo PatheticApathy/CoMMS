@@ -5,7 +5,7 @@ import { ScreenHeight } from '@/components/global-style'
 import { getToken } from '@/components/securestore';
 
 export default function Welcome() {
-  if (getToken()) { return <Redirect href={'/home'} /> }
+  if (getToken()) { return <Redirect href={'/(tabs)/home'} /> }
   return (
     <MainView>
       <View style={{ flex: 1, paddingTop: ScreenHeight * 0.2 }}>
