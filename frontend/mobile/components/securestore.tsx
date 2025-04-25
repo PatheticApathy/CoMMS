@@ -7,9 +7,9 @@ import { Notify } from './notify';
 export const IdentityContext = createContext<Token | undefined>(undefined)
 
 export function getToken() {
-  const tkn = SecureStore.getItem('token')
+  const tkn = SecureStore.getItemAsync('token')
   if (!tkn) { throw new Error('no token found') }
-  return JSON.parse(tkn)
+  return tkn
 
 }
 export async function setToken(token: string) {

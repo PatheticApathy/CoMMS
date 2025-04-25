@@ -97,30 +97,6 @@ export function EditProfile() {
   if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
 
   async function profileSubmit(values: z.infer<typeof formSchema>) {
-   /* const username = {
-      String: values.username,
-      Valid: Boolean(values.username)
-    }
-    const firstname: Firstname = {
-      String: values.firstname,
-      Valid: Boolean(values.firstname)
-    }
-    const lastname: Lastname = {
-      String: values.lastname,
-      Valid: Boolean(values.lastname)
-    }
-    const email = {
-      String: values.email,
-      Valid: Boolean(values.email)
-    }
-    const phone = {
-      String: values.phone,
-      Valid: Boolean(values.phone)
-    }
-    const profilepicture: Profilepicture = {
-      String: "/test.png",
-      Valid: true
-    }*/
 
     const values2: UpdateProfileParams = {
       username: {

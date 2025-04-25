@@ -44,16 +44,16 @@ export default function EditProfileComp() {
 
   const router = useRouter()
 
-  const { data, trigger, error, isMutating } = useSWRMutation('https://4ba1-138-47-128-9.ngrok-free.app/user/update', changeProfile, {throwOnError: false})
+  const { data, trigger, error, isMutating } = useSWRMutation(`${process.env.EXPO_PUBLIC_API_URL}/api/user/update`, changeProfile, {throwOnError: false})
 
   let token = getToken()
   let id = 1
 
-  const { data: tokenData, error: error2 } = useSWR(['https://4ba1-138-47-128-9.ngrok-free.app/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
+  const { data: tokenData, error: error2 } = useSWR([`${process.env.EXPO_PUBLIC_API_URL}/api/user/decrypt`, token], ([url, token]) => getProfileArgs(url, token))
   if (tokenData)
       id = tokenData.id
 
-  const { data: user, error: error3, mutate: userMutate } = useSWR<User, string>(`https://4ba1-138-47-128-9.ngrok-free.app/user/search?id=${id}`, fetcher)
+  const { data: user, error: error3, mutate: userMutate } = useSWR<User, string>(`${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${id}`, fetcher)
     userMutate()
 
   if (error3) return <ThemedText>Error loading Profile.</ThemedText>;

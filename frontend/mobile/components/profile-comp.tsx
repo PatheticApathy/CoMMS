@@ -38,7 +38,7 @@ export default function ProfileComp() {
   if (tokenData)
     id = tokenData.id
 
-  const { data: user, error: error3 } = useSWR<User, string>(`${process.env.API}/api/user/search?id=${id}`, fetcher)
+  const { data: user, error: error3 } = useSWR<User, string>(`${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${id}`, fetcher)
 
   if (!user) return <ThemedText>Loading...</ThemedText>;
 
