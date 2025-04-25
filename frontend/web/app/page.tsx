@@ -1,14 +1,13 @@
-import styles from "./page.module.css";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button"
 
 export default function Welcome() {
   return (
-    <main className={styles.main}>
+    <main>
       <div className="h-screen">
         <div className="flex flex-col text-center justify-center">
-          <h1 className="font-bold text-6xl pt-40 justify-end">Welcome to CoMMS</h1>
+          <h1 className="font-bold text-6xl pt-20 justify-end">Welcome to CoMMS</h1>
           <h2 className="text-3xl pt-10">The Construction Material Management System</h2>
         </div>
         <div className="pt-28">

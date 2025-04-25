@@ -7,8 +7,10 @@ import useSWR from "swr"
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, Controller } from 'react-hook-form';
-import { User, Firstname, Lastname } from '@/user-api-types'
-import { getToken } from '@/app/(tabs)/securestore'
+import { GetUserRow, Firstname, Lastname } from '@/user-api-types'
+import { getToken, IdentityContext } from '@/components/securestore'
+import { useContext } from "react"
+import { Headers } from '@/constants/header-options'
 
 const formSchema = z.object({
   username: z.string(),
@@ -18,22 +20,18 @@ const formSchema = z.object({
   phone: z.string(),
 })
 
-async function getProfileArgs(url: string, arg: {token: string}) {
-  return fetch(url, {
-      method: 'POST',
-      body: JSON.stringify(arg)
-  }).then(res => res.json())
-}
-
 async function changeProfile(url: string, { arg }) {
   return fetch(url, {
+      headers: Headers,
       method: 'PUT',
       body: JSON.stringify(arg)
   }).then(res => res.json())
 }
 
 const fetcher = async  (url: string) => {
-  const res = await fetch(url)
+  const res = await fetch(url, {
+    headers: Headers
+  })
   if (!res.ok) {
     throw new Error("Failed to fetch data");
   }
@@ -42,21 +40,13 @@ const fetcher = async  (url: string) => {
 
 export default function EditProfileComp() {
 
+  const identity = useContext(IdentityContext)
   const router = useRouter()
 
-  const { data, trigger, error, isMutating } = useSWRMutation(`${process.env.EXPO_PUBLIC_API_URL}/api/user/update`, changeProfile, {throwOnError: false})
+  const { trigger } = useSWRMutation(`${process.env.EXPO_PUBLIC_API_URL}/api/user/update`, changeProfile, {throwOnError: false})
 
-  let token = getToken()
-  let id = 1
+  const { data: user, mutate: userMutate } = useSWR<GetUserRow[], string>(identity ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${identity.id}` : null, fetcher)
 
-  const { data: tokenData, error: error2 } = useSWR([`${process.env.EXPO_PUBLIC_API_URL}/api/user/decrypt`, token], ([url, token]) => getProfileArgs(url, token))
-  if (tokenData)
-      id = tokenData.id
-
-  const { data: user, error: error3, mutate: userMutate } = useSWR<User, string>(`${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${id}`, fetcher)
-    userMutate()
-
-  if (error3) return <ThemedText>Error loading Profile.</ThemedText>;
   if (!user) return <ThemedText>Loading...</ThemedText>;  
 
   const {
@@ -66,15 +56,13 @@ export default function EditProfileComp() {
   } = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: user.username,
-      firstname: user.firstname.Valid? user.firstname.String : "",
-      lastname: user.lastname.Valid? user.lastname.String : "",
-      email: user.email,
-      phone: user.phone,
+      username: user[0].username,
+      firstname: user[0].firstname.Valid? user[0].firstname.String : "",
+      lastname: user[0].lastname.Valid? user[0].lastname.String : "",
+      email: user[0].email,
+      phone: user[0].phone,
     },
   })
-
-  if (isMutating) { return (<ThemedText>Loading</ThemedText>) }
 
   async function profileSubmit(values: z.infer<typeof formSchema>) {
     const username: Firstname = {
@@ -103,9 +91,10 @@ export default function EditProfileComp() {
       lastname,
       email,
       phone,
-      ID: id,
+      ID: identity ? identity.id : 0,
     }
     trigger(values2)
+    userMutate()
     router.navigate('/profile')
   }
 

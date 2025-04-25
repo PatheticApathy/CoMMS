@@ -2,13 +2,12 @@ import { StyleSheet, Button, Image } from 'react-native';
 import { Link } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { getToken, delTokenNIdentity, IdentityContext } from '@/app/(tabs)/securestore'
+import { getToken, delTokenNIdentity, IdentityContext } from '@/components/securestore'
 import useSWR from 'swr'
 import { GetUserRow } from '@/user-api-types'
 import { useRouter } from 'expo-router'
 import { Headers } from '@/constants/header-options';
 import { useContext } from "react"
-
 
 const fetcher = async (url: string) => {
   const res = await fetch(url, {
@@ -20,12 +19,20 @@ const fetcher = async (url: string) => {
   return res.json();
 }
 
+let token = getToken()
+
+console.log(token)
+
+let token2 = token?.slice
+
+console.log("token2: ", token2)
+
 export default function ProfileComp() {
 
   const identity = useContext(IdentityContext)
   const router = useRouter()
 
-  const { data: user, error: error3 } = useSWR<GetUserRow[], string>(identity ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${identity.id}` : null, fetcher)
+  const { data: user } = useSWR<GetUserRow[], string>(identity ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${identity.id}` : null, fetcher)
 
   if (!user) return <ThemedText>Loading...</ThemedText>;
 
