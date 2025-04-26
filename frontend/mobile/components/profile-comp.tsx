@@ -9,6 +9,15 @@ import { useRouter } from 'expo-router'
 import { Headers } from '@/constants/header-options';
 import { useContext } from "react"
 
+async function getProfileArgs(url: string, arg: string) {
+  return fetch(url, {
+    method: 'POST',
+    headers: Headers,
+    redirect: 'follow',
+    body: arg
+  }).then(res => res.json())
+}
+
 const fetcher = async (url: string) => {
   const res = await fetch(url, {
     headers: Headers
@@ -20,19 +29,18 @@ const fetcher = async (url: string) => {
 }
 
 let token = getToken()
-
-console.log(token)
-
-let token2 = token?.slice
-
-console.log("token2: ", token2)
+let id = 1
 
 export default function ProfileComp() {
 
   const identity = useContext(IdentityContext)
   const router = useRouter()
 
-  const { data: user } = useSWR<GetUserRow[], string>(identity ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${identity.id}` : null, fetcher)
+  const { data: tokenData } = useSWR([`${process.env.EXPO_PUBLIC_API_URL}/api/user/decrypt`, token], ([url, token]) => getProfileArgs(url, token))
+  if (tokenData)
+    id = tokenData.id
+
+  const { data: user } = useSWR<GetUserRow[], string>(identity ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${id}` : null, fetcher)
 
   if (!user) return <ThemedText>Loading...</ThemedText>;
 

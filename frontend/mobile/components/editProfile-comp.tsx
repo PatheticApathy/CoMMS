@@ -20,6 +20,15 @@ const formSchema = z.object({
   phone: z.string(),
 })
 
+async function getProfileArgs(url: string, arg: string) {
+  return fetch(url, {
+    method: 'POST',
+    headers: Headers,
+    redirect: 'follow',
+    body: arg
+  }).then(res => res.json())
+}
+
 async function changeProfile(url: string, { arg }) {
   return fetch(url, {
       headers: Headers,
@@ -38,14 +47,21 @@ const fetcher = async  (url: string) => {
   return res.json();
 };
 
+let token = getToken()
+let id = 1
+
 export default function EditProfileComp() {
 
   const identity = useContext(IdentityContext)
   const router = useRouter()
 
+  const { data: tokenData } = useSWR([`${process.env.EXPO_PUBLIC_API_URL}/api/user/decrypt`, token], ([url, token]) => getProfileArgs(url, token))
+  if (tokenData)
+    id = tokenData.id
+
   const { trigger } = useSWRMutation(`${process.env.EXPO_PUBLIC_API_URL}/api/user/update`, changeProfile, {throwOnError: false})
 
-  const { data: user, mutate: userMutate } = useSWR<GetUserRow[], string>(identity ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${identity.id}` : null, fetcher)
+  const { data: user, mutate: userMutate } = useSWR<GetUserRow[], string>(identity ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${id}` : null, fetcher)
 
   if (!user) return <ThemedText>Loading...</ThemedText>;  
 
@@ -91,7 +107,7 @@ export default function EditProfileComp() {
       lastname,
       email,
       phone,
-      ID: identity ? identity.id : 0,
+      ID: identity ? id : 0,
     }
     trigger(values2)
     userMutate()
