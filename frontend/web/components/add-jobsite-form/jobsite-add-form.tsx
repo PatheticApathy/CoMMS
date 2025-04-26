@@ -98,7 +98,7 @@ export default function JobsiteForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(SendAddJobsiteRequest)}>
-        {isMutating ? <Button variant={'ghost'}>Sending</Button> : <Button type="submit">Add Jobsite</Button>}
+        {isMutating ? <Button variant={'ghost'}>Sending</Button> : <Button variant="yellow" type="submit">Add Jobsite</Button>}
         <ComboboxFormField form_attr={{ name: "company_id", description: "All known companies", form: form }} default_label="Choose a company" options={companiesOptions} />
         <FormInput name="name" placeholder="Name" description="" form={form} />
         <div>

@@ -19,7 +19,7 @@ export default function InputWithButton({ onSearch }: SearchProps) {
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
       />
-      <Button onClick={() => onSearch(searchQuery)}>Search</Button>
+      <Button variant="yellow" onClick={() => onSearch(searchQuery)}>Search</Button>
     </div>
   );
 }

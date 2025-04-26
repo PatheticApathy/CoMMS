@@ -276,13 +276,13 @@ export function UserTable() {
           className="max-w-sm"
         />
         <InitAddFormDialougeAdmin />
-        <CsvDownloadButton className={cn(buttonVariants({ variant: 'outline' }))} data={data}><FileSpreadsheet /></CsvDownloadButton>
-        <Button variant="outline" size="default" onClick={() => window.print()}>
+        <CsvDownloadButton className={cn(buttonVariants({ variant: 'accent' }))} data={data}><FileSpreadsheet /></CsvDownloadButton>
+        <Button variant="accent" size="default" onClick={() => window.print()}>
           <Printer />
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
+            <Button variant="accent" className="ml-auto">
               Columns <ChevronDown />
             </Button>
           </DropdownMenuTrigger>
@@ -364,7 +364,7 @@ export function UserTable() {
         </div>
         <div className="space-x-2">
           <Button
-            variant="outline"
+            variant="accent"
             size="sm"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
@@ -372,7 +372,7 @@ export function UserTable() {
             Previous
           </Button>
           <Button
-            variant="outline"
+            variant="accent"
             size="sm"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
