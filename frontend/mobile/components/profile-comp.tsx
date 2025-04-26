@@ -57,22 +57,23 @@ export default function ProfileComp() {
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
         <Image
-          source={{
-            uri: 'https://static.vecteezy.com/system/resources/thumbnails/009/734/564/small/default-avatar-profile-icon-of-social-media-user-vector.jpg'
-          }}
+          style={styles.pfpImage}
+          source={require('../assets/images/test.png')}
         />
-        <ThemedText>
-          Username: {user[0].username}
-        </ThemedText>
-        <ThemedText>
-          Name: {user[0].firstname.Valid ? user[0].firstname.String : "N/A"} {user[0].lastname.Valid ? user[0].lastname.String : "N/A"}
-        </ThemedText>
-        <ThemedText>
-          Email: {user[0].email}
-        </ThemedText>
-        <ThemedText>
-          Phone: {user[0].phone}
-        </ThemedText>
+        <ThemedView style={styles.profileTextContainer}>
+          <ThemedText style={styles.profileText}>
+            Username: {user[0].username}
+          </ThemedText>
+          <ThemedText style={styles.profileText}>
+            Name: {user[0].firstname.Valid ? user[0].firstname.String : "N/A"} {user[0].lastname.Valid ? user[0].lastname.String : "N/A"}
+          </ThemedText>
+          <ThemedText style={styles.profileText}>
+            Email: {user[0].email}
+          </ThemedText>
+          <ThemedText style={styles.profileText}>
+            Phone: {user[0].phone}
+          </ThemedText>
+        </ThemedView>
       </ThemedView>
       <ThemedView style={styles.buttons}>
         <ThemedView style={styles.logoutButton}>
@@ -108,7 +109,7 @@ const styles = StyleSheet.create({
   },
   stepContainer: {
     gap: 8,
-    marginTop: 20,
+    marginTop: -25,
     marginBottom: 8,
     marginLeft: 10,
     marginRight: 10,
@@ -116,7 +117,7 @@ const styles = StyleSheet.create({
   buttons: {
     flexDirection: 'row',
     position: 'relative',
-    top: 120,
+    top: 80,
     alignSelf: 'center'
   },
   editButton: {
@@ -126,5 +127,18 @@ const styles = StyleSheet.create({
   logoutButton: {
     width: 110,
     marginRight: 20
+  },
+  profileTextContainer: {
+    marginTop: 10
+  },
+  profileText: {
+    fontSize: 20,
+    marginTop: 15
+  },
+  pfpImage : {
+    overflow: "hidden",
+    width: 130,
+    height: 130,
+    borderRadius: 130/2
   }
 });

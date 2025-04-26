@@ -117,14 +117,13 @@ export default function EditProfileComp() {
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1}} scrollEnabled={true}>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title" style={styles.title}>View Profile</ThemedText>
-        <ThemedText type="subtitle" style={styles.subtitle}>View your profile here</ThemedText>
+        <ThemedText type="title" style={styles.title}>Edit Profile</ThemedText>
+        <ThemedText type="subtitle" style={styles.subtitle}>Edit your profile here</ThemedText>
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
-        <Image 
-            source={{
-                uri: 'https://static.vecteezy.com/system/resources/thumbnails/009/734/564/small/default-avatar-profile-icon-of-social-media-user-vector.jpg'
-            }} 
+        <Image
+          style={styles.pfpImage}
+          source={require('../assets/images/test.png')}
         />
         <Controller
           control={control}
@@ -246,14 +245,14 @@ const styles = StyleSheet.create({
   },
   stepContainer: {
     gap: 8,
-    marginTop: 20,
+    marginTop: -5,
     marginBottom: 8,
     marginLeft: 10,
     marginRight: 10,
   },
   input: {
     height: 40,
-    margin: 12,
+    margin: 5,
     borderWidth: 1,
     padding: 10,
     borderColor: 'white',
@@ -262,7 +261,7 @@ const styles = StyleSheet.create({
   buttons: {
     flexDirection: 'row',
     position: 'relative',
-    top: 50,
+    top: 15,
     alignSelf: 'center'
   },
   saveButton: {
@@ -272,5 +271,11 @@ const styles = StyleSheet.create({
   profileButton: {
     width: 140,
     marginRight: 20
+  },
+  pfpImage : {
+    overflow: "hidden",
+    width: 130,
+    height: 130,
+    borderRadius: 130/2
   }
 });
