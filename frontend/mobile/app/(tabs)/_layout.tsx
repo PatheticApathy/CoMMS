@@ -73,12 +73,6 @@ export default function TabLayout({ children }: { children: ReactNode }) {
             }}
           />
           <Tabs.Screen
-            name="(tabs)"
-            options={{
-              href: null,
-            }}
-          />
-          <Tabs.Screen
             name="editProfile"
             options={{
               href: null,
