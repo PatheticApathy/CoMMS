@@ -47,10 +47,11 @@ const fetcher = async  (url: string) => {
   return res.json();
 };
 
-let token = getToken()
 let id = 1
 
 export default function EditProfileComp() {
+
+  let token = getToken()
 
   const identity = useContext(IdentityContext)
   const router = useRouter()
@@ -124,6 +125,9 @@ export default function EditProfileComp() {
         <Image
           style={styles.pfpImage}
           source={require('../assets/images/test.png')}
+          //source={{
+          //  uri: `${process.env.EXPO_PUBLIC_API_URL}/${user[0].profilepicture.String}`, headers: Headers
+          //}}
         />
         <Controller
           control={control}

@@ -28,10 +28,11 @@ const fetcher = async (url: string) => {
   return res.json();
 }
 
-let token = getToken()
 let id = 1
 
 export default function ProfileComp() {
+
+  let token = getToken()
 
   const identity = useContext(IdentityContext)
   const router = useRouter()
@@ -43,6 +44,9 @@ export default function ProfileComp() {
   const { data: user } = useSWR<GetUserRow[], string>(identity ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${id}` : null, fetcher)
 
   if (!user) return <ThemedText>Loading...</ThemedText>;
+
+  if (user[0].profilepicture)
+    console.log(user[0].profilepicture.String)
 
   async function logoutSubmit() {
     delTokenNIdentity()
@@ -58,7 +62,7 @@ export default function ProfileComp() {
       <ThemedView style={styles.stepContainer}>
         <Image
           style={styles.pfpImage}
-          source={require('../assets/images/test.png')}
+          source={user[0].profilepicture.Valid ? {uri: `${process.env.EXPO_PUBLIC_API_URL}/${user[0].profilepicture.String}`, headers: Headers} : require('../assets/images/test.png')}
         />
         <ThemedView style={styles.profileTextContainer}>
           <ThemedText style={styles.profileText}>
