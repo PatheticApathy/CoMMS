@@ -2,11 +2,11 @@ import CheckoutLogList from "@/components/CheckoutLogList";
 import FileSVG from "@/components/file";
 import { ScreenHeight } from "@/components/global-style";
 import MainView from "@/components/MainView";
+import MaterialButton from "@/components/MaterialAccessButton";
 import MaterialLogList from "@/components/MaterialLogList";
 import { Headers } from "@/constants/header-options";
 import { ChangeQuantity, CheckoutLog, Material, MaterialLog } from "@/material-api-types";
 import { GetUserRow } from "@/user-api-types";
-//import { Image } from 'expo-image';
 import { useLocalSearchParams } from "expo-router";
 import { Image, ActivityIndicator, StyleSheet, Text, ScrollView, View, FlatList } from "react-native";
 import useSWR, { Fetcher } from "swr";
@@ -99,11 +99,10 @@ export default function MaterialPage() {
   const ImageUrl = `${process.env.EXPO_PUBLIC_API_URL}/${material[0].picture.Valid ? material[0].picture.String : 'file.svg'}`
 
 
-  if (ImageUrl.split('.').pop() == 'svg') { }
-
   return (
     <MainView>
       <ScrollView style={{ flex: 2 }} nestedScrollEnabled={true}>
+        <MaterialButton />
         <Text style={style.ItemTitle}>{material[0].name.Valid ? material[0].name.String : 'Material'}</Text>
         <RenderImage image_url={ImageUrl} />
         <View style={{ flex: 1, justifyContent: 'center' }}>
