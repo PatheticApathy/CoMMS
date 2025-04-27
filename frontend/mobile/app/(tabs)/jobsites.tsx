@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { StyleSheet, View, Text, ActivityIndicator } from 'react-native';
-import MapView from 'react-native-maps';
+import { StyleSheet, View, Text, ActivityIndicator, Platform } from 'react-native';
+import MapView, { Polygon, Marker } from 'react-native-maps';
 import useSWR from 'swr';
 import { GetUserRow, JobSite } from '@/user-api-types';
 import { getToken, IdentityContext } from '@/components/securestore';
@@ -8,33 +8,19 @@ import { Material } from '@/material-api-types';
 import { Headers } from '@/constants/header-options';
 
 const fetchUser = async (url: string): Promise<GetUserRow[]> => {
-  try {
-    const res = await fetch(url, {
-      headers: Headers,
-    });
-    if (!res.ok) {
-      console.error(`fetchUser failed: ${res.status} ${res.statusText}`);
-      throw new Error('Failed to fetch data');
-    }
-    return res.json();
-  } catch (error) {
-    console.error('fetchUser error:', error);
-    throw error;
-  }
+  const res = await fetch(url, { headers: Headers });
+  if (!res.ok) throw new Error('Failed to fetch user data');
+  return res.json();
 };
 
 const jobSiteFetcher = async (url: string): Promise<JobSite> => {
-  const res = await fetch(url, {
-    headers: Headers,
-  });
-  if (!res.ok) throw new Error('Failed to fetch job sites');
+  const res = await fetch(url, { headers: Headers });
+  if (!res.ok) throw new Error('Failed to fetch job site data');
   return res.json();
 };
 
 const materialFetcher = async (url: string): Promise<Material[]> => {
-  const res = await fetch(url, {
-    headers: Headers,
-  });
+  const res = await fetch(url, { headers: Headers });
   if (!res.ok) throw new Error('Failed to fetch materials');
   return res.json();
 };
@@ -51,17 +37,16 @@ export default function Jobsites() {
     currentUser && currentUser[0].jobsite_id.Valid
       ? `${process.env.EXPO_PUBLIC_API_URL}/api/sites/search?id=${currentUser[0].jobsite_id.Int64}`
       : null,
-    jobSiteFetcher,
+    jobSiteFetcher
   );
 
   const { data: materials, error: errorMaterials } = useSWR<Material[]>(
     currentUser
-      ? `${process.env.EXPO_PUBLIC_API_URL}/api/material/material/search?site=${currentUser[0].jobsite_id.Valid
-        ? currentUser[0].jobsite_id.Int64
-        : undefined
-      }`
+      ? `${process.env.EXPO_PUBLIC_API_URL}/api/material/material/search?site=${
+          currentUser[0].jobsite_id.Valid ? currentUser[0].jobsite_id.Int64 : undefined
+        }`
       : null,
-    materialFetcher,
+    materialFetcher
   );
 
   const [zonePolygon, setZonePolygon] = useState<any | null>(null);
@@ -106,23 +91,68 @@ export default function Jobsites() {
     );
   }
 
+  // Check if the platform is iOS
+  if (Platform.OS !== 'ios') {
+    return (
+      <View style={styles.centered}>
+        <Text>Maps are only available on iOS</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.map}>
-      <MapView style={styles.map}
+      <MapView
+        style={styles.map}
+        initialRegion={{
+          latitude: lat,
+          longitude: lng,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        }}
+      >
+        {/* Job Site Polygon */}
+        {zonePolygon && (
+          <Polygon
+            coordinates={zonePolygon}
+            strokeColor="purple"
+            fillColor="rgba(128, 0, 128, 0.2)"
+            strokeWidth={2}
+          />
+        )}
 
-      />
+        {/* Material Markers */}
+        {materials.map((material) => {
+          const hasCoords =
+            material.location_lat?.Valid &&
+            material.location_lng?.Valid &&
+            typeof material.location_lat.Float64 === 'number' &&
+            typeof material.location_lng.Float64 === 'number';
+
+          if (!hasCoords) return null;
+
+          return (
+            <Marker
+              key={material.id}
+              coordinate={{
+                latitude: material.location_lat.Float64,
+                longitude: material.location_lng.Float64,
+              }}
+              title={material.name?.Valid ? material.name.String : 'Unnamed Material'}
+              description={`Type: ${
+                material.type?.Valid ? material.type.String : 'Unknown'
+              }\nQty: ${material.quantity} ${material.unit}`}
+            />
+          );
+        })}
+      </MapView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  mapContainer: {
-    flex: 1,
-  },
   map: {
-    width: '100%',
-    height: '100%'
+    flex: 1,
   },
   centered: {
     flex: 1,
