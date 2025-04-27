@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 "use client"
 
 import {
@@ -24,10 +26,12 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import useSWR from "swr"
-import { Firstname, Lastname, GetUserRow, UpdateProfileParams } from "@/user-api-types"
+import { toast } from "sonner"
+import { GetUserRow, UpdateProfileParams } from "@/user-api-types"
 import { IdentityContext, getToken } from "@/components/identity-provider"
 import { useContext } from "react"
 import Image from "next/image"
+import FormFileInput from "./form-maker/form-dropzone"
 
 const formSchema = z.object({
   username: z.string(),
@@ -35,6 +39,7 @@ const formSchema = z.object({
   lastname: z.string(),
   email: z.string(),
   phone: z.string(),
+  picture: z.instanceof(FileList).optional(),
 })
 
 
@@ -43,7 +48,7 @@ async function changeProfile(url: string, { arg }: { arg: UpdateProfileParams })
     method: 'PUT',
     headers: { 'Authorization': getToken() },
     body: JSON.stringify(arg)
-  }).then(res => res.json())
+  })
 }
 
 const fetcher = async (url: string) => {
@@ -56,9 +61,12 @@ const fetcher = async (url: string) => {
   return res.json();
 };
 
+const AddPicture = async (url: string, { arg }: { arg: { type: string, file: Blob } }) => await fetch(url, { headers: { 'Content-Type': `image/${arg.type}` }, method: 'POST', body: arg.file });
+
 export function EditProfile() {
   const identity = useContext(IdentityContext)
   const { trigger, error, isMutating } = useSWRMutation('/api/user/update', changeProfile, { throwOnError: false })
+  const { trigger: download } = useSWRMutation('api/picture', AddPicture)
   const { data: user, error: error3 } = useSWR<GetUserRow[], string>(identity ? `/api/user/search?id=${identity.id}` : undefined, fetcher)
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -68,6 +76,7 @@ export function EditProfile() {
       lastname: user[0].lastname.Valid ? user[0].lastname.String : "",
       email: user[0].email,
       phone: user[0].phone,
+      picture: undefined,
     } :
       {
         username: "",
@@ -75,6 +84,7 @@ export function EditProfile() {
         lastname: "",
         email: "",
         phone: "",
+        picture: undefined,
       }
     ,
   })
@@ -87,36 +97,67 @@ export function EditProfile() {
   if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
 
   async function profileSubmit(values: z.infer<typeof formSchema>) {
-    const username = {
-      String: values.username,
-      Valid: Boolean(values.username)
-    }
-    const firstname: Firstname = {
-      String: values.firstname,
-      Valid: Boolean(values.firstname)
-    }
-    const lastname: Lastname = {
-      String: values.lastname,
-      Valid: Boolean(values.lastname)
-    }
-    const email = {
-      String: values.email,
-      Valid: Boolean(values.email)
-    }
-    const phone = {
-      String: values.phone,
-      Valid: Boolean(values.phone)
-    }
 
     const values2: UpdateProfileParams = {
-      username,
-      firstname,
-      lastname,
-      email,
-      phone,
+      username: {
+        Valid: Boolean(values.username),
+        String: values.username
+      },
+      firstname: {
+        Valid: Boolean(values.firstname),
+        String: values.firstname
+      },
+      lastname: {
+        Valid: Boolean(values.lastname),
+        String: values.lastname
+      },
+      email: {
+        Valid: Boolean(values.email),
+        String: values.email
+      },
+      phone: {
+        Valid: Boolean(values.phone),
+        String: values.phone
+      },
+      profilepicture: {
+        Valid: true,
+        String: "/test.png"
+      },
       ID: identity ? identity.id : 0,
     }
-    trigger(values2)
+
+    try {
+      console.log(values.picture)
+      if (values.picture && values.picture?.length > 0) {
+        toast.message("Sending picture")
+        const extension = values.picture[0].name.split('.').pop()
+        if (!extension) {
+          toast.error("Invalid file extension")
+          return
+        }
+        const resp = await download({ type: extension, file: values.picture[0] })
+        if (!resp.ok) {
+          console.log("Resp 1: ", resp)
+          const message = await resp.json() as { message : string }
+          console.log("Message: ", message)
+          toast.error(message.message || "Error has occurred")
+          return
+        }
+        const name = await resp.json() as { name: string }
+        values2.profilepicture.String = `/${name.name}`
+      }
+
+      console.log(`File name is ${values2.profilepicture.String}`)
+      const resp = await trigger(values2)
+      if (!resp.ok) {
+        console.log("Resp 2: ", resp)
+        toast.error(await resp.text() || "Error has occurred")
+        return
+      }
+    } catch (err: any) {
+      console.log(err)
+      toast.error(err.message || "Error has occurred")
+    }
   }
 
   return (
@@ -131,9 +172,10 @@ export function EditProfile() {
             <DialogDescription>Edit your profile here. Click Save Changes when you&apos;re done.</DialogDescription>
           </DialogHeader>
           <form onSubmit={form.handleSubmit(profileSubmit)} className="space-y-8">
-            <div className="rounded-full overflow-hidden h-28 w-28">
-              <Image alt='Profile picture' src="/default-avatar-profile-icon-of-social-media-user-vector.jpg" width={120} height={120} />
-            </div>
+              <div className="rounded-full overflow-hidden h-28 w-28">
+                <Image alt='Profile picture' src={user[0].profilepicture.Valid ? user[0].profilepicture.String : '/test.png'} width={120} height={120}></Image>
+              </div>
+            <FormFileInput name="picture" placeholder="Add picture" description="" form={form}/>
             <FormField
               control={form.control}
               name="username"

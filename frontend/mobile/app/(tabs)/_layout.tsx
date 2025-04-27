@@ -82,6 +82,12 @@ export default function TabLayout({ children }: { children: ReactNode }) {
             href: null,
           }}
         />
+        <Tabs.Screen
+          name="securestore"
+          options={{
+            href: null,
+          }}
+        />
       </Tabs>
     </>
   );

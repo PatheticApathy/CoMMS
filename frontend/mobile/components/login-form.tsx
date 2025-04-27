@@ -1,4 +1,4 @@
-import { StyleSheet, Button, TextInput, Text } from 'react-native';
+import { StyleSheet, Button, TextInput, Text, View } from 'react-native';
 import { Link, Redirect, router } from 'expo-router';
 import React from 'react';
 import { z } from "zod";
@@ -8,7 +8,7 @@ import useSWRMutation from 'swr/mutation'
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { LogInUser } from "@/user-api-types"
-import { setToken } from "@/components/securestore"
+import { setToken, delTokenNIdentity } from "@/components/securestore"
 
 const formSchema = z.object({
   username: z.string().nonempty(),
@@ -28,7 +28,7 @@ async function logIn(url: string, { arg }: { arg: LogInUser }) {
 
 export default function LoginForm() {
 
-  const { trigger, error, isMutating } = useSWRMutation(`${process.env.EXPO_PUBLIC_API_URL}/api/user/login`, logIn)
+  const { trigger } = useSWRMutation(`${process.env.EXPO_PUBLIC_API_URL}/api/user/login`, logIn)
 
   const {
     control,
@@ -56,13 +56,13 @@ export default function LoginForm() {
     }
   }
 
-  if (error) { <Text>{error.message}</Text> }
+  //if (error) { <Text>{error.message}</Text> }
   return (
-    <ThemedView>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title" style={styles.title}>Login</ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
+    <View>
+      <View style={styles.titleContainer}>
+        <Text style={styles.title}>Login</Text>
+      </View>
+      <View style={styles.stepContainer}>
         <Controller
           control={control}
           rules={{
@@ -98,15 +98,15 @@ export default function LoginForm() {
           )}
           name="password"
         />
-      </ThemedView>
-      <ThemedView style={styles.button}>
+      </View>
+      <View style={styles.button}>
         <Button title="Login" onPress={handleSubmit(onSubmit)}></Button>
-        <ThemedText style={styles.signUpText}>Don't Have an Account?</ThemedText>
+        <Text style={styles.signUpText}>Don't Have an Account?</Text>
         <Link href="/signup" asChild>
-          <ThemedText style={styles.signUpLink}>Sign Up!</ThemedText>
+          <Text style={styles.signUpLink}>Sign Up!</Text>
         </Link>
-      </ThemedView>
-    </ThemedView>
+      </View>
+    </View>
   );
 }
 
@@ -122,7 +122,9 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   title: {
+    paddingTop: 30,
     fontSize: 30,
+    color: 'white'
   },
   subtitle: {
     fontSize: 20,
