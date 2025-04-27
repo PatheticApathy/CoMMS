@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Platform, StyleSheet, View, Text, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, Text, ActivityIndicator } from 'react-native';
+import MapView from 'react-native-maps';
 import useSWR from 'swr';
 import { GetUserRow, JobSite } from '@/user-api-types';
 import { getToken, IdentityContext } from '@/components/securestore';
@@ -55,11 +56,10 @@ export default function Jobsites() {
 
   const { data: materials, error: errorMaterials } = useSWR<Material[]>(
     currentUser
-      ? `${process.env.EXPO_PUBLIC_API_URL}/api/material/material/search?site=${
-          currentUser[0].jobsite_id.Valid
-            ? currentUser[0].jobsite_id.Int64
-            : undefined
-        }`
+      ? `${process.env.EXPO_PUBLIC_API_URL}/api/material/material/search?site=${currentUser[0].jobsite_id.Valid
+        ? currentUser[0].jobsite_id.Int64
+        : undefined
+      }`
       : null,
     materialFetcher,
   );
@@ -106,22 +106,23 @@ export default function Jobsites() {
     );
   }
 
-  let AppleMaps;
-  if (Platform.OS === 'ios') {
-    AppleMaps = require('expo-maps')
-    return (
-      <AppleMaps.View
-        style={styles.map}
+
+  return (
+    <View style={styles.map}>
+      <MapView style={styles.map}
+
       />
-    );
-  } else {
-    return <Text>Maps are only available on iOS</Text>;
-  }
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-  map: {
+  mapContainer: {
     flex: 1,
+  },
+  map: {
+    width: '100%',
+    height: '100%'
   },
   centered: {
     flex: 1,

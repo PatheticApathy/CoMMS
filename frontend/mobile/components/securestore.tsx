@@ -1,7 +1,7 @@
 import * as SecureStore from 'expo-secure-store';
 import { Token } from "@/user-api-types"
 import { createContext, ReactNode, useEffect, useState } from "react"
-import { Redirect, router } from 'expo-router';
+import { router } from 'expo-router';
 import { Notify } from './notify';
 import { Headers } from '@/constants/header-options';
 
