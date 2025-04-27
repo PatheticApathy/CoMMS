@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Control, Controller } from "react-hook-form"
 import { KeyboardTypeOptions, TextInput } from "react-native"
-export default function FormInput({ value, placeholder, keyboardType, OnChangeText }: { value: string, placeholder: string, keyboardtype: KeyboardTypeOptions | undefined, OnChangeText: (text: string) => void }) {
+export default function FormInput({ value, placeholder, keyboardtype, OnChangeText }: { value: string, placeholder: string, keyboardtype: KeyboardTypeOptions | undefined, OnChangeText: (text: string) => void }) {
   //NOTE: ignore the styling error
   return (
     <TextInput
@@ -9,7 +9,7 @@ export default function FormInput({ value, placeholder, keyboardType, OnChangeTe
       placeholder={placeholder}
       onChangeText={(text) => { OnChangeText(text) }}
       value={value}
-      keyboardType={keyboardType || 'default'}
+      keyboardType={keyboardtype || 'default'}
     />
   )
 }

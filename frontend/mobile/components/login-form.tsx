@@ -28,7 +28,7 @@ async function logIn(url: string, { arg }: { arg: LogInUser }) {
 
 export default function LoginForm() {
 
-  const { trigger } = useSWRMutation(`${process.env.EXPO_PUBLIC_API_URL}/api/user/login`, logIn)
+  const { trigger, error } = useSWRMutation(`${process.env.EXPO_PUBLIC_API_URL}/api/user/login`, logIn)
 
   const {
     control,
