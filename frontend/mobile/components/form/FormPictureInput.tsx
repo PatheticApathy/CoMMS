@@ -89,6 +89,7 @@ const style = StyleSheet.create({
   buttonstyle:
   {
     margin: 20,
+    padding: 15,
     flex: 1,
     backgroundColor: 'gray',
     borderRadius: 20,
@@ -98,7 +99,6 @@ const style = StyleSheet.create({
   },
   pictureSelectorContainer:
   {
-    flex: 1,
     flexDirection: 'row',
   }
 })

@@ -1,6 +1,6 @@
 import FormInput from '@/components/form/form-input';
 import { ScreenHeight } from '@/components/global-style';
-import { Headers } from '@/components/header-options';
+import { Headers } from '@/constants/header-options';
 import MainView from '@/components/MainView';
 import { Notify } from '@/components/notify';
 import { AddMaterial, Material } from '@/material-api-types';
@@ -168,7 +168,7 @@ const AddMaterials = () => {
 
   //make button change colores on submission
   return (
-    <FormModalView>
+    <FormModalView title='Add New Material'>
       <DisplayJobSites />
       <FormInput value={name} keyboardtype='default' placeholder="Name" OnChangeText={setName} />
       <FormInput value={quantity} keyboardtype='number-pad' placeholder="Quantity" OnChangeText={setQuantity} />
