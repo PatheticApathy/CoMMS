@@ -110,7 +110,7 @@ export default function ContactsTable({ searchQuery, tableData, tableAction }: {
                 <DialogDescription>View {user.username}&apos;s Profile</DialogDescription>
               </DialogHeader>
               <div className="rounded-full overflow-hidden h-28 w-28">
-                  <Image alt='Yapper' className="" src="/default-avatar-profile-icon-of-social-media-user-vector.jpg" width={120} height={120} />
+                  <Image alt='Yapper' className="" src={user.profilepicture.Valid ? user.profilepicture.String : '/test.png'} width={120} height={120} />
               </div>
               <div>Username: {user.username}</div>
               <div>Name: {user.firstname.Valid ? user.firstname.String : "N/A"} {user.lastname.Valid ? user.lastname.String : "N/A"}</div>

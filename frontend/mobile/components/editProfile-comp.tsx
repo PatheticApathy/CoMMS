@@ -7,8 +7,10 @@ import useSWR from "swr"
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, Controller } from 'react-hook-form';
-import { User, Firstname, Lastname } from '@/user-api-types'
-import { getToken } from '@/components/securestore'
+import { GetUserRow, Firstname, Lastname } from '@/user-api-types'
+import { getToken, IdentityContext } from '@/components/securestore'
+import { useContext } from "react"
+import { Headers } from '@/constants/header-options'
 
 const formSchema = z.object({
   username: z.string(),
@@ -18,45 +20,50 @@ const formSchema = z.object({
   phone: z.string(),
 })
 
-async function getProfileArgs(url: string, arg: {token: string}) {
+async function getProfileArgs(url: string, arg: string) {
   return fetch(url, {
-      method: 'POST',
-      body: JSON.stringify(arg)
+    method: 'POST',
+    headers: Headers,
+    redirect: 'follow',
+    body: arg
   }).then(res => res.json())
 }
 
 async function changeProfile(url: string, { arg }) {
   return fetch(url, {
+      headers: Headers,
       method: 'PUT',
       body: JSON.stringify(arg)
   }).then(res => res.json())
 }
 
 const fetcher = async  (url: string) => {
-  const res = await fetch(url)
+  const res = await fetch(url, {
+    headers: Headers
+  })
   if (!res.ok) {
     throw new Error("Failed to fetch data");
   }
   return res.json();
 };
 
+let id = 1
+
 export default function EditProfileComp() {
 
+  let token = getToken()
+
+  const identity = useContext(IdentityContext)
   const router = useRouter()
 
-  const { data, trigger, error, isMutating } = useSWRMutation('https://4ba1-138-47-128-9.ngrok-free.app/user/update', changeProfile, {throwOnError: false})
-
-  let token = getToken()
-  let id = 1
-
-  const { data: tokenData, error: error2 } = useSWR(['https://4ba1-138-47-128-9.ngrok-free.app/user/decrypt', token], ([url, token]) => getProfileArgs(url, token))
+  const { data: tokenData } = useSWR([`${process.env.EXPO_PUBLIC_API_URL}/api/user/decrypt`, token], ([url, token]) => getProfileArgs(url, token))
   if (tokenData)
-      id = tokenData.id
+    id = tokenData.id
 
-  const { data: user, error: error3, mutate: userMutate } = useSWR<User, string>(`https://4ba1-138-47-128-9.ngrok-free.app/user/search?id=${id}`, fetcher)
-    userMutate()
+  const { trigger } = useSWRMutation(`${process.env.EXPO_PUBLIC_API_URL}/api/user/update`, changeProfile, {throwOnError: false})
 
-  if (error3) return <ThemedText>Error loading Profile.</ThemedText>;
+  const { data: user, mutate: userMutate } = useSWR<GetUserRow[], string>(identity ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${id}` : null, fetcher)
+
   if (!user) return <ThemedText>Loading...</ThemedText>;  
 
   const {
@@ -66,15 +73,13 @@ export default function EditProfileComp() {
   } = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: user.username,
-      firstname: user.firstname.Valid? user.firstname.String : "",
-      lastname: user.lastname.Valid? user.lastname.String : "",
-      email: user.email,
-      phone: user.phone,
+      username: user[0].username,
+      firstname: user[0].firstname.Valid? user[0].firstname.String : "",
+      lastname: user[0].lastname.Valid? user[0].lastname.String : "",
+      email: user[0].email,
+      phone: user[0].phone,
     },
   })
-
-  if (isMutating) { return (<ThemedText>Loading</ThemedText>) }
 
   async function profileSubmit(values: z.infer<typeof formSchema>) {
     const username: Firstname = {
@@ -103,23 +108,26 @@ export default function EditProfileComp() {
       lastname,
       email,
       phone,
-      ID: id,
+      ID: identity ? id : 0,
     }
     trigger(values2)
+    userMutate()
     router.navigate('/profile')
   }
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1}} scrollEnabled={true}>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title" style={styles.title}>View Profile</ThemedText>
-        <ThemedText type="subtitle" style={styles.subtitle}>View your profile here</ThemedText>
+        <ThemedText type="title" style={styles.title}>Edit Profile</ThemedText>
+        <ThemedText type="subtitle" style={styles.subtitle}>Edit your profile here</ThemedText>
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
-        <Image 
-            source={{
-                uri: 'https://static.vecteezy.com/system/resources/thumbnails/009/734/564/small/default-avatar-profile-icon-of-social-media-user-vector.jpg'
-            }} 
+        <Image
+          style={styles.pfpImage}
+          source={require('../assets/images/test.png')}
+          //source={{
+          //  uri: `${process.env.EXPO_PUBLIC_API_URL}/${user[0].profilepicture.String}`, headers: Headers
+          //}}
         />
         <Controller
           control={control}
@@ -241,14 +249,14 @@ const styles = StyleSheet.create({
   },
   stepContainer: {
     gap: 8,
-    marginTop: 20,
+    marginTop: -5,
     marginBottom: 8,
     marginLeft: 10,
     marginRight: 10,
   },
   input: {
     height: 40,
-    margin: 12,
+    margin: 5,
     borderWidth: 1,
     padding: 10,
     borderColor: 'white',
@@ -257,7 +265,7 @@ const styles = StyleSheet.create({
   buttons: {
     flexDirection: 'row',
     position: 'relative',
-    top: 50,
+    top: 15,
     alignSelf: 'center'
   },
   saveButton: {
@@ -267,5 +275,11 @@ const styles = StyleSheet.create({
   profileButton: {
     width: 140,
     marginRight: 20
+  },
+  pfpImage : {
+    overflow: "hidden",
+    width: 130,
+    height: 130,
+    borderRadius: 130/2
   }
 });
