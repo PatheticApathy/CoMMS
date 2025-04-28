@@ -48,32 +48,34 @@ export default function Dashboard({jobsite, jobsites, materials, }: { jobsite: J
       <div>
         <h2 className="text-xl font-semibold mb-4">Other Jobsites</h2>
         <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-4">
-          {filteredJobsites && filteredJobsites.length > 0 ? (
+            {filteredJobsites && filteredJobsites.length > 0 ? (
             filteredJobsites.map((site) => {
               const recentMaterial = getMostRecentMaterial(site.id);
               return (
-                <Card className="@container/card cursor-pointer bg-accent text-surface border border-secondary hover:shadow-lg transition-shadow">
-                  <CardHeader className="bg-accent text-primary rounded-t-xl">
-                    <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums text-surface">
-                      {site.name || "No Name Available"}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardFooter className="flex-col items-start gap-1 text-sm text-surface bg-accent rounded-b-xl">
-                    <div className="line-clamp-1 flex gap-2 font-medium">
-                      Address: {site.addr?.Valid ? site.addr.String : "No Address Available"}
-                    </div>
-                    <div className="text-muted-foreground">
-                      {recentMaterial
-                        ? `Most Recent Material: ${recentMaterial.name.String} (${recentMaterial.quantity})`
-                        : "No Materials Available"}
-                    </div>
-                  </CardFooter>
-                </Card>
+              <Card
+                key={site.id}
+                className="@container/card cursor-pointer bg-accent text-surface border border-secondary hover:shadow-lg transition-shadow">
+                <CardHeader className="bg-accent text-primary rounded-t-xl">
+                <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums text-surface">
+                  {site.name || "No Name Available"}
+                </CardTitle>
+                </CardHeader>
+                <CardFooter className="flex-col items-start gap-1 text-sm text-surface bg-accent rounded-b-xl">
+                <div className="line-clamp-1 flex gap-2 font-medium">
+                  Address: {site.addr?.Valid ? site.addr.String : "No Address Available"}
+                </div>
+                <div className="text-muted-foreground">
+                  {recentMaterial
+                  ? `Most Recent Material: ${recentMaterial.name.String} (${recentMaterial.quantity})`
+                  : "No Materials Available"}
+                </div>
+                </CardFooter>
+              </Card>
               );
             })
-          ) : (
+            ) : (
             <p className="text-muted-foreground">No other jobsites available.</p>
-          )}
+            )}
         </div>
       </div>
     </div>

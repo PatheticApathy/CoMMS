@@ -81,7 +81,7 @@ const fetchJobsites = async (url: string): Promise<JobSite[]> => {
 
 
 
-const Columns = (companies: Company[] | undefined, jobsites: JobSite[] | undefined): ColumnDef<User>[] => ([
+const Columns = (_companies: Company[] | undefined, _jobsites: JobSite[] | undefined): ColumnDef<User>[] => ([
   {
     id: "select",
     header: ({ table }) => (
