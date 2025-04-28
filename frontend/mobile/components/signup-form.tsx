@@ -35,7 +35,7 @@ async function signUp(url: string, { arg }: { arg: SignUpUser }) {
     },
     method: 'POST',
     body: JSON.stringify(arg)
-  }).then(res => res.text())
+  })
 }
 
 export default function SignupForm() {
