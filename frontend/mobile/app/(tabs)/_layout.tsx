@@ -6,7 +6,7 @@ import { HapticTab } from '@/components/HapticTab';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import IdentityProvider from '@/components/securestore';
 
 export default function TabLayout({ children }: { children: ReactNode }) {
@@ -58,11 +58,10 @@ export default function TabLayout({ children }: { children: ReactNode }) {
             }}
           />
           <Tabs.Screen
-            name="company"
+            name="admin"
             options={{
-              href: null,
-              title: 'Company',
-              tabBarIcon: ({ color }) => <MaterialCommunityIcons size={28} name="office-building" color={color} />,
+              title: 'Admin',
+              tabBarIcon: ({ color }) => <MaterialIcons name="admin-panel-settings" size={24} color={color} />,
             }}
           />
           <Tabs.Screen

@@ -2,49 +2,59 @@ import { StyleSheet, Button, Image } from 'react-native';
 import { Link } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { getToken, delTokenNIdentity } from '@/components/securestore'
-import useSWR from 'swr'
-import { User } from '@/user-api-types'
-import { useRouter } from 'expo-router'
-import { Headers } from '@/constants/header-options';
+import { getToken, delTokenNIdentity } from '@/components/securestore';
+import useSWR from 'swr';
+import { User } from '@/user-api-types';
+import { useRouter } from 'expo-router';
+import { getHeaders } from '@/constants/header-options';
+import { useEffect, useState } from 'react';
 
 async function getProfileArgs(url: string, arg: string) {
+  const headers = await getHeaders();
   return fetch(url, {
     method: 'POST',
-    headers: Headers,
+    headers,
     redirect: 'follow',
-    body: arg
-  }).then(res => res.json())
+    body: arg,
+  }).then((res) => res.json());
 }
 
 const fetcher = async (url: string) => {
-  const res = await fetch(url, {
-    headers: Headers,
-  })
+  const headers = await getHeaders();
+  const res = await fetch(url, { headers });
   if (!res.ok) {
-    throw new Error("Failed to fetch");
+    throw new Error('Failed to fetch');
   }
   return res.json();
-}
+};
 
 export default function ProfileComp() {
+  const router = useRouter();
+  const [id, setId] = useState<number | null>(null);
 
-  const router = useRouter()
+  useEffect(() => {
+    async function fetchToken() {
+      const token = await getToken();
+      if (token) {
+        const tokenData = await getProfileArgs(`${process.env.EXPO_PUBLIC_API_URL}/api/user/decrypt`, token);
+        if (tokenData) {
+          setId(tokenData.id);
+        }
+      }
+    }
+    fetchToken();
+  }, []);
 
-  let token = getToken()
-  let id = 1
-
-  const { data: tokenData, error: error2 } = useSWR([`${process.env.EXPO_PUBLIC_API_URL}/api/user/decrypt`, token], ([url, token]) => getProfileArgs(url, token))
-  if (tokenData)
-    id = tokenData.id
-
-  const { data: user, error: error3 } = useSWR<User, string>(`${process.env.API}/api/user/search?id=${id}`, fetcher)
+  const { data: user, error } = useSWR<User, string>(
+    id ? `${process.env.API}/api/user/search?id=${id}` : null,
+    fetcher
+  );
 
   if (!user) return <ThemedText>Loading...</ThemedText>;
 
   async function logoutSubmit() {
-    delTokenNIdentity()
-    router.navigate('/')
+    delTokenNIdentity();
+    router.navigate('/');
   }
 
   return (
@@ -56,21 +66,15 @@ export default function ProfileComp() {
       <ThemedView style={styles.stepContainer}>
         <Image
           source={{
-            uri: 'https://static.vecteezy.com/system/resources/thumbnails/009/734/564/small/default-avatar-profile-icon-of-social-media-user-vector.jpg'
+            uri: 'https://static.vecteezy.com/system/resources/thumbnails/009/734/564/small/default-avatar-profile-icon-of-social-media-user-vector.jpg',
           }}
         />
+        <ThemedText>Username: {user.username}</ThemedText>
         <ThemedText>
-          Username: {user.username}
+          Name: {user.firstname.Valid ? user.firstname.String : 'N/A'} {user.lastname.Valid ? user.lastname.String : 'N/A'}
         </ThemedText>
-        <ThemedText>
-          Name: {user.firstname.Valid ? user.firstname.String : "N/A"} {user.lastname.Valid ? user.lastname.String : "N/A"}
-        </ThemedText>
-        <ThemedText>
-          Email: {user.email}
-        </ThemedText>
-        <ThemedText>
-          Phone: {user.phone}
-        </ThemedText>
+        <ThemedText>Email: {user.email}</ThemedText>
+        <ThemedText>Phone: {user.phone}</ThemedText>
       </ThemedView>
       <ThemedView style={styles.buttons}>
         <ThemedView style={styles.logoutButton}>
@@ -115,14 +119,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     position: 'relative',
     top: 120,
-    alignSelf: 'center'
+    alignSelf: 'center',
   },
   editButton: {
     width: 110,
-    marginLeft: 20
+    marginLeft: 20,
   },
   logoutButton: {
     width: 110,
-    marginRight: 20
-  }
+    marginRight: 20,
+  },
 });

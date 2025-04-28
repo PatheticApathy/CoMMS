@@ -1,5 +1,5 @@
 import { cookies } from "next/headers"
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { SidebarProvider } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/comms-sidebar"
 import IdentityProvider from "@/components/identity-provider";
 
@@ -18,7 +18,6 @@ export default async function DashBoardLayout({
       <SidebarProvider defaultOpen={defaultOpen}>
         <AppSidebar />
         <main>
-          <SidebarTrigger />
           <IdentityProvider>
             {children}
           </IdentityProvider>

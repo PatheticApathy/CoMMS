@@ -1,7 +1,7 @@
 import FileSVG from "@/components/file";
 import { ScreenHeight } from "@/components/global-style";
 import MainView from "@/components/MainView";
-import { Headers } from "@/constants/header-options";
+import { getHeaders } from "@/constants/header-options";
 import { Material } from "@/material-api-types";
 //import { Image } from 'expo-image';
 import { useLocalSearchParams } from "expo-router";
@@ -9,7 +9,7 @@ import { Image, ActivityIndicator, StyleSheet, Text, ScrollView } from "react-na
 import useSWR, { Fetcher } from "swr";
 
 const fetcher: Fetcher<Material[], string> = async (...args) => fetch(...args, {
-  headers: Headers
+  headers: await getHeaders()
 }).then(res => res.json())
 
 const RenderImage = ({ image_url }: { image_url: string }) => {
