@@ -47,6 +47,8 @@ const AddMaterials = () => {
   const [status, setStatus] = useState('In Stock');
   const [type, setType] = useState('');
   const [unit, setUnit] = useState('');
+  // const [location_lat, setLocationLat] = useState(''); //Needed for map marker.
+  // const [location_lng, setLocationLng] = useState(''); //Set in map view.
   const [[picture, extension], setPicture] = useState<[Blob | undefined, string]>([undefined, '']);
 
   const [isDownloading, setDownload] = useState(false);
@@ -72,6 +74,8 @@ const AddMaterials = () => {
       status,
       type,
       unit,
+      // location_lat, //not used for now
+      // location_lng, //not used for now
       picture
     })
 
@@ -98,6 +102,16 @@ const AddMaterials = () => {
           String: values.type
         },
         unit: values.unit,
+        // location_lat: values.location_lat,
+        // type:{
+        //  Valid: true,
+        //  Float64: values.location_lat
+        // },                                       // not used for now
+        // location_lng: values.location_lng,
+        // type:{
+        //  Valid: true,
+        //  Float64: values.location_lng
+        // },
         picture: { Valid: true, String: "/file.svg" }
       };
 
@@ -176,6 +190,8 @@ const AddMaterials = () => {
       <FormInput value={unit} keyboardtype='default' placeholder="Unit" OnChangeText={setUnit} />
       <ComboboxFormField default_label={status} options={status_opts} OnClickSet={setStatus} />
       <FormPictueInput OnPicture={setPicture} />
+      {/* Some form of material add map that will allow you to place the marker.
+          react-native-maps does have a lot of dynamic markers to use.          */}
       {isDownloading ? <Button title='sending' /> : <Button onPress={async () => { await SendAddMaterialRequest() }} title='Add Material' />}
     </FormModalView>
   )
