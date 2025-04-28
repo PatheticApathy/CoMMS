@@ -81,7 +81,7 @@ const fetchJobsites = async (url: string): Promise<JobSite[]> => {
 
 
 
-const Columns = (_companies: Company[] | undefined, _jobsites: JobSite[] | undefined): ColumnDef<User>[] => ([
+const Columns = (): ColumnDef<User>[] => ([
   {
     id: "select",
     header: ({ table }) => (
@@ -173,14 +173,12 @@ const Columns = (_companies: Company[] | undefined, _jobsites: JobSite[] | undef
 
 export default function ContactsTable() {
   const { data, error } = useSWR<UserJoin[]>("/api/user/join", fetcher);
-  const { data: companies } = useSWR<Company[]>("/api/company/all", fetchCompanies);
-  const { data: jobsites } = useSWR<JobSite[]>("/api/sites/all", fetchJobsites);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] =
     useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const columns = Columns(companies, jobsites)
+  const columns = Columns()
   const identity = useContext(IdentityContext)
 
   const { data: currentuser, error: error2 } = useSWR<GetUserRow[], string>(identity ? `/api/user/search?id=${identity?.id}` : null, fetchUser);
