@@ -95,7 +95,7 @@ export default function MaterialForm({ route }: { route: string | undefined }) {
         const resp = await download({ type: extension, file: values.picture[0] })
         if (!resp.ok) {
           const message = await resp.json() as { message: string }
-          toast.error(message.message || "Error has occured");
+          toast.error(message.message || "Error has occurred");
           return
         }
         const name = await resp.json() as { name: string }
@@ -105,7 +105,7 @@ export default function MaterialForm({ route }: { route: string | undefined }) {
       console.log(`File name is ${payload.picture.String}`)
       const resp = await trigger(payload)
       if (!resp.ok) {
-        toast.error(await resp.text() || "Error has occured");
+        toast.error(await resp.text() || "Error has occurred");
         return
       }
       const data = await resp.json() as Material

@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { LogInUser } from "@/user-api-types"
 import { setToken } from "@/components/identity-provider"
+import { toast } from "sonner"
 
 const formSchema = z.object({
   username: z.string(),
@@ -49,7 +50,7 @@ export default function LoginForm() {
   })
 
   if (isMutating) { return (<div className='flex items-center justify-center w-screen h-screen'>Loading <Loading /></div>) }
-  if (error) { return (<p className='flex items-center justify-center w-screen h-screen'>Error occured lol</p>) }
+  if (error) { toast.error("Login Failed") }
   if (data) {
     setToken(data)
     redirect('/dashboard')

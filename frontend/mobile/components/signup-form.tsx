@@ -1,15 +1,13 @@
-import { NetworkInfo } from 'react-native-network-info';
-import { StyleSheet, Button, TextInput } from 'react-native';
+import { NetworkInfo }from 'react-native-network-info';
+import { StyleSheet, Button, TextInput, Text, View } from 'react-native';
 import { Link } from 'expo-router';
 import React from 'react';
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm, Controller } from 'react-hook-form';
 import useSWRMutation from 'swr/mutation'
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
 import { SignUpUser } from "@/user-api-types"
-import { setToken, getToken } from "@/components/securestore"
+import { setToken } from "@/components/securestore"
 import { useRouter } from 'expo-router'
 
 const formSchema = z.object({
@@ -31,7 +29,11 @@ const formSchema = z.object({
 
 async function signUp(url: string, { arg }: { arg: SignUpUser }) {
   return fetch(url, {
-    method: 'POSt',
+    headers: {
+      'CF-Access-Client-Id': process.env.EXPO_PUBLIC_API_CF_CLIENT_ID!,
+      'CF-Access-Client-Secret': process.env.EXPO_PUBLIC_API_CF_ACCESS_CLIENT_SECRET!,
+    },
+    method: 'POST',
     body: JSON.stringify(arg)
   }).then(res => res.text())
 }
@@ -40,7 +42,7 @@ export default function SignupForm() {
 
   const router = useRouter()
 
-  const { data, trigger, error, isMutating } = useSWRMutation('http://192.168.1.0:8082/user/signup', signUp, { throwOnError: false })
+  const { data, trigger } = useSWRMutation(`${process.env.EXPO_PUBLIC_API_URL}/api/user/signup`, signUp, { throwOnError: false })
 
   const {
     control,
@@ -58,24 +60,28 @@ export default function SignupForm() {
   })
 
   if (data) {
-    setToken(data)
-  }
-
-  let token = getToken()
-  if (token) {
-    router.navigate('/home')
+    console.log(data)
   }
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    trigger(values)
+    try {
+      const token = await trigger(values)
+      if (token) {
+        await setToken(token)
+        console.log(token)
+        router.push('/home')
+      }
+    } catch (err) {
+      console.error(err)
+    }
   }
 
   return (
-    <ThemedView>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title" style={styles.title}>Signup</ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
+    <View>
+      <View style={styles.titleContainer}>
+        <Text style={styles.title}>Signup</Text>
+      </View>
+      <View style={styles.stepContainer}>
         <Controller
           control={control}
           rules={{
@@ -163,15 +169,15 @@ export default function SignupForm() {
           )}
           name="phone"
         />
-      </ThemedView>
-      <ThemedView style={styles.button}>
+      </View>
+      <View style={styles.button}>
         <Button title="Sign Up" onPress={handleSubmit(onSubmit)}></Button>
-        <ThemedText style={styles.logInText}>Already Have an Account?</ThemedText>
+        <Text style={styles.logInText}>Already Have an Account?</Text>
         <Link href="/login" asChild style={styles.logInLink}>
-          <ThemedText style={styles.logInLink}>Log In!</ThemedText>
+          <Text style={styles.logInLink}>Log In!</Text>
         </Link>
-      </ThemedView>
-    </ThemedView>
+      </View>
+    </View>
   );
 }
 
@@ -181,13 +187,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     alignSelf: 'center',
-    paddingTop: 75,
+    paddingTop: 40,
     height: 150,
     marginLeft: 5,
     marginRight: 5,
   },
   title: {
+    paddingTop: 30,
     fontSize: 30,
+    color: 'white'
   },
   subtitle: {
     fontSize: 20,
@@ -204,7 +212,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     width: 200,
     position: 'relative',
-    top: 40
+    top: 50
   },
   input: {
     height: 40,

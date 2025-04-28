@@ -1,7 +1,7 @@
 import * as SecureStore from 'expo-secure-store';
 import { Token } from "@/user-api-types"
 import { createContext, ReactNode, useEffect, useState } from "react"
-import { Redirect, router } from 'expo-router';
+import { router } from 'expo-router';
 import { Notify } from './notify';
 import { getHeaders } from '@/constants/header-options';
 
@@ -14,7 +14,8 @@ export async function getToken() {
     router.push("/login");
     return null; // Return null if no token is found
   }
-  return tkn.trim().trimEnd();
+  return tkn.trim()
+
 }
 export async function setToken(token: string) {
   delTokenNIdentity()

@@ -2,11 +2,12 @@ import { StyleSheet, Button, Image } from 'react-native';
 import { Link } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { getToken, delTokenNIdentity } from '@/components/securestore';
+import { getToken, delTokenNIdentity, IdentityContext } from '@/components/securestore';
 import useSWR from 'swr';
-import { User } from '@/user-api-types';
+import { GetUserRow, User } from '@/user-api-types';
 import { useRouter } from 'expo-router';
 import { getHeaders } from '@/constants/header-options';
+import { useContext } from "react"
 import { useEffect, useState } from 'react';
 
 async function getProfileArgs(url: string, arg: string) {
@@ -26,31 +27,27 @@ const fetcher = async (url: string) => {
     throw new Error('Failed to fetch');
   }
   return res.json();
-};
+}
+
+let id = 1
 
 export default function ProfileComp() {
-  const router = useRouter();
-  const [id, setId] = useState<number | null>(null);
 
-  useEffect(() => {
-    async function fetchToken() {
-      const token = await getToken();
-      if (token) {
-        const tokenData = await getProfileArgs(`${process.env.EXPO_PUBLIC_API_URL}/api/user/decrypt`, token);
-        if (tokenData) {
-          setId(tokenData.id);
-        }
-      }
-    }
-    fetchToken();
-  }, []);
+  let token = getToken()
 
-  const { data: user, error } = useSWR<User, string>(
-    id ? `${process.env.API}/api/user/search?id=${id}` : null,
-    fetcher
-  );
+  const identity = useContext(IdentityContext)
+  const router = useRouter()
+
+  const { data: tokenData } = useSWR([`${process.env.EXPO_PUBLIC_API_URL}/api/user/decrypt`, token], ([url, token]) => getProfileArgs(url, token))
+  if (tokenData)
+    id = tokenData.id
+
+  const { data: user } = useSWR<GetUserRow[], string>(identity ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${id}` : null, fetcher)
 
   if (!user) return <ThemedText>Loading...</ThemedText>;
+
+  if (user[0].profilepicture)
+    console.log(user[0].profilepicture.String)
 
   async function logoutSubmit() {
     delTokenNIdentity();
@@ -65,16 +62,23 @@ export default function ProfileComp() {
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
         <Image
-          source={{
-            uri: 'https://static.vecteezy.com/system/resources/thumbnails/009/734/564/small/default-avatar-profile-icon-of-social-media-user-vector.jpg',
-          }}
+          style={styles.pfpImage}
+          source={user[0].profilepicture.Valid ? {uri: `${process.env.EXPO_PUBLIC_API_URL}/${user[0].profilepicture.String}`, headers: Headers} : require('../assets/images/test.png')}
         />
-        <ThemedText>Username: {user.username}</ThemedText>
-        <ThemedText>
-          Name: {user.firstname.Valid ? user.firstname.String : 'N/A'} {user.lastname.Valid ? user.lastname.String : 'N/A'}
-        </ThemedText>
-        <ThemedText>Email: {user.email}</ThemedText>
-        <ThemedText>Phone: {user.phone}</ThemedText>
+        <ThemedView style={styles.profileTextContainer}>
+          <ThemedText style={styles.profileText}>
+            Username: {user[0].username}
+          </ThemedText>
+          <ThemedText style={styles.profileText}>
+            Name: {user[0].firstname.Valid ? user[0].firstname.String : "N/A"} {user[0].lastname.Valid ? user[0].lastname.String : "N/A"}
+          </ThemedText>
+          <ThemedText style={styles.profileText}>
+            Email: {user[0].email}
+          </ThemedText>
+          <ThemedText style={styles.profileText}>
+            Phone: {user[0].phone}
+          </ThemedText>
+        </ThemedView>
       </ThemedView>
       <ThemedView style={styles.buttons}>
         <ThemedView style={styles.logoutButton}>
@@ -110,7 +114,7 @@ const styles = StyleSheet.create({
   },
   stepContainer: {
     gap: 8,
-    marginTop: 20,
+    marginTop: -25,
     marginBottom: 8,
     marginLeft: 10,
     marginRight: 10,
@@ -118,8 +122,8 @@ const styles = StyleSheet.create({
   buttons: {
     flexDirection: 'row',
     position: 'relative',
-    top: 120,
-    alignSelf: 'center',
+    top: 80,
+    alignSelf: 'center'
   },
   editButton: {
     width: 110,
@@ -127,6 +131,19 @@ const styles = StyleSheet.create({
   },
   logoutButton: {
     width: 110,
-    marginRight: 20,
+    marginRight: 20
   },
+  profileTextContainer: {
+    marginTop: 10
+  },
+  profileText: {
+    fontSize: 20,
+    marginTop: 15
+  },
+  pfpImage : {
+    overflow: "hidden",
+    width: 130,
+    height: 130,
+    borderRadius: 130/2
+  }
 });
