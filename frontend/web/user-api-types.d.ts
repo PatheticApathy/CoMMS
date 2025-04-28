@@ -21,6 +21,7 @@ export interface UpdateProfileParams {
   username: { Valid: boolean, String: string }
   email: { Valid: boolean, String: string }
   phone: { Valid: boolean, String: string }
+  profilepicture: { Valid: boolean, String: string }
   ID: number
 }
 
