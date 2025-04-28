@@ -6,13 +6,13 @@ import { Coworker, GetUserRow } from '@/user-api-types';
 import { useContext, useState } from 'react';
 import { IdentityContext } from '@/components/securestore';
 import ContactsList from '@/components/ContactsList';
-import { Headers } from '@/constants/header-options';
+import { getHeaders } from '@/constants/header-options';
 
 const fetcher: Fetcher<Coworker[], string> = async (...args) => fetch(...args, {
-  headers: Headers
+  headers: await getHeaders()
 }).then(res => res.json())
 const fetchUser: Fetcher<GetUserRow[], string> = async (...args) => fetch(...args, {
-  headers: Headers
+  headers: await getHeaders()
 }).then(res => res.json())
 
 export default function Coworkers() {

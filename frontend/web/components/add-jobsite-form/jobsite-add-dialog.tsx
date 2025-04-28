@@ -25,7 +25,7 @@ export default function AddJobsiteFormDialouge({ children }: Readonly<{ children
           <DialogTitle>Add New Jobsite/Company</DialogTitle>
           <DialogDescription>Add jobsite/company to be managed..</DialogDescription>
         </DialogHeader>
-        <Button onClick={() => setShowFirstTable(!showFirstTable)} className="mb-4">
+        <Button variant="yellow" onClick={() => setShowFirstTable(!showFirstTable)} className="mb-4">
         Switch Form
         </Button>
         <div className="">

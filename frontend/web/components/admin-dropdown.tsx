@@ -72,14 +72,14 @@ export default function AdminDropDown({ user, jobsites, companies }: { user: Use
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-        <DropdownMenuItem
+        <DropdownMenuLabel className="text-surface">Actions</DropdownMenuLabel>
+        <DropdownMenuItem className="text-surface"
           onClick={() => navigator.clipboard.writeText(user.id.toString())}
         >
           Copy id #
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
+        <DropdownMenuItem className="text-surface"
           onClick={() => deleteUser(user.id)}
         >
           Delete user
@@ -91,7 +91,7 @@ export default function AdminDropDown({ user, jobsites, companies }: { user: Use
             onChange={(e) => setNewCompany(e.target.value)}
             className="max-w-sm"
           />
-          <Button onClick={handleUpdateCompany}>
+          <Button variant="yellow" onClick={handleUpdateCompany}>
             Change company
           </Button>
         </DropdownMenuItem>
@@ -102,7 +102,7 @@ export default function AdminDropDown({ user, jobsites, companies }: { user: Use
             onChange={(e) => setNewJobsite(e.target.value)}
             className="max-w-sm"
           />
-          <Button onClick={handleUpdateJobsite}>
+          <Button variant="yellow" onClick={handleUpdateJobsite}>
             Change jobsite
           </Button>
         </DropdownMenuItem>
@@ -113,7 +113,7 @@ export default function AdminDropDown({ user, jobsites, companies }: { user: Use
             onChange={(e) => setNewRole(e.target.value)}
             className="max-w-sm"
           />
-          <Button onClick={(e) => { e.preventDefault(); updateUser(user.id, "role", { String: newRole, Valid: true }); }}>
+          <Button variant="yellow" onClick={(e) => { e.preventDefault(); updateUser(user.id, "role", { String: newRole, Valid: true }); }}>
             Change role
           </Button>
         </DropdownMenuItem>

@@ -11,7 +11,7 @@ const Item = ({ coworkers }: { coworkers: Coworker }) => (
   <View style={style.segment}>
 
     <Text style={style.title}>{coworkers.username}</Text>
-    <Text style={style.text}>{coworkers.firstname.Valid ? (coworkers.firstname.String + (coworkers.lastname.Valid ? coworkers.lastname.String : "")) : "No name"}</Text>
+    <Text style={style.text}>{coworkers.firstname.Valid ? (coworkers.firstname.String + " " + (coworkers.lastname.Valid ? coworkers.lastname.String : "")) : "No name"}</Text>
     <Text style={style.text}>{coworkers.email}</Text>
     <Text style={style.text}>{coworkers.phone}</Text>
   </View>
@@ -21,7 +21,7 @@ export default function CoworkerList({ coworkers }: UserListInput) {
   return (<FlatList
     data={coworkers}
     renderItem={(iteminfo) => <Item coworkers={iteminfo.item} />}
-    keyExtractor={coworkers => String(coworkers.id)}
+    keyExtractor={coworkers => String(coworkers.username)}
   />
   )
 }

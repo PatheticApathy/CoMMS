@@ -1,5 +1,7 @@
 import type { Config } from "tailwindcss";
 
+const plugin = require('tailwindcss/plugin');
+
 export default {
     darkMode: ["class"],
     content: [
@@ -10,19 +12,12 @@ export default {
   theme: {
   	extend: {
   		colors: {
-  			background: 'var(--background)',
-  			foreground: 'var(--foreground)',
-  			sidebar: {
-  				DEFAULT: 'hsl(var(--sidebar-background))',
-  				foreground: 'hsl(var(--sidebar-foreground))',
-  				primary: 'hsl(var(--sidebar-primary))',
-  				'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-  				accent: 'hsl(var(--sidebar-accent))',
-  				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-  				border: 'hsl(var(--sidebar-border))',
-  				ring: 'hsl(var(--sidebar-ring))'
-  			}
-  		},
+			primary: 'var(--color-primary)',
+			secondary: 'var(--color-secondary)',
+			accent: 'var(--color-accent)',
+			background: 'var(--color-background)',
+			surface: 'var(--color-surface)',
+		  },
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
@@ -30,5 +25,14 @@ export default {
   		}
   	}
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    plugin(function ({ addBase }) {
+      addBase({
+        body: {
+          backgroundColor: 'var(--color-background)',
+          color: 'var(--color-surface)',
+        },
+      });
+    }),
+  ],
 } satisfies Config;

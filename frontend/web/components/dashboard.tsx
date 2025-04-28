@@ -1,9 +1,5 @@
-import { TrendingUpIcon } from "lucide-react";
-
-import { Badge } from "@/components/ui/badge";
 import {
   Card,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -27,30 +23,22 @@ export default function Dashboard({jobsite, jobsites, materials, }: { jobsite: J
   const mainJobsiteMaterial = getMostRecentMaterial(jobsite?.id);
 
   return (
-    <div className="flex flex-col gap-8 w-full px-4 lg:px-6">
+    <div className="flex flex-col gap-8 w-3/5 px-4 lg:px-6">
       <h2 className="text-xl font-semibold mb-4">Your Job Site</h2>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-4">
         <Link href="dashboard/jobsite">
-          <Card className="@container/card cursor-pointer hover:shadow-lg transition-shadow">
-            <CardHeader className="relative">
-              <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
+          <Card className="@container/card cursor-pointer bg-accent text-surface border border-secondary hover:shadow-lg transition-shadow">
+            <CardHeader className="bg-accent text-primary rounded-t-xl">
+              <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums text-surface">
                 {jobsite?.name || "No Jobsite Available"}
               </CardTitle>
-              <div className="absolute right-4 top-4">
-                <Badge variant="outline" className="flex gap-1 rounded-lg text-xs">
-                  <TrendingUpIcon className="size-3" />
-                  Active
-                </Badge>
-              </div>
             </CardHeader>
-            <CardFooter className="flex-col items-start gap-1 text-sm">
+            <CardFooter className="flex-col items-start gap-1 text-sm text-surface bg-accent rounded-b-xl">
               <div className="line-clamp-1 flex gap-2 font-medium">
                 Address: {jobsite?.addr?.Valid ? jobsite.addr.String : "No Address Available"}
               </div>
-              <div className="text-muted-foreground">
-                {mainJobsiteMaterial
-                  ? `Most Recent Material: ${mainJobsiteMaterial.name.String} (${mainJobsiteMaterial.quantity})`
-                  : "No Materials Available"}
+              <div className="text-surface/70">
+                {mainJobsiteMaterial ? `Most Recent Material: ${mainJobsiteMaterial.name.String} (${mainJobsiteMaterial.quantity})` : "No Materials Available"}
               </div>
             </CardFooter>
           </Card>
@@ -64,14 +52,13 @@ export default function Dashboard({jobsite, jobsites, materials, }: { jobsite: J
             filteredJobsites.map((site) => {
               const recentMaterial = getMostRecentMaterial(site.id);
               return (
-                <Card key={site.id} className="@container/card">
-                  <CardHeader className="relative">
-                    <CardDescription>Jobsite Name</CardDescription>
-                    <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
+                <Card className="@container/card cursor-pointer bg-accent text-surface border border-secondary hover:shadow-lg transition-shadow">
+                  <CardHeader className="bg-accent text-primary rounded-t-xl">
+                    <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums text-surface">
                       {site.name || "No Name Available"}
                     </CardTitle>
                   </CardHeader>
-                  <CardFooter className="flex-col items-start gap-1 text-sm">
+                  <CardFooter className="flex-col items-start gap-1 text-sm text-surface bg-accent rounded-b-xl">
                     <div className="line-clamp-1 flex gap-2 font-medium">
                       Address: {site.addr?.Valid ? site.addr.String : "No Address Available"}
                     </div>

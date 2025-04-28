@@ -1,3 +1,4 @@
+import { NetworkInfo }from 'react-native-network-info';
 import { StyleSheet, Button, TextInput, Text, View } from 'react-native';
 import { Link } from 'expo-router';
 import React from 'react';
