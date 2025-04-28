@@ -23,6 +23,7 @@ export async function setToken(token: string) {
 }
 export async function delTokenNIdentity() {
   await SecureStore.deleteItemAsync('token')
+  await SecureStore.deleteItemAsync('identity')
 }
 
 export default function IdentityProvider({ children }: { children: ReactNode }) {
