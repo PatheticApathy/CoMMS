@@ -18,11 +18,8 @@ const fetcher = async (url: string) => {
   return res.json();
 }
 
-let id = 1
-
 export default function ProfileComp() {
   
-
   const headers = getHeaders()
 
   const identity = useContext(IdentityContext)
@@ -35,12 +32,15 @@ export default function ProfileComp() {
 
   const { data: user } = useSWR<GetUserRow[], string>(identity ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${id}` : null, fetcher)
 
+
   if (!user) return <ThemedText>Loading...</ThemedText>;
 
   async function logoutSubmit() {
     delTokenNIdentity();
     router.navigate('/');
   }
+
+  const headers = getHeaders();
 
   return (
     <ThemedView>

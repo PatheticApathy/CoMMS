@@ -5,7 +5,7 @@ import MainView from '@/components/MainView';
 import { Notify } from '@/components/notify';
 import { AddMaterial, Material } from '@/material-api-types';
 import { JobSite } from '@/user-api-types';
-import { ActivityIndicator, Text } from 'react-native';
+import { ActivityIndicator, Text, Modal } from 'react-native';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/dist/mutation';
 import { Button } from 'react-native';
@@ -13,7 +13,8 @@ import { z } from 'zod'
 import FormPictueInput from '@/components/form/FormPictureInput';
 import ComboboxFormField from '@/components/form/comboboxFormField';
 import FormModalView from '@/components/FormModalView';
-import { useState } from 'react';
+import React, { useState } from 'react';
+import MaterialAddMap from './material_add_map'; // Import the MaterialAddMap component
 
 // Schema for form
 const AddMaterialSchema = z.object({
@@ -47,12 +48,22 @@ const AddMaterials = () => {
   const [status, setStatus] = useState('In Stock');
   const [type, setType] = useState('');
   const [unit, setUnit] = useState('');
-  // const [location_lat, setLocationLat] = useState(''); //Needed for map marker.
-  // const [location_lng, setLocationLng] = useState(''); //Set in map view.
   const [[picture, extension], setPicture] = useState<[Blob | undefined, string]>([undefined, '']);
 
   const [isDownloading, setDownload] = useState(false);
+  const [isMapVisible, setMapVisible] = useState(false); // State to control map modal visibility
+  const [locationLat, setLocationLat] = useState<number | null>(null); // Latitude of the marker
+  const [locationLng, setLocationLng] = useState<number | null>(null); // Longitude of the marker
 
+  const handleOpenMap = () => setMapVisible(true); // Open the map modal
+  const handleCloseMap = () => setMapVisible(false); // Close the map modal
+
+  const handleLocationSelect = (lat: number, lng: number) => {
+    console.log('Selected Location:', { lat, lng });
+    setLocationLat(lat);
+    setLocationLng(lng);
+    setMapVisible(false);
+  };
 
   const { data: jobsites, error: jobsitesError, isLoading: loading_jobs } = useSWR<JobSite[]>(`${process.env.EXPO_PUBLIC_API_URL}/api/sites/all`, fetchJobsites);
   const { trigger } = useSWRMutation(`${process.env.EXPO_PUBLIC_API_URL}/api/material/material/add`, PostAddMaterial);
@@ -74,8 +85,6 @@ const AddMaterials = () => {
       status,
       type,
       unit,
-      // location_lat, //not used for now
-      // location_lng, //not used for now
       picture
     })
 
@@ -84,12 +93,12 @@ const AddMaterials = () => {
       const payload: AddMaterial = {
         job_site: values.job_site,
         location_lat: {
-          Valid: false,
-          Float64: 0
+          Valid: locationLat !== null,
+          Float64: locationLat || 0
         },
         location_lng: {
-          Valid: false,
-          Float64: 0
+          Valid: locationLng !== null,
+          Float64: locationLng || 0
         },
         name: {
           Valid: true,
@@ -102,16 +111,6 @@ const AddMaterials = () => {
           String: values.type
         },
         unit: values.unit,
-        // location_lat: values.location_lat,
-        // type:{
-        //  Valid: true,
-        //  Float64: values.location_lat
-        // },                                       // not used for now
-        // location_lng: values.location_lng,
-        // type:{
-        //  Valid: true,
-        //  Float64: values.location_lng
-        // },
         picture: { Valid: true, String: "/file.svg" }
       };
 
@@ -157,46 +156,38 @@ const AddMaterials = () => {
     setDownload(false)
   };
 
-  const DisplayJobSites = () => {
-
-    if (jobsitesError) {
-      return <Text>Error loading jobsites</Text>;
-    }
-
-    if (loading_jobs) {
-      return <ActivityIndicator style={{ justifyContent: 'center', height: ScreenHeight }} />;
-    }
-
-    if (jobsites) {
-      const jobsiteOptions = jobsites.map(jobsite => ({
-        label: jobsite.name,
-        value: jobsite.id
-      }));
-      return <ComboboxFormField default_label={job_site} OnClickSet={setJobSite} options={jobsiteOptions} />
-    }
-
-    return <Text>No Jobites</Text>
-  }
-
-  if (loading_jobs) { return (<MainView><ActivityIndicator style={{ justifyContent: 'center', height: ScreenHeight }} /></MainView>) }
-
-  //make button change colores on submission
   return (
-    <FormModalView title='Add New Material'>
-      <DisplayJobSites />
-      <FormInput value={name} keyboardtype='default' placeholder="Name" OnChangeText={setName} />
-      <FormInput value={quantity} keyboardtype='number-pad' placeholder="Quantity" OnChangeText={setQuantity} />
-      <FormInput value={type} keyboardtype='default' placeholder="Type" OnChangeText={setType} />
-      <FormInput value={unit} keyboardtype='default' placeholder="Unit" OnChangeText={setUnit} />
+    <FormModalView title="Add New Material">
+      <FormInput value={name} keyboardtype="default" placeholder="Name" OnChangeText={setName} />
+      <FormInput value={quantity} keyboardtype="number-pad" placeholder="Quantity" OnChangeText={setQuantity} />
+      <FormInput value={type} keyboardtype="default" placeholder="Type" OnChangeText={setType} />
+      <FormInput value={unit} keyboardtype="default" placeholder="Unit" OnChangeText={setUnit} />
       <ComboboxFormField default_label={status} options={status_opts} OnClickSet={setStatus} />
       <FormPictueInput OnPicture={setPicture} />
-      {/* Some form of material add map that will allow you to place the marker.
-          react-native-maps does have a lot of dynamic markers to use.          */}
-      {isDownloading ? <Button title='sending' /> : <Button onPress={async () => { await SendAddMaterialRequest() }} title='Add Material' />}
+      <Button title="Select Location on Map" onPress={handleOpenMap} /> {/* Button to open the map modal */}
+      {isDownloading ? (
+        <Button title="sending" />
+      ) : (
+        <Button onPress={async () => await SendAddMaterialRequest()} title="Add Material" />
+      )}
+
+      {/* Map Modal */}
+      <Modal visible={isMapVisible} animationType="slide" onRequestClose={handleCloseMap}>
+        <MaterialAddMap
+          initialRegion={{
+            latitude: 37.7749, // Default latitude (e.g., San Francisco)
+            longitude: -122.4194, // Default longitude
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          }}
+          jobSiteLat={37.7749} // Replace with actual job site latitude
+          jobSiteLng={-122.4194} // Replace with actual job site longitude
+          onLocationSelect={handleLocationSelect}
+          onClose={handleCloseMap}
+        />
+      </Modal>
     </FormModalView>
-  )
-}
+  );
+};
 
-export default AddMaterials
-
-
+export default AddMaterials;

@@ -3,10 +3,11 @@ import FileSVG from "@/components/file";
 import { ScreenHeight } from "@/components/global-style";
 import MainView from "@/components/MainView";
 import MaterialLogList from "@/components/MaterialLogList";
-import { getHeaders } from "@/constants/header-options";
-import { ChangeQuantity, CheckoutLog, Material, MaterialLog } from "@/material-api-types";
+import { BlockingHeaders, getHeaders } from "@/constants/header-options";
+import { CheckoutLog, Material, MaterialLog } from "@/material-api-types";
 import { GetUserRow } from "@/user-api-types";
 import { Link, useLocalSearchParams } from "expo-router";
+import { useEffect, useState } from "react";
 import { Image, ActivityIndicator, StyleSheet, Text, ScrollView, View } from "react-native";
 import useSWR, { Fetcher } from "swr";
 
@@ -24,7 +25,7 @@ const RenderImage = ({ image_url }: { image_url: string }) => {
       alt="Could not find picture of material"
       source={{
         uri: image_url,
-        headers: Headers,
+        headers: BlockingHeaders,
       }}
       width={320}
       height={280}
@@ -84,6 +85,7 @@ export default function MaterialPage() {
   const { data: checkout_logs, isLoading: checkout_loading, error: checkout_error } = useSWR(material && material[0] ? `${process.env.EXPO_PUBLIC_API_URL}/api/material/checkout/recent?id=${material[0].id}` : null, CheckoutLogFetcher)
   const { data: material_logs, isLoading: material_loading, error: material_error } = useSWR(material && material[0] ? `${process.env.EXPO_PUBLIC_API_URL}/api/material/mlogs/recent?id=${material[0].id}` : null, MaterialLogFetcher)
   const { data: usernames } = useSWR(checkout_logs ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/search?${checkout_logs.map(log => `id=${log.user_id}`).join('&')}` : undefined, UsersFetcher)
+
 
   if (error) { return <MainView>Error</MainView> }
   if (isLoading) { return <MainView ><ActivityIndicator style={{ justifyContent: 'center', height: ScreenHeight }} /></MainView> }
