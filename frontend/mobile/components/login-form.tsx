@@ -1,14 +1,13 @@
 import { StyleSheet, Button, TextInput, Text, View } from 'react-native';
-import { Link, Redirect, router } from 'expo-router';
+import { Link, router } from 'expo-router';
 import React from 'react';
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm, Controller } from 'react-hook-form';
 import useSWRMutation from 'swr/mutation'
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
 import { LogInUser } from "@/user-api-types"
-import { setToken, delTokenNIdentity } from "@/components/securestore"
+import { setToken } from "@/components/securestore"
+import { Notify } from './notify';
 
 const formSchema = z.object({
   username: z.string().nonempty(),
@@ -23,7 +22,7 @@ async function logIn(url: string, { arg }: { arg: LogInUser }) {
     },
     method: 'POST',
     body: JSON.stringify(arg)
-  }).then((res) => { if (res.ok) { return res.text() } else { return undefined } })
+  }).then((res) => res)
 }
 
 export default function LoginForm() {
@@ -44,15 +43,17 @@ export default function LoginForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const token = await trigger(values)
-      if (token) {
-        await setToken(token)
+      const res = await trigger(values)
+      if (res.ok) {
+        const token = await res.text();
+        await setToken(token.trim())
         console.log(token)
         router.push('/home')
-
+        return
       }
+      Notify.error(await res.text());
     } catch (err) {
-      console.error(err)
+      Notify.error(String(err))
     }
   }
 
@@ -148,8 +149,8 @@ const styles = StyleSheet.create({
     margin: 12,
     borderWidth: 1,
     padding: 10,
-    borderColor: 'white',
-    color: 'white'
+    borderColor: 'gray',
+    color: 'gray'
   },
   signUpText: {
     alignSelf: 'center'

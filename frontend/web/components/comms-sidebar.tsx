@@ -12,35 +12,41 @@ import {
 import { Profile } from "./profile-dialog"
 import { ModeToggle } from "./darkmode-button"
 import IdentityProvider from "./identity-provider"
+import { Home, UserCog, Phone, MapPinned, Package } from "lucide-react";
 
 export function AppSidebar() {
   return (
-    <Sidebar>
+    <Sidebar collapsible="icon">
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenuButton asChild>
-            <a href="/dashboard/jobsite">
-              <span>Your Jobsite</span>
-            </a>
-          </SidebarMenuButton>
-          <SidebarMenuButton asChild>
-            <a href="/dashboard/material">
-              <span>Materials</span>
-            </a>
-          </SidebarMenuButton>
-          <SidebarMenuButton asChild>
-            <a href="/dashboard/contacts">
-              <span>Contacts</span>
-            </a>
-          </SidebarMenuButton>
-          <SidebarMenuButton asChild>
-            <a href="#">
-              <span>Company</span>
+            <a href="/dashboard">
+              <Home className="mr-2 w-5 h-5" />
+              <span>Home</span>
             </a>
           </SidebarMenuButton>
           <SidebarMenuButton asChild>
             <a href="/dashboard/admin">
+              <UserCog className="mr-2 w-5 h-5" /> 
               <span>Admin</span>
+            </a>
+          </SidebarMenuButton>
+          <SidebarMenuButton asChild>
+            <a href="/dashboard/contacts">
+              <Phone className="mr-2 w-5 h-5" />
+              <span>Contacts</span>
+            </a>
+          </SidebarMenuButton>
+          <SidebarMenuButton asChild>
+            <a href="/dashboard/jobsite">
+              <MapPinned className="mr-2 w-5 h-5" />
+              <span>Job Site</span>
+            </a>
+          </SidebarMenuButton>
+          <SidebarMenuButton asChild>
+            <a href="/dashboard/material">
+              <Package className="mr-2 w-5 h-5" />
+              <span>Materials</span>
             </a>
           </SidebarMenuButton>
           <SidebarGroupContent></SidebarGroupContent>

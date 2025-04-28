@@ -1,9 +1,11 @@
 import { Button, View, Text } from 'react-native';
-import { Link } from 'expo-router';
+import { Link, Redirect } from 'expo-router';
 import MainView from '@/components/MainView';
 import { ScreenHeight } from '@/components/global-style'
+import { getToken } from '@/components/securestore';
 
 export default function Welcome() {
+  if (getToken()) { return <Redirect href={'/home'} /> }
   return (
     <MainView>
       <View style={{ flex: 1, paddingTop: ScreenHeight * 0.1 }}>
