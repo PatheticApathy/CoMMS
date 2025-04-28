@@ -1,45 +1,53 @@
-import { StyleSheet, Button } from 'react-native';
-import { Link } from 'expo-router';
+import React from 'react';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import useSWR, { Fetcher } from 'swr';
+import { IdentityContext } from '@/components/securestore';
+import { MaterialWithLogs } from '@/material-api-types';
+import Dashboard from '@/components/home';
+import { useContext } from 'react';
+import { getHeaders } from '@/constants/header-options';
+import { GetUserRow, JobSite } from '@/user-api-types';
 
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
 
-export default function Dashboard() {
+const fetchUser: Fetcher<GetUserRow[], string> = async (...args) => fetch(...args, {
+  headers: await getHeaders()
+}).then(res => res.json())
+const fetchJobsite: Fetcher<JobSite, string> = async (...args) => fetch(...args, {
+  headers: await getHeaders()
+}).then(res => res.json())
+const fetchJobsites: Fetcher<JobSite[], string> = async (...args) => fetch(...args, {
+  headers: await getHeaders()
+}).then(res => res.json())
+const fetchMaterials: Fetcher<MaterialWithLogs[], string> = async (...args) => fetch(...args, {
+  headers: await getHeaders()
+}).then(res => res.json())
+
+export default function HomePage() {
+  const identity = useContext(IdentityContext);
+
+  const { data: user } = useSWR(identity ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${identity.id}` : null, fetchUser);
+  const { data: jobsite } = useSWR(user && user[0] ? `${process.env.EXPO_PUBLIC_API_URL}/api/sites/search?id=${user[0].jobsite_id.Valid ? user[0].jobsite_id.Int64 : undefined}` : null, fetchJobsite);
+  const { data: jobsites } = useSWR(user && user[0] ? `${process.env.EXPO_PUBLIC_API_URL}/api/sites/company?id=${user[0].company_id.Valid ? user[0].company_id.Int64 : undefined}` : null, fetchJobsites);
+  const { data: materials } = useSWR(user && user[0] ? `${process.env.EXPO_PUBLIC_API_URL}/api/material/material/created` : null, fetchMaterials);
+
+  if (!identity || !user || !jobsite || !jobsites || !materials) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
   return (
-    <ThemedView>
-    </ThemedView>
+    <Dashboard jobsite={jobsite} jobsites={jobsites} materials={materials} />
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'column',
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
-    alignSelf: 'center',
-    paddingTop: 75,
-    height: 200,
-    marginLeft: 5,
-    marginRight: 5,
   },
-  title: {
-    fontSize: 30,
-  },
-  subtitle: {
-    fontSize: 20,
-    textAlign: 'center',
-  },
-  stepContainer: {
-    gap: 8,
-    marginTop: 20,
-    marginBottom: 8,
-    marginLeft: 10,
-    marginRight: 10,
-  },
-  button: {
-    alignSelf: 'center',
-    width: 200,
-    position: 'relative',
-    top: 120
-  }
 });

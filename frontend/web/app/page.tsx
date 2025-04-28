@@ -21,7 +21,7 @@ export default function Welcome() {
             </p>
             <div className="w-1/2 pt-20 justify-self-center">
               <Link href="/login">
-                <Button>Go To Login</Button>
+                <Button variant="yellow">Go To Login</Button>
               </Link>
             </div>
           </div>

@@ -36,7 +36,7 @@ export default function MTable({ materials, route }: { materials: Material[], ro
     )
   }
   return (
-    <div className="mx-auto py-10">
+    <div className="flex flex-col h-full w-full px-4">
       <DataTable columns={MaterialTableColumns(route, identity)} data={rows} />
     </div>
   )

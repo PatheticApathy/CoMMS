@@ -7,18 +7,23 @@ import { GetUserRow } from '@/user-api-types';
 import { useContext } from 'react';
 import { IdentityContext } from '@/components/securestore';
 import MaterialList from '@/components/MaterialList';
-import { Headers } from '@/constants/header-options';
+import { getHeaders } from '@/constants/header-options';
 import { Link } from 'expo-router';
 
 const fetcher: Fetcher<Material[], string> = async (...args) => fetch(...args, {
-  headers: Headers
+  headers: await getHeaders()
 }).then(res => res.json())
 const fetchUser: Fetcher<GetUserRow[], string> = async (...args) => fetch(...args, {
-  headers: Headers
+  headers: await getHeaders()
 }).then(res => res.json())
 
 export default function Materials() {
   const identity = useContext(IdentityContext);
+  async function logHeaders() {
+    const headers = await getHeaders();
+    console.log({ Authorization: headers.Authorization });
+  }
+  logHeaders();
   const { data: user } = useSWR(identity ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${identity.id}` : null, fetchUser,)
   const { data: materials, error, isLoading } = useSWR(user && user[0] ? `${process.env.EXPO_PUBLIC_API_URL}/api/material/material/search?site=${user[0].jobsite_id.Valid ? user[0].jobsite_id.Int64 : undefined}` : null, fetcher)
 

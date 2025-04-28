@@ -3,19 +3,19 @@ import FileSVG from "@/components/file";
 import { ScreenHeight } from "@/components/global-style";
 import MainView from "@/components/MainView";
 import MaterialLogList from "@/components/MaterialLogList";
-import { Headers } from "@/constants/header-options";
-import { CheckoutLog, Material, MaterialLog } from "@/material-api-types";
+import { getHeaders } from "@/constants/header-options";
+import { ChangeQuantity, CheckoutLog, Material, MaterialLog } from "@/material-api-types";
 import { GetUserRow } from "@/user-api-types";
 import { Link, useLocalSearchParams } from "expo-router";
 import { Image, ActivityIndicator, StyleSheet, Text, ScrollView, View } from "react-native";
 import useSWR, { Fetcher } from "swr";
 
 const fetcher: Fetcher<Material[], string> = async (...args) => fetch(...args, {
-  headers: Headers
+  headers: await getHeaders()
 }).then(res => res.json())
-const MaterialLogFetcher: Fetcher<MaterialLog[], string> = async (...args) => fetch(...args, { headers: Headers, cache: 'default' }).then(res => res.json())
-const CheckoutLogFetcher: Fetcher<CheckoutLog[], string> = async (...args) => fetch(...args, { headers: Headers, cache: 'default' }).then(res => res.json())
-const UsersFetcher: Fetcher<GetUserRow[], string> = async (...args) => fetch(...args, { headers: Headers, cache: 'default' }).then(res => res.json())
+const MaterialLogFetcher: Fetcher<MaterialLog[], string> = async (...args) => fetch(...args, { headers: await getHeaders(), cache: 'default' }).then(res => res.json())
+const CheckoutLogFetcher: Fetcher<CheckoutLog[], string> = async (...args) => fetch(...args, { headers: await getHeaders(), cache: 'default' }).then(res => res.json())
+const UsersFetcher: Fetcher<GetUserRow[], string> = async (...args) => fetch(...args, { headers: await getHeaders(), cache: 'default' }).then(res => res.json())
 
 const RenderImage = ({ image_url }: { image_url: string }) => {
   if (image_url.split('.').pop() == 'svg') { return <FileSVG /> }

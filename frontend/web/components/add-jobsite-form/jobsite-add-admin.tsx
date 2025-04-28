@@ -3,7 +3,7 @@ import { Button } from "../ui/button";
 export default function InitAddFormDialougeAdmin() {
   return (
     <AddJobsiteFormDialouge>
-      <Button className="" variant={"outline"}>+</Button>
+      <Button className="" variant={"accent"}>+</Button>
     </AddJobsiteFormDialouge>
   )
 }

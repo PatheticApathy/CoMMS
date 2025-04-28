@@ -2,28 +2,29 @@ import { StyleSheet, Button, Image } from 'react-native';
 import { Link } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { getToken, delTokenNIdentity, IdentityContext } from '@/components/securestore'
-import useSWR from 'swr'
-import { GetUserRow } from '@/user-api-types'
-import { useRouter } from 'expo-router'
-import { Headers } from '@/constants/header-options';
+import { getToken, delTokenNIdentity, IdentityContext } from '@/components/securestore';
+import useSWR from 'swr';
+import { GetUserRow, User } from '@/user-api-types';
+import { useRouter } from 'expo-router';
+import { getHeaders } from '@/constants/header-options';
 import { useContext } from "react"
+import { useEffect, useState } from 'react';
 
 async function getProfileArgs(url: string, arg: string) {
+  const headers = await getHeaders();
   return fetch(url, {
     method: 'POST',
-    headers: Headers,
+    headers,
     redirect: 'follow',
-    body: arg
-  }).then(res => res.json())
+    body: arg,
+  }).then((res) => res.json());
 }
 
 const fetcher = async (url: string) => {
-  const res = await fetch(url, {
-    headers: Headers
-  })
+  const headers = await getHeaders();
+  const res = await fetch(url, { headers });
   if (!res.ok) {
-    throw new Error("Failed to fetch");
+    throw new Error('Failed to fetch');
   }
   return res.json();
 }
@@ -49,8 +50,8 @@ export default function ProfileComp() {
     console.log(user[0].profilepicture.String)
 
   async function logoutSubmit() {
-    delTokenNIdentity()
-    router.navigate('/')
+    delTokenNIdentity();
+    router.navigate('/');
   }
 
   return (
@@ -126,7 +127,7 @@ const styles = StyleSheet.create({
   },
   editButton: {
     width: 110,
-    marginLeft: 20
+    marginLeft: 20,
   },
   logoutButton: {
     width: 110,

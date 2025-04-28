@@ -1,5 +1,7 @@
 import {
   Sidebar,
+  SidebarHeader,
+  SidebarTrigger,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
@@ -17,6 +19,9 @@ import { Home, UserCog, Phone, MapPinned, Package } from "lucide-react";
 export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
+      <SidebarHeader>
+        <SidebarTrigger />
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenuButton asChild>

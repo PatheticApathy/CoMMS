@@ -108,3 +108,18 @@ export interface CheckinTime {
   Time: string
   Valid: boolean
 }
+
+export interface MaterialWithLogs {
+  id: number
+  job_site: number
+  last_checked_out: { Valid: bool, Time: string }
+  location_lat: LocationLat
+  location_lng: LocationLng
+  name: Name
+  quantity: number
+  status: string
+  type: Type
+  unit: string
+  picture: { Valid: bool, String: string }
+  timestamp: { Valid: bool, Time: string }
+}

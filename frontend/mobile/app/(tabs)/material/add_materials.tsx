@@ -1,6 +1,6 @@
 import FormInput from '@/components/form/form-input';
 import { ScreenHeight } from '@/components/global-style';
-import { Headers } from '@/constants/header-options';
+import { getHeaders } from '@/constants/header-options';
 import MainView from '@/components/MainView';
 import { Notify } from '@/components/notify';
 import { AddMaterial, Material } from '@/material-api-types';
@@ -27,11 +27,11 @@ const AddMaterialSchema = z.object({
 });
 
 // Fetcher
-const PostAddMaterial = async (url: string, { arg }: { arg: AddMaterial }) => await fetch(url, { headers: Headers, method: 'POST', body: JSON.stringify(arg) });
-const PostPicture = async (url: string, { arg }: { arg: { type: string, file: Blob } }) => await fetch(url, { headers: { ...Headers, 'Content-Type': `image/${arg.type}` }, method: 'POST', body: arg.file });
+const PostAddMaterial = async (url: string, { arg }: { arg: AddMaterial }) => await fetch(url, { headers: await getHeaders(), method: 'POST', body: JSON.stringify(arg) });
+const PostPicture = async (url: string, { arg }: { arg: { type: string, file: Blob } }) => await fetch(url, { headers: { ...(await getHeaders()), 'Content-Type': `image/${arg.type}` }, method: 'POST', body: arg.file });
 const fetchJobsites = async (url: string): Promise<JobSite[]> => {
   const res = await fetch(url, {
-    headers: Headers,
+    headers: await getHeaders(),
   });
   if (!res.ok) {
     throw new Error("Failed to fetch jobsites");
@@ -47,6 +47,8 @@ const AddMaterials = () => {
   const [status, setStatus] = useState('In Stock');
   const [type, setType] = useState('');
   const [unit, setUnit] = useState('');
+  // const [location_lat, setLocationLat] = useState(''); //Needed for map marker.
+  // const [location_lng, setLocationLng] = useState(''); //Set in map view.
   const [[picture, extension], setPicture] = useState<[Blob | undefined, string]>([undefined, '']);
 
   const [isDownloading, setDownload] = useState(false);
@@ -72,6 +74,8 @@ const AddMaterials = () => {
       status,
       type,
       unit,
+      // location_lat, //not used for now
+      // location_lng, //not used for now
       picture
     })
 
@@ -98,6 +102,16 @@ const AddMaterials = () => {
           String: values.type
         },
         unit: values.unit,
+        // location_lat: values.location_lat,
+        // type:{
+        //  Valid: true,
+        //  Float64: values.location_lat
+        // },                                       // not used for now
+        // location_lng: values.location_lng,
+        // type:{
+        //  Valid: true,
+        //  Float64: values.location_lng
+        // },
         picture: { Valid: true, String: "/file.svg" }
       };
 
@@ -176,6 +190,8 @@ const AddMaterials = () => {
       <FormInput value={unit} keyboardtype='default' placeholder="Unit" OnChangeText={setUnit} />
       <ComboboxFormField default_label={status} options={status_opts} OnClickSet={setStatus} />
       <FormPictueInput OnPicture={setPicture} />
+      {/* Some form of material add map that will allow you to place the marker.
+          react-native-maps does have a lot of dynamic markers to use.          */}
       {isDownloading ? <Button title='sending' /> : <Button onPress={async () => { await SendAddMaterialRequest() }} title='Add Material' />}
     </FormModalView>
   )
