@@ -9,6 +9,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { LogInUser } from "@/user-api-types"
 import { setToken, delTokenNIdentity } from "@/components/securestore"
+import { Notify } from './notify';
 
 const formSchema = z.object({
   username: z.string().nonempty(),
@@ -28,7 +29,7 @@ async function logIn(url: string, { arg }: { arg: LogInUser }) {
 
 export default function LoginForm() {
 
-  const { trigger, error } = useSWRMutation(`${process.env.EXPO_PUBLIC_API_URL}/api/user/login`, logIn)
+  const { trigger } = useSWRMutation(`${process.env.EXPO_PUBLIC_API_URL}/api/user/login`, logIn)
 
   const {
     control,

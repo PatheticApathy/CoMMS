@@ -1,29 +1,23 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { StyleSheet, View, Text, ActivityIndicator, Platform } from 'react-native';
 import MapView, { Polygon, Marker } from 'react-native-maps';
-import useSWR from 'swr';
+import useSWR, { Fetcher } from 'swr';
 import { GetUserRow, JobSite } from '@/user-api-types';
 import { getToken, IdentityContext } from '@/components/securestore';
 import { Material } from '@/material-api-types';
-import { Headers } from '@/constants/header-options';
+import { getHeaders } from '@/constants/header-options';
 
-const fetchUser = async (url: string): Promise<GetUserRow[]> => {
-  const res = await fetch(url, { headers: Headers });
-  if (!res.ok) throw new Error('Failed to fetch user data');
-  return res.json();
-};
+const fetchUser: Fetcher<GetUserRow[], string> = async (...args) => fetch(...args, {
+  headers: await getHeaders(),
+}).then(res => res.json());
 
-const jobSiteFetcher = async (url: string): Promise<JobSite> => {
-  const res = await fetch(url, { headers: Headers });
-  if (!res.ok) throw new Error('Failed to fetch job site data');
-  return res.json();
-};
+const jobSiteFetcher: Fetcher<JobSite, string> = async (...args) => fetch(...args, {
+  headers: await getHeaders(),
+}).then(res => res.json());
 
-const materialFetcher = async (url: string): Promise<Material[]> => {
-  const res = await fetch(url, { headers: Headers });
-  if (!res.ok) throw new Error('Failed to fetch materials');
-  return res.json();
-};
+const materialFetcher: Fetcher<Material[], string> = async (...args) => fetch(...args, {
+  headers: await getHeaders(),
+}).then(res => res.json());
 
 export default function Jobsites() {
   const identity = useContext(IdentityContext);

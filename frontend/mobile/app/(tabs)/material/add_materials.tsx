@@ -1,6 +1,6 @@
 import FormInput from '@/components/form/form-input';
 import { ScreenHeight } from '@/components/global-style';
-import { getHeaders } from '@/components/header-options';
+import { getHeaders } from '@/constants/header-options';
 import MainView from '@/components/MainView';
 import { Notify } from '@/components/notify';
 import { AddMaterial, Material } from '@/material-api-types';
