@@ -1,4 +1,4 @@
-import { Pressable, Button, Text, View, StyleSheet } from "react-native";
+import { Pressable, Text, View, StyleSheet } from "react-native";
 import * as FileSystem from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker'
 import { useEffect } from "react";
@@ -26,7 +26,7 @@ export default function FormPictueInput({ OnPicture }: { OnPicture: (file: [Blob
           style={({ pressed }) => pressed ? { ...style.buttonstyle, backgroundColor: 'cyan' } : style.buttonstyle}
           onPress={async () => {
             const pic = await ImagePicker.launchImageLibraryAsync({
-              mediaTypes: ImagePicker.MediaTypeOptions.Images,
+              mediaTypes: 'images',
               allowsEditing: true,
               quality: 1,
             })

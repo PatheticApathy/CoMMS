@@ -11,6 +11,7 @@ export default function MaterialPage() {
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="[quantity]" options={{ headerShown: false, presentation: 'modal' }} />
+        <Stack.Screen name="add_log" options={{ headerShown: false, presentation: 'modal' }} />
       </Stack>
     </ThemeProvider>
   );
