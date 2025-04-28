@@ -34,7 +34,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import useSWR from "swr";
-import { User, UserJoin, Company, JobSite, GetUserRow } from "@/user-api-types";
+import { User, UserJoin, GetUserRow } from "@/user-api-types";
 import Loading from "@/components/loading";
 import { getToken, IdentityContext } from '@/components/identity-provider';
 import { cn } from "@/lib/utils";
@@ -58,28 +58,6 @@ const fetchUser = async  (url: string): Promise<GetUserRow[]> => {
   }
   return res.json();
 };
-
-const fetchCompanies = async (url: string): Promise<Company[]> => {
-  const res = await fetch(url,
-    { headers: { 'authorization': getToken() || 'bruh' } }
-  );
-  if (!res.ok) {
-    throw new Error("Failed to fetch companies");
-  }
-  return res.json();
-};
-
-const fetchJobsites = async (url: string): Promise<JobSite[]> => {
-  const res = await fetch(url,
-    { headers: { 'authorization': getToken() || 'bruh' } }
-  )
-  if (!res.ok) {
-    throw new Error("Failed to fetch jobsites");
-  }
-  return res.json();
-};
-
-
 
 const Columns = (): ColumnDef<User>[] => ([
   {
