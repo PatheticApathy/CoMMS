@@ -135,17 +135,13 @@ export default function MaterialOptions() {
           transparent={true}
           visible={visible}
         >
-          {picture ?
-            <View style={{ padding: '10%', marginTop: '85%', backgroundColor: 'yellow' }}>
-              <Pressable style={{ backgroundColor: 'white' }} onPress={async () => await handle_checkout()}><Text>Submit Request</Text></Pressable>
-              <Pressable onPress={() => setFile([undefined, ''])}><Text>Close</Text></Pressable>
-            </View> :
-            <View style={{ padding: '10%', marginTop: '85%', backgroundColor: 'green' }}>
-              <Text>Please add a picture to finish your request</Text>
-              <FormPictueInput OnPicture={setFile} />
-              <Pressable onPress={() => setVisible(false)}><Text>Close</Text></Pressable>
-            </View>
-          }
+          <View style={{ padding: '10%', marginTop: '85%', backgroundColor: 'green' }}>
+            <Text>Please add a picture to finish your request</Text>
+            <FormPictueInput OnPicture={setFile} />
+            <Pressable style={{ backgroundColor: 'white' }} onPress={async () => await handle_checkout()}><Text>Submit Request</Text></Pressable>
+            <Pressable onPress={() => setFile([undefined, ''])}><Text>Close</Text></Pressable>
+            <Pressable onPress={() => setVisible(false)}><Text>Close</Text></Pressable>
+          </View>
         </Modal>
         <View style={style.ActionTheme}>
           <Pressable style={{ flex: 1, backgroundColor: 'white' }} onPress={() => setVisible(true)}><Text>{check ? 'Checkin' : 'Checkout'}</Text></Pressable>
