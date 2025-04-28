@@ -4,11 +4,12 @@ import MainView from "@/components/MainView"
 import { Notify } from "@/components/notify"
 import { getHeaders } from "@/constants/header-options"
 import { AddMaterialLog, MaterialLog } from "@/material-api-types"
-import { useLocalSearchParams } from "expo-router"
+import { useLocalSearchParams, useRouter } from "expo-router"
 import { useState } from "react"
-import { Pressable, Text } from "react-native"
+import { Pressable, Text, View } from "react-native"
 import useSWRMutation from "swr/dist/mutation"
 import { z } from "zod"
+
 
 //Schema for form
 const AddMaterialLogSchema = z.object({
@@ -28,10 +29,11 @@ const PostAddMaterialLog = async (url: string, { arg }: { arg: AddMaterialLog })
 export default function AddMaterialLogForm() {
 
   //form controller
-  const { id } = useLocalSearchParams()
+  const router = useRouter()
+  const { id } = useLocalSearchParams() as { id: string }
 
   const [note, changeNote] = useState('')
-  const [status, changeStatus] = useState('')
+  const [status, changeStatus] = useState('In Stock')
   const [quantity_change, changeQuantity] = useState('')
 
 
@@ -43,7 +45,7 @@ export default function AddMaterialLogForm() {
     { label: "Out of Stock", value: "Out of Stock" },
   ]
 
-  const { trigger: add_log } = useSWRMutation('/api/material/mlogs/add', PostAddMaterialLog)
+  const { trigger: add_log } = useSWRMutation(`${process.env.EXPO_PUBLIC_API_URL}/api/material/mlogs/add`, PostAddMaterialLog)
 
   const SendAddMaterialLogRequest = async () => {
     try {
@@ -59,6 +61,7 @@ export default function AddMaterialLogForm() {
         const resp = await add_log({ ...value, note: { String: validation.data.note, Valid: validation.data.note !== '' ? true : false } })
         const log = await resp.json() as MaterialLog
         Notify.success(`Material Log for material id: ${log.material_id} Added!`);
+        router.back()
       } else {
         console.log(JSON.stringify(validation.error.format(), null, 2))
         Notify.error(validation.error.issues.map((issue) => {
@@ -73,10 +76,25 @@ export default function AddMaterialLogForm() {
 
   return (
     <MainView>
-      <FormInput keyboardtype={undefined} value={note} placeholder="Note" OnChangeText={changeNote} />
-      <FormInput keyboardtype={undefined} value={quantity_change} placeholder="Quantity Change" OnChangeText={changeQuantity} />
-      <ComboboxFormField default_label={status} OnClickSet={changeStatus} options={status_opts} />
-      {pressed ? <Pressable><Text>Sending</Text></Pressable> : <Pressable onPress={SendAddMaterialLogRequest}><Text>Send Request</Text></Pressable>}
+      <View style={{ width: '100%', height: '100%', alignContent: 'center', justifyContent: 'center' }}>
+        <View style={{ paddingLeft: 35 }}>
+          <FormInput keyboardtype={undefined} value={note} placeholder="Note" OnChangeText={changeNote} />
+          <FormInput keyboardtype={undefined} value={quantity_change} placeholder="Quantity Change" OnChangeText={changeQuantity} />
+        </View>
+        <ComboboxFormField default_label={status} OnClickSet={changeStatus} options={status_opts} />
+        {pressed ? <Pressable><Text>Sending</Text></Pressable> :
+          <Pressable
+            onPress={
+              () => {
+                setPressed(true)
+                SendAddMaterialLogRequest()
+                setPressed(false)
+              }
+            }>
+            <Text style={{ textAlign: 'center' }}>Send Request</Text>
+          </Pressable>
+        }
+      </View>
     </MainView >
   )
 }

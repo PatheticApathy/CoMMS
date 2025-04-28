@@ -2,27 +2,20 @@ import CheckoutLogList from "@/components/CheckoutLogList";
 import FileSVG from "@/components/file";
 import { ScreenHeight } from "@/components/global-style";
 import MainView from "@/components/MainView";
-import MaterialButton from "@/components/MaterialAccessButton";
 import MaterialLogList from "@/components/MaterialLogList";
 import { getHeaders } from "@/constants/header-options";
 import { ChangeQuantity, CheckoutLog, Material, MaterialLog } from "@/material-api-types";
 import { GetUserRow } from "@/user-api-types";
-import { useLocalSearchParams } from "expo-router";
-import { Image, ActivityIndicator, StyleSheet, Text, ScrollView, View, FlatList } from "react-native";
+import { Link, useLocalSearchParams } from "expo-router";
+import { Image, ActivityIndicator, StyleSheet, Text, ScrollView, View } from "react-native";
 import useSWR, { Fetcher } from "swr";
-import useSWRMutation from "swr/dist/mutation";
 
 const fetcher: Fetcher<Material[], string> = async (...args) => fetch(...args, {
   headers: await getHeaders()
 }).then(res => res.json())
-const MaterialLogFetcher: Fetcher<MaterialLog[], string> = async (...args) => fetch(...args, { headers: Headers, cache: 'default' }).then(res => res.json())
-const CheckoutLogFetcher: Fetcher<CheckoutLog[], string> = async (...args) => fetch(...args, { headers: Headers, cache: 'default' }).then(res => res.json())
-const UsersFetcher: Fetcher<GetUserRow[], string> = async (...args) => fetch(...args, { headers: Headers, cache: 'default' }).then(res => res.json())
-const CheckOut = async (url: string, { arg }: { arg: { checkout_picture: string, user_id: number, item_id: number, amount: number } }) => await fetch(url, { headers: Headers, method: 'POST', body: JSON.stringify(arg) })
-const CheckIn = async (url: string, { arg }: { arg: { checkin_picture: string, user_id: number, item_id: number } }) => await fetch(url, { headers: Headers, method: 'PUT', body: JSON.stringify(arg) })
-const QuantityChange = async (url: string, { arg }: { arg: ChangeQuantity }) => await fetch(url, { headers: Headers, method: 'PUT', body: JSON.stringify(arg) })
-const DeleteMaterial = async (url: string, { arg }: { arg: number }) => await fetch(url, { headers: Headers, method: 'DELETE', body: String(arg) })
-const PostPicture = async (url: string, { arg }: { arg: { type: string, file: Blob } }) => await fetch(url, { headers: Headers, method: 'POST', body: arg.file });
+const MaterialLogFetcher: Fetcher<MaterialLog[], string> = async (...args) => fetch(...args, { headers: await getHeaders(), cache: 'default' }).then(res => res.json())
+const CheckoutLogFetcher: Fetcher<CheckoutLog[], string> = async (...args) => fetch(...args, { headers: await getHeaders(), cache: 'default' }).then(res => res.json())
+const UsersFetcher: Fetcher<GetUserRow[], string> = async (...args) => fetch(...args, { headers: await getHeaders(), cache: 'default' }).then(res => res.json())
 
 const RenderImage = ({ image_url }: { image_url: string }) => {
   if (image_url.split('.').pop() == 'svg') { return <FileSVG /> }
@@ -86,12 +79,11 @@ const DisplayCheckouts = ({ checkout_logs, error, isLoading, users }: { checkout
 }
 
 export default function MaterialPage() {
-  const { id } = useLocalSearchParams()
+  const { id }: { id: string } = useLocalSearchParams()
   const { data: material, error, isLoading } = useSWR(`${process.env.EXPO_PUBLIC_API_URL}/api/material/material/search?id=${id}`, fetcher)
   const { data: checkout_logs, isLoading: checkout_loading, error: checkout_error } = useSWR(material && material[0] ? `${process.env.EXPO_PUBLIC_API_URL}/api/material/checkout/recent?id=${material[0].id}` : null, CheckoutLogFetcher)
   const { data: material_logs, isLoading: material_loading, error: material_error } = useSWR(material && material[0] ? `${process.env.EXPO_PUBLIC_API_URL}/api/material/mlogs/recent?id=${material[0].id}` : null, MaterialLogFetcher)
   const { data: usernames } = useSWR(checkout_logs ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/search?${checkout_logs.map(log => `id=${log.user_id}`).join('&')}` : undefined, UsersFetcher)
-  const { trigger: download } = useSWRMutation(`${process.env.EXPO_PUBLIC_API_URL}/api/picture`, PostPicture);
 
   if (error) { return <MainView>Error</MainView> }
   if (isLoading) { return <MainView ><ActivityIndicator style={{ justifyContent: 'center', height: ScreenHeight }} /></MainView> }
@@ -102,7 +94,15 @@ export default function MaterialPage() {
   return (
     <MainView>
       <ScrollView style={{ flex: 2 }} nestedScrollEnabled={true}>
-        <MaterialButton />
+
+        <Link href={{
+          pathname: '/(tabs)/material/[id]/[quantity]',
+          params: { id: id, quantity: material[0].quantity }
+        }}
+          style={style.OptionContainer}
+        >
+          <Text style={style.OptionLink}>Actions</Text>
+        </Link>
         <Text style={style.ItemTitle}>{material[0].name.Valid ? material[0].name.String : 'Material'}</Text>
         <RenderImage image_url={ImageUrl} />
         <View style={{ flex: 1, justifyContent: 'center' }}>
@@ -124,4 +124,14 @@ const style = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: '10%'
   },
+  OptionLink:
+  {
+    backgroundColor: 'red',
+  },
+  OptionContainer: {
+    zIndex: 1,
+    position: 'absolute',
+    paddingLeft: '80%',
+    paddingTop: '45%',
+  }
 })

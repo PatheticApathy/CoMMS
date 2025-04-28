@@ -1,14 +1,12 @@
 import { StyleSheet, Button, TextInput, Text, View } from 'react-native';
-import { Link, Redirect, router } from 'expo-router';
+import { Link, router } from 'expo-router';
 import React from 'react';
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm, Controller } from 'react-hook-form';
 import useSWRMutation from 'swr/mutation'
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
 import { LogInUser } from "@/user-api-types"
-import { setToken, delTokenNIdentity } from "@/components/securestore"
+import { setToken } from "@/components/securestore"
 import { Notify } from './notify';
 
 const formSchema = z.object({
