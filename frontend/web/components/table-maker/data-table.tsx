@@ -22,7 +22,7 @@ import {
 } from "@tanstack/react-table"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils";
-import { FileSpreadsheet } from "lucide-react";
+import { FileSpreadsheet, Printer } from "lucide-react";
 import { Input } from "@/components/ui/input"
 import {
   Table,
@@ -71,7 +71,7 @@ export function DataTable<TData, TValue>({
   })
   return (
     <div>
-      <div className="flex items-center py-4">
+      <div className="flex items-center">
         <Input
           placeholder="Name"
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
@@ -121,6 +121,9 @@ export function DataTable<TData, TValue>({
           className="max-w-sm"
         />
         <CsvDownloadButton className={cn(buttonVariants({ variant: 'accent' }))} data={data}><FileSpreadsheet /></CsvDownloadButton>
+        <Button variant="accent" size="default" onClick={() => window.print()}>
+          <Printer />
+        </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="accent" className="ml-auto">
@@ -194,7 +197,7 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
         <div>
-          <div className="flex items-center justify-center pr-4 space-x-2 py-4">
+          <div className="flex items-center justify-center space-x-2">
             <Button
               variant="accent"
               size="sm"

@@ -1,6 +1,6 @@
 import FormInput from '@/components/form/form-input';
 import { ScreenHeight } from '@/components/global-style';
-import { Headers } from '@/constants/header-options';
+import { getHeaders } from '@/components/header-options';
 import MainView from '@/components/MainView';
 import { Notify } from '@/components/notify';
 import { AddMaterial, Material } from '@/material-api-types';
@@ -27,11 +27,11 @@ const AddMaterialSchema = z.object({
 });
 
 // Fetcher
-const PostAddMaterial = async (url: string, { arg }: { arg: AddMaterial }) => await fetch(url, { headers: Headers, method: 'POST', body: JSON.stringify(arg) });
-const PostPicture = async (url: string, { arg }: { arg: { type: string, file: Blob } }) => await fetch(url, { headers: { ...Headers, 'Content-Type': `image/${arg.type}` }, method: 'POST', body: arg.file });
+const PostAddMaterial = async (url: string, { arg }: { arg: AddMaterial }) => await fetch(url, { headers: await getHeaders(), method: 'POST', body: JSON.stringify(arg) });
+const PostPicture = async (url: string, { arg }: { arg: { type: string, file: Blob } }) => await fetch(url, { headers: { ...(await getHeaders()), 'Content-Type': `image/${arg.type}` }, method: 'POST', body: arg.file });
 const fetchJobsites = async (url: string): Promise<JobSite[]> => {
   const res = await fetch(url, {
-    headers: Headers,
+    headers: await getHeaders(),
   });
   if (!res.ok) {
     throw new Error("Failed to fetch jobsites");

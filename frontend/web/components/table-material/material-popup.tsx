@@ -23,14 +23,44 @@ import { FileWithPath } from "react-dropzone";
 import { getToken } from "@/components/identity-provider";
 
 //fetchers
-const MaterialLogFetcher: Fetcher<MaterialLog[], string> = async (...args) => fetch(...args, { headers: { 'Authorization': getToken() }, cache: 'default' }).then(res => res.json())
-const CheckoutLogFetcher: Fetcher<CheckoutLog[], string> = async (...args) => fetch(...args, { headers: { 'Authorization': getToken() }, cache: 'default' }).then(res => res.json())
-const UsersFetcher: Fetcher<GetUserRow[], string> = async (...args) => fetch(...args, { headers: { 'Authorization': getToken() }, cache: 'default' }).then(res => res.json())
-const CheckOut = async (url: string, { arg }: { arg: { checkout_picture: string, user_id: number, item_id: number, amount: number } }) => await fetch(url, { headers: { 'Authorization': getToken() }, method: 'POST', body: JSON.stringify(arg) })
-const CheckIn = async (url: string, { arg }: { arg: { checkin_picture: string, user_id: number, item_id: number } }) => await fetch(url, { headers: { 'Authorization': getToken() }, method: 'PUT', body: JSON.stringify(arg) })
-const QuantityChange = async (url: string, { arg }: { arg: ChangeQuantity }) => await fetch(url, { headers: { 'Authorization': getToken() }, method: 'PUT', body: JSON.stringify(arg) })
-const DeleteMaterial = async (url: string, { arg }: { arg: number }) => await fetch(url, { headers: { 'Authorization': getToken() }, method: 'DELETE', body: String(arg) })
-const PostPicture = async (url: string, { arg }: { arg: { type: string, file: Blob } }) => await fetch(url, { headers: { 'Content-Type': `image/${arg.type}` }, method: 'POST', body: arg.file });
+const MaterialLogFetcher: Fetcher<MaterialLog[], string> = async (...args) => {
+  const token = await getToken();
+  return fetch(...args, { headers: { 'Authorization': token || '' }, cache: 'default' }).then(res => res.json());
+};
+
+const CheckoutLogFetcher: Fetcher<CheckoutLog[], string> = async (...args) => {
+  const token = await getToken();
+  return fetch(...args, { headers: { 'Authorization': token || '' }, cache: 'default' }).then(res => res.json());
+};
+
+const UsersFetcher: Fetcher<GetUserRow[], string> = async (...args) => {
+  const token = await getToken();
+  return fetch(...args, { headers: { 'Authorization': token || '' }, cache: 'default' }).then(res => res.json());
+};
+
+const CheckOut = async (url: string, { arg }: { arg: { checkout_picture: string, user_id: number, item_id: number, amount: number } }) => {
+  const token = await getToken();
+  return fetch(url, { headers: { 'Authorization': token || '' }, method: 'POST', body: JSON.stringify(arg) });
+};
+
+const CheckIn = async (url: string, { arg }: { arg: { checkin_picture: string, user_id: number, item_id: number } }) => {
+  const token = await getToken();
+  return fetch(url, { headers: { 'Authorization': token || '' }, method: 'PUT', body: JSON.stringify(arg) });
+};
+
+const QuantityChange = async (url: string, { arg }: { arg: ChangeQuantity }) => {
+  const token = await getToken();
+  return fetch(url, { headers: { 'Authorization': token || '' }, method: 'PUT', body: JSON.stringify(arg) });
+};
+
+const DeleteMaterial = async (url: string, { arg }: { arg: number }) => {
+  const token = await getToken();
+  return fetch(url, { headers: { 'Authorization': token || '' }, method: 'DELETE', body: String(arg) });
+};
+
+const PostPicture = async (url: string, { arg }: { arg: { type: string, file: Blob } }) => {
+  return fetch(url, { headers: { 'Content-Type': `image/${arg.type}` }, method: 'POST', body: arg.file });
+};
 
 const DisplayMaterialLogs = (material_logs: MaterialLog[] | undefined, error: boolean, isLoading: boolean,) => {
   if (isLoading) {

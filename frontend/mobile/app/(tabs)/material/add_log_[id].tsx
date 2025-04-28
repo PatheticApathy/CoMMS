@@ -2,7 +2,7 @@ import ComboboxFormField from "@/components/form/comboboxFormField"
 import FormInput from "@/components/form/form-input"
 import MainView from "@/components/MainView"
 import { Notify } from "@/components/notify"
-import { Headers } from "@/constants/header-options"
+import { getHeaders } from "@/constants/header-options"
 import { AddMaterialLog, MaterialLog } from "@/material-api-types"
 import { useLocalSearchParams } from "expo-router"
 import { useState } from "react"
@@ -21,7 +21,7 @@ const AddMaterialLogSchema = z.object({
 
 //fetcher
 const PostAddMaterialLog = async (url: string, { arg }: { arg: AddMaterialLog }) => await fetch(url, {
-  headers: Headers,
+  headers: await getHeaders(),
   method: 'POST', body: JSON.stringify(arg)
 })
 

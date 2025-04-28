@@ -1,3 +1,4 @@
+import React from 'react';
 import { Button, View, Text } from 'react-native';
 import { Link, Redirect } from 'expo-router';
 import MainView from '@/components/MainView';
@@ -5,7 +6,17 @@ import { ScreenHeight } from '@/components/global-style'
 import { getToken } from '@/components/securestore';
 
 export default function Welcome() {
-  //if (getToken()) { return <Redirect href={'/(tabs)/home'} /> }
+  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+
+  React.useEffect(() => {
+    getToken().then(token => {
+      if (token) {
+        setIsAuthenticated(true);
+      }
+    });
+  }, []);
+
+  if (isAuthenticated) { return <Redirect href={'/(tabs)/home'} /> }
   return (
     <MainView>
       <View style={{ flex: 1, paddingTop: ScreenHeight * 0.1 }}>
