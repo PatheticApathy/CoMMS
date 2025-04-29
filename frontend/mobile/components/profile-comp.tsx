@@ -1,6 +1,5 @@
 import { StyleSheet, Button, Image, View, Text } from 'react-native';
 import { Link } from 'expo-router';
-import { ThemedText } from '@/components/ThemedText';
 import MainView from '@/components/MainView'
 import { delTokenNIdentity, IdentityContext } from '@/components/securestore';
 import useSWR from 'swr';
@@ -8,6 +7,8 @@ import { GetUserRow } from '@/user-api-types';
 import { useRouter } from 'expo-router';
 import { getHeaders } from '@/constants/header-options';
 import { useContext } from "react"
+import { useColorScheme } from '@/hooks/useColorScheme.web';
+import { Colors } from '@/constants/Colors';
 
 const fetcher = async (url: string) => {
   const headers = await getHeaders();
@@ -42,11 +43,14 @@ export default function ProfileComp() {
     router.navigate('/');
   }
 
+  const color_scheme = useColorScheme()
+  const color_text = color_scheme === 'dark' ? Colors.dark_text : Colors.light_text
+
   return (
     <MainView>
       <View style={styles.titleContainer}>
-        <Text style={styles.title}>View Profile</Text>
-        <Text style={styles.subtitle}>View your profile here</Text>
+        <Text style={{ ...styles.title, ...color_text }}>View Profile</Text>
+        <Text style={{ ...styles.subtitle, ...color_text }}>View your profile here</Text>
       </View>
       <View style={styles.stepContainer}>
         <Image
@@ -54,16 +58,16 @@ export default function ProfileComp() {
           source={user[0].profilepicture.Valid ? {uri: `${process.env.EXPO_PUBLIC_API_URL}/${user[0].profilepicture.String}`, headers: headers} : require('../assets/images/test.png')}
         />
         <View style={styles.profileTextContainer}>
-          <Text style={styles.profileText}>
+          <Text style={{ ...styles.profileText, ...color_text }}>
             Username: {user[0].username}
           </Text>
-          <Text style={styles.profileText}>
+          <Text style={{ ...styles.profileText, ...color_text }}>
             Name: {user[0].firstname.Valid ? user[0].firstname.String : "N/A"} {user[0].lastname.Valid ? user[0].lastname.String : "N/A"}
           </Text>
-          <Text style={styles.profileText}>
+          <Text style={{ ...styles.profileText, ...color_text }}>
             Email: {user[0].email}
           </Text>
-          <Text style={styles.profileText}>
+          <Text style={{ ...styles.profileText, ...color_text }}>
             Phone: {user[0].phone}
           </Text>
         </View>

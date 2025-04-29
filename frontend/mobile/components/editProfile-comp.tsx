@@ -1,7 +1,5 @@
 import { StyleSheet, Button, Image, View, TextInput, ScrollView, Text } from 'react-native';
 import { Link, useRouter } from 'expo-router';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
 import MainView from '@/components/MainView'
 import useSWRMutation from 'swr/mutation';
 import useSWR from "swr"
@@ -12,7 +10,8 @@ import { GetUserRow, Firstname, Lastname } from '@/user-api-types'
 import { IdentityContext } from '@/components/securestore'
 import { useContext } from "react"
 import { getHeaders } from '@/constants/header-options'
-import { useState } from 'react';
+import { useColorScheme } from '@/hooks/useColorScheme.web';
+import { Colors } from '@/constants/Colors';
 
 const formSchema = z.object({
   username: z.string(),
@@ -106,14 +105,21 @@ export default function EditProfileComp() {
       phone,
       ID: identity ? id : 0,
     }
+    trigger(values2)
+    userMutate()
+    router.push("/profile")
   }
+
+  const color_scheme = useColorScheme()
+  const color_text = color_scheme === 'dark' ? Colors.dark_text : Colors.light_text
+  const color_border = color_scheme === 'dark' ? Colors.dark_border : Colors.light_border
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1}} scrollEnabled={true}>
       <MainView>
         <View style={styles.titleContainer}>
-          <Text style={styles.title}>Edit Profile</Text>
-          <Text style={styles.subtitle}>Edit your profile here</Text>
+          <Text style={{ ...styles.title, ...color_text }}>Edit Profile</Text>
+          <Text style={{ ...styles.subtitle, ...color_text }}>Edit your profile here</Text>
         </View>
         <View style={styles.stepContainer}>
           <Image
@@ -127,9 +133,9 @@ export default function EditProfileComp() {
             }}
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
-                style={styles.input}
+                style={{ ...styles.input, ...color_border, ...color_text }}
                 placeholder='Username'
-                placeholderTextColor='white'
+                placeholderTextColor = {color_scheme === 'dark' ? '#C9ADA7' : '#00272B'}
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}      
@@ -144,9 +150,9 @@ export default function EditProfileComp() {
             }}
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
-                style={styles.input}
+                style={{ ...styles.input, ...color_border, ...color_text }}
                 placeholder='First Name'
-                placeholderTextColor='white'
+                placeholderTextColor = {color_scheme === 'dark' ? '#C9ADA7' : '#00272B'}
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}      
@@ -161,9 +167,9 @@ export default function EditProfileComp() {
             }}
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
-                style={styles.input}
+                style={{ ...styles.input, ...color_border, ...color_text }}
                 placeholder='Last Name'
-                placeholderTextColor='white'
+                placeholderTextColor = {color_scheme === 'dark' ? '#C9ADA7' : '#00272B'}
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}      
@@ -178,9 +184,9 @@ export default function EditProfileComp() {
             }}
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
-                style={styles.input}
+                style={{ ...styles.input, ...color_border, ...color_text }}
                 placeholder='Email'
-                placeholderTextColor='white'
+                placeholderTextColor = {color_scheme === 'dark' ? '#C9ADA7' : '#00272B'}
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}      
@@ -195,9 +201,9 @@ export default function EditProfileComp() {
             }}
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
-                style={styles.input}
+                style={{ ...styles.input, ...color_border, ...color_text }}
                 placeholder='Phone'
-                placeholderTextColor='white'
+                placeholderTextColor = {color_scheme === 'dark' ? '#C9ADA7' : '#00272B'}
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}      

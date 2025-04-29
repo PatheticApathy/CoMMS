@@ -1,4 +1,3 @@
-import { NetworkInfo }from 'react-native-network-info';
 import { StyleSheet, Button, TextInput, Text, View } from 'react-native';
 import { Link } from 'expo-router';
 import React from 'react';
@@ -10,6 +9,8 @@ import { SignUpUser } from "@/user-api-types"
 import { setToken } from "@/components/securestore"
 import { useRouter } from 'expo-router'
 import MainView from '@/components/MainView'
+import { useColorScheme } from '@/hooks/useColorScheme.web';
+import { Colors } from '@/constants/Colors';
 
 const formSchema = z.object({
   username: z.string().nonempty(),
@@ -77,10 +78,14 @@ export default function SignupForm() {
     }
   }
 
+  const color_scheme = useColorScheme()
+  const color_text = color_scheme === 'dark' ? Colors.dark_text : Colors.light_text
+  const color_border = color_scheme === 'dark' ? Colors.dark_border : Colors.light_border
+
   return (
     <MainView>
       <View style={styles.titleContainer}>
-        <Text style={styles.title}>Signup</Text>
+        <Text style={{ ...styles.title, ...color_text }}>Signup</Text>
       </View>
       <View style={styles.stepContainer}>
         <Controller
@@ -90,9 +95,9 @@ export default function SignupForm() {
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              style={styles.input}
+              style={{ ...styles.input, ...color_border, ...color_text }}
               placeholder="Username"
-              placeholderTextColor='white'
+              placeholderTextColor = {color_scheme === 'dark' ? '#C9ADA7' : '#00272B'}
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
@@ -107,9 +112,9 @@ export default function SignupForm() {
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              style={styles.input}
+              style={{ ...styles.input, ...color_border, ...color_text }}
               placeholder="Password"
-              placeholderTextColor='white'
+              placeholderTextColor = {color_scheme === 'dark' ? '#C9ADA7' : '#00272B'}
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
@@ -125,9 +130,9 @@ export default function SignupForm() {
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              style={styles.input}
+              style={{ ...styles.input, ...color_border, ...color_text }}
               placeholder="Confirm Password"
-              placeholderTextColor='white'
+              placeholderTextColor = {color_scheme === 'dark' ? '#C9ADA7' : '#00272B'}
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
@@ -143,9 +148,9 @@ export default function SignupForm() {
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              style={styles.input}
+              style={{ ...styles.input, ...color_border, ...color_text }}
               placeholder="Email"
-              placeholderTextColor='white'
+              placeholderTextColor = {color_scheme === 'dark' ? '#C9ADA7' : '#00272B'}
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
@@ -160,9 +165,9 @@ export default function SignupForm() {
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              style={styles.input}
+              style={{ ...styles.input, ...color_border, ...color_text }}
               placeholder="Phone"
-              placeholderTextColor='white'
+              placeholderTextColor = {color_scheme === 'dark' ? '#C9ADA7' : '#00272B'}
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
@@ -173,7 +178,7 @@ export default function SignupForm() {
       </View>
       <View style={styles.button}>
         <Button title="Sign Up" onPress={handleSubmit(onSubmit)}></Button>
-        <Text style={styles.logInText}>Already Have an Account?</Text>
+        <Text style={{ ...styles.logInText, ...color_text }}>Already Have an Account?</Text>
         <Link href="/login" asChild style={styles.logInLink}>
           <Text style={styles.logInLink}>Log In!</Text>
         </Link>
@@ -196,7 +201,6 @@ const styles = StyleSheet.create({
   title: {
     paddingTop: 30,
     fontSize: 30,
-    color: 'white'
   },
   subtitle: {
     fontSize: 20,
@@ -208,6 +212,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     marginLeft: 10,
     marginRight: 10,
+    width: "80%"
   },
   button: {
     alignSelf: 'center',
@@ -220,8 +225,6 @@ const styles = StyleSheet.create({
     margin: 6,
     borderWidth: 1,
     padding: 10,
-    borderColor: 'white',
-    color: 'white'
   },
   logInText: {
     alignSelf: 'center'

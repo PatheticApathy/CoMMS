@@ -9,6 +9,8 @@ import { LogInUser } from "@/user-api-types"
 import { setToken } from "@/components/securestore"
 import { Notify } from './notify';
 import MainView from '@/components/MainView'
+import { useColorScheme } from '@/hooks/useColorScheme.web';
+import { Colors } from '@/constants/Colors';
 
 const formSchema = z.object({
   username: z.string().nonempty(),
@@ -58,11 +60,16 @@ export default function LoginForm() {
     }
   }
 
+  const color_scheme = useColorScheme()
+  const color_text = color_scheme === 'dark' ? Colors.dark_text : Colors.light_text
+  const color_border = color_scheme === 'dark' ? Colors.dark_border : Colors.light_border
+
+
   //if (error) { <Text>{error.message}</Text> }
   return (
     <MainView>
       <View style={styles.titleContainer}>
-        <Text style={styles.title}>Login</Text>
+        <Text style={{ ...styles.title, ...color_text }}>Login</Text>
       </View>
       <View style={styles.stepContainer}>
         <Controller
@@ -72,9 +79,9 @@ export default function LoginForm() {
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              style={styles.input}
+              style={{ ...styles.input, ...color_border, ...color_text }}
               placeholder="Username"
-              placeholderTextColor='white'
+              placeholderTextColor = {color_scheme === 'dark' ? '#C9ADA7' : '#00272B'}
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
@@ -89,9 +96,9 @@ export default function LoginForm() {
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              style={styles.input}
+              style={{ ...styles.input, ...color_border, ...color_text }}
               placeholder="Password"
-              placeholderTextColor='white'
+              placeholderTextColor = {color_scheme === 'dark' ? '#C9ADA7' : '#00272B'}
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
@@ -103,7 +110,7 @@ export default function LoginForm() {
       </View>
       <View style={styles.button}>
         <Button title="Login" onPress={handleSubmit(onSubmit)}></Button>
-        <Text style={styles.signUpText}>Don't Have an Account?</Text>
+        <Text style={{ ...styles.signUpText, ...color_text }}>Don't Have an Account?</Text>
         <Link href="/signup" asChild>
           <Text style={styles.signUpLink}>Sign Up!</Text>
         </Link>
@@ -137,7 +144,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 8,
     marginLeft: 10,
-    width: '100%',
+    width: '80%',
     marginRight: 10,
   },
   button: {
@@ -151,8 +158,6 @@ const styles = StyleSheet.create({
     margin: 12,
     borderWidth: 1,
     padding: 10,
-    borderColor: 'gray',
-    color: 'gray',
   },
   signUpText: {
     alignSelf: 'center'
