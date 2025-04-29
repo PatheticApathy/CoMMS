@@ -1,5 +1,6 @@
 import React from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import MainView from '@/components/MainView';
+import { ActivityIndicator, StyleSheet, Text } from 'react-native';
 import useSWR, { Fetcher } from 'swr';
 import { IdentityContext } from '@/components/securestore';
 import { MaterialWithLogs } from '@/material-api-types';
@@ -30,12 +31,15 @@ export default function HomePage() {
   const { data: jobsites } = useSWR(user && user[0] ? `${process.env.EXPO_PUBLIC_API_URL}/api/sites/company?id=${user[0].company_id.Valid ? user[0].company_id.Int64 : undefined}` : null, fetchJobsites);
   const { data: materials } = useSWR(user && user[0] ? `${process.env.EXPO_PUBLIC_API_URL}/api/material/material/created` : null, fetchMaterials);
 
-  if (!identity || !user || !jobsite || !jobsites || !materials) {
+
+  
+  if (!jobsite) { return (<MainView><Text>No jobsite to display</Text></MainView>) }
+  if (!identity || !user) {
     return (
-      <View style={styles.loadingContainer}>
+      <MainView>
         <ActivityIndicator size="large" color="#0000ff" />
         <Text>Loading...</Text>
-      </View>
+      </MainView>
     );
   }
 
@@ -46,6 +50,11 @@ export default function HomePage() {
 
 const styles = StyleSheet.create({
   loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  centered: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',

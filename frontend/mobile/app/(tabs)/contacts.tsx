@@ -43,9 +43,9 @@ export default function Coworkers() {
     }
   };
 
-  if (isLoading) { return (<MainView><ActivityIndicator style={{ justifyContent: 'center', height: ScreenHeight }} /></MainView>) }
-  if (error) { return (<MainView><Text style={{ color: 'red', justifyContent: 'center', height: '100%' }}>Error occured while trying to load coworkers</Text></MainView>) }
-  if (!coworkers) { return (<MainView><Text style={{ justifyContent: 'center', height: '100%' }}>No coworkers to display</Text></MainView>) }
+  if (isLoading) { return (<MainView><ActivityIndicator style={styles.centered} /></MainView>) }
+  if (error) { return (<MainView><Text style={styles.centered}>Error occured while trying to load coworkers</Text></MainView>) }
+  if (!coworkers) { return (<MainView><Text style={styles.centered}>No coworkers to display</Text></MainView>) }
   return (
     <MainView>
       <Text style={{ paddingTop: ScreenHeight * 0.01, color: 'white', flex: 1, alignSelf: 'center', fontSize: 40, textAlign: 'center' }}>Coworkers</Text>
@@ -71,5 +71,10 @@ const styles = StyleSheet.create({
     margin: 10,
     borderRadius: 5,
     fontSize: 18,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
