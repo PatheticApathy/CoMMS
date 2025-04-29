@@ -1,7 +1,8 @@
-import { StyleSheet, Button, Image, View, TextInput, ScrollView } from 'react-native';
+import { StyleSheet, Button, Image, View, TextInput, ScrollView, Text } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import MainView from '@/components/MainView'
 import useSWRMutation from 'swr/mutation';
 import useSWR from "swr"
 import { z } from 'zod'
@@ -58,7 +59,7 @@ export default function EditProfileComp() {
 
   const { data: user, mutate: userMutate } = useSWR<GetUserRow[], string>(identity ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${id}` : null, fetcher)
 
-  if (!user) return <ThemedText>Loading...</ThemedText>;  
+  if (!user) return <Text>Loading...</Text>;  
 
   const {
     control,
@@ -109,111 +110,113 @@ export default function EditProfileComp() {
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1}} scrollEnabled={true}>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title" style={styles.title}>Edit Profile</ThemedText>
-        <ThemedText type="subtitle" style={styles.subtitle}>Edit your profile here</ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Image
-          style={styles.pfpImage}
-          source={user[0].profilepicture.Valid ? {uri: `${process.env.EXPO_PUBLIC_API_URL}/${user[0].profilepicture.String}`, headers: headers} : require('../assets/images/test.png')}
-        />
-        <Controller
-          control={control}
-          rules={{
-            required: true,
-          }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={styles.input}
-              placeholder='Username'
-              placeholderTextColor='white'
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}      
-            />
-          )}
-          name="username"
-        />
-        <Controller
-          control={control}
-          rules={{
-            required: false,
-          }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={styles.input}
-              placeholder='First Name'
-              placeholderTextColor='white'
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}      
-            />
-          )}
-          name="firstname"
-        />
-        <Controller
-          control={control}
-          rules={{
-            required: false,
-          }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={styles.input}
-              placeholder='Last Name'
-              placeholderTextColor='white'
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}      
-            />
-          )}
-          name="lastname"
-        />
-        <Controller
-          control={control}
-          rules={{
-            required: true,
-          }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={styles.input}
-              placeholder='Email'
-              placeholderTextColor='white'
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}      
-            />
-          )}
-          name="email"
-        />
-        <Controller
-          control={control}
-          rules={{
-            required: true,
-          }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={styles.input}
-              placeholder='Phone'
-              placeholderTextColor='white'
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}      
-            />
-          )}
-          name="phone"
-        />
-      </ThemedView>
-      <ThemedView style={styles.buttons}>
-        <ThemedView style={styles.profileButton}>
-            <Link href="/profile" asChild>
-                <Button title="Back to Profile"></Button>
-            </Link>
-        </ThemedView>
-        <ThemedView style={styles.saveButton}>
-          <Button title="Save Changes" onPress={handleSubmit(profileSubmit)}></Button>
-        </ThemedView>
-      </ThemedView>
+      <MainView>
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>Edit Profile</Text>
+          <Text style={styles.subtitle}>Edit your profile here</Text>
+        </View>
+        <View style={styles.stepContainer}>
+          <Image
+            style={styles.pfpImage}
+            source={user[0].profilepicture.Valid ? {uri: `${process.env.EXPO_PUBLIC_API_URL}/${user[0].profilepicture.String}`, headers: headers} : require('../assets/images/test.png')}
+          />
+          <Controller
+            control={control}
+            rules={{
+              required: true,
+            }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                style={styles.input}
+                placeholder='Username'
+                placeholderTextColor='white'
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}      
+              />
+            )}
+            name="username"
+          />
+          <Controller
+            control={control}
+            rules={{
+              required: false,
+            }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                style={styles.input}
+                placeholder='First Name'
+                placeholderTextColor='white'
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}      
+              />
+            )}
+            name="firstname"
+          />
+          <Controller
+            control={control}
+            rules={{
+              required: false,
+            }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                style={styles.input}
+                placeholder='Last Name'
+                placeholderTextColor='white'
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}      
+              />
+            )}
+            name="lastname"
+          />
+          <Controller
+            control={control}
+            rules={{
+              required: true,
+            }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                style={styles.input}
+                placeholder='Email'
+                placeholderTextColor='white'
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}      
+              />
+            )}
+            name="email"
+          />
+          <Controller
+            control={control}
+            rules={{
+              required: true,
+            }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                style={styles.input}
+                placeholder='Phone'
+                placeholderTextColor='white'
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}      
+              />
+            )}
+            name="phone"
+          />
+        </View>
+        <View style={styles.buttons}>
+          <View style={styles.profileButton}>
+              <Link href="/profile" asChild>
+                  <Button title="Back to Profile"></Button>
+              </Link>
+          </View>
+          <View style={styles.saveButton}>
+            <Button title="Save Changes" onPress={handleSubmit(profileSubmit)}></Button>
+          </View>
+        </View>
+      </MainView>
     </ScrollView>
   );
 }

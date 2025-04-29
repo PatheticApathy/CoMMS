@@ -24,7 +24,7 @@ export default function Welcome() {
         <Text style={{ flex: 2, fontSize: 25, textAlign: 'center', color: 'white' }}>The Construction Material Management System</Text>
       </View>
       <View style={{ flex: 2, alignItems: 'center' }}>
-        <Text style={{ fontSize: 21, textAlign: 'center', color: 'white'  }}>
+        <Text style={{ fontSize: 21, textAlign: 'center', color: 'white' }}>
           The Construction Material Management System, or CoMMS, is a system through which employees of construction
           companies, or companies in fields that require similar material tracking, can keep track of materials throughout a job site. This system
           is designed to be used through this website for easy accessibility.

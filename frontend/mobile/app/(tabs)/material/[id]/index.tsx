@@ -7,7 +7,6 @@ import { BlockingHeaders, getHeaders } from "@/constants/header-options";
 import { CheckoutLog, Material, MaterialLog } from "@/material-api-types";
 import { GetUserRow } from "@/user-api-types";
 import { Link, useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
 import { Image, ActivityIndicator, StyleSheet, Text, ScrollView, View } from "react-native";
 import useSWR, { Fetcher } from "swr";
 
