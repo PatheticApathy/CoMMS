@@ -1,6 +1,5 @@
 import type { Config } from "tailwindcss";
-
-const plugin = require('tailwindcss/plugin');
+import plugin from 'tailwindcss/plugin';
 
 export default {
     darkMode: ["class"],
@@ -26,7 +25,7 @@ export default {
   	}
   },
   plugins: [
-    plugin(function ({ addBase }) {
+    plugin(function ({ addBase }: { addBase: (styles: Record<string, any>) => void }) {
       addBase({
         body: {
           backgroundColor: 'var(--color-background)',

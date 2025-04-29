@@ -34,7 +34,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import useSWR from "swr";
-import { User, UserJoin, Company, JobSite, GetUserRow } from "@/user-api-types";
+import { User, UserJoin, GetUserRow } from "@/user-api-types";
 import Loading from "@/components/loading";
 import { getToken, IdentityContext } from '@/components/identity-provider';
 import { cn } from "@/lib/utils";
@@ -59,29 +59,7 @@ const fetchUser = async  (url: string): Promise<GetUserRow[]> => {
   return res.json();
 };
 
-const fetchCompanies = async (url: string): Promise<Company[]> => {
-  const res = await fetch(url,
-    { headers: { 'authorization': getToken() || 'bruh' } }
-  );
-  if (!res.ok) {
-    throw new Error("Failed to fetch companies");
-  }
-  return res.json();
-};
-
-const fetchJobsites = async (url: string): Promise<JobSite[]> => {
-  const res = await fetch(url,
-    { headers: { 'authorization': getToken() || 'bruh' } }
-  )
-  if (!res.ok) {
-    throw new Error("Failed to fetch jobsites");
-  }
-  return res.json();
-};
-
-
-
-const Columns = (companies: Company[] | undefined, jobsites: JobSite[] | undefined): ColumnDef<User>[] => ([
+const Columns = (): ColumnDef<User>[] => ([
   {
     id: "select",
     header: ({ table }) => (
@@ -173,14 +151,12 @@ const Columns = (companies: Company[] | undefined, jobsites: JobSite[] | undefin
 
 export default function ContactsTable() {
   const { data, error } = useSWR<UserJoin[]>("/api/user/join", fetcher);
-  const { data: companies } = useSWR<Company[]>("/api/company/all", fetchCompanies);
-  const { data: jobsites } = useSWR<JobSite[]>("/api/sites/all", fetchJobsites);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] =
     useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const columns = Columns(companies, jobsites)
+  const columns = Columns()
   const identity = useContext(IdentityContext)
 
   const { data: currentuser, error: error2 } = useSWR<GetUserRow[], string>(identity ? `/api/user/search?id=${identity?.id}` : null, fetchUser);

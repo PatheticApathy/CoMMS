@@ -7,17 +7,20 @@ import { getToken, IdentityContext } from '@/components/securestore';
 import { Material } from '@/material-api-types';
 import { getHeaders } from '@/constants/header-options';
 
-const fetchUser: Fetcher<GetUserRow[], string> = async (...args) => fetch(...args, {
-  headers: await getHeaders(),
-}).then(res => res.json());
+const fetchUser: Fetcher<GetUserRow[], string> = async (...args) =>
+  fetch(...args, {
+    headers: await getHeaders(),
+  }).then((res) => res.json());
 
-const jobSiteFetcher: Fetcher<JobSite, string> = async (...args) => fetch(...args, {
-  headers: await getHeaders(),
-}).then(res => res.json());
+const jobSiteFetcher: Fetcher<JobSite, string> = async (...args) =>
+  fetch(...args, {
+    headers: await getHeaders(),
+  }).then((res) => res.json());
 
-const materialFetcher: Fetcher<Material[], string> = async (...args) => fetch(...args, {
-  headers: await getHeaders(),
-}).then(res => res.json());
+const materialFetcher: Fetcher<Material[], string> = async (...args) =>
+  fetch(...args, {
+    headers: await getHeaders(),
+  }).then((res) => res.json());
 
 export default function Jobsites() {
   const identity = useContext(IdentityContext);
@@ -123,7 +126,10 @@ export default function Jobsites() {
             typeof material.location_lat.Float64 === 'number' &&
             typeof material.location_lng.Float64 === 'number';
 
-          if (!hasCoords) return null;
+          if (!hasCoords) {
+            console.warn(`Material ${material.id} is missing coordinates.`);
+            return null;
+          }
 
           return (
             <Marker

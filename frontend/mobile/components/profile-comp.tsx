@@ -2,23 +2,13 @@ import { StyleSheet, Button, Image } from 'react-native';
 import { Link } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { getToken, delTokenNIdentity, IdentityContext } from '@/components/securestore';
+import { delTokenNIdentity, IdentityContext } from '@/components/securestore';
 import useSWR from 'swr';
-import { GetUserRow, User } from '@/user-api-types';
+import { GetUserRow } from '@/user-api-types';
 import { useRouter } from 'expo-router';
 import { getHeaders } from '@/constants/header-options';
 import { useContext } from "react"
-import { useEffect, useState } from 'react';
 
-async function getProfileArgs(url: string, arg: string) {
-  const headers = await getHeaders();
-  return fetch(url, {
-    method: 'POST',
-    headers,
-    redirect: 'follow',
-    body: arg,
-  }).then((res) => res.json());
-}
 
 const fetcher = async (url: string) => {
   const headers = await getHeaders();
@@ -29,20 +19,12 @@ const fetcher = async (url: string) => {
   return res.json();
 }
 
-let id = 1
-
 export default function ProfileComp() {
-
-  let token = getToken()
 
   const identity = useContext(IdentityContext)
   const router = useRouter()
 
-  const { data: tokenData } = useSWR([`${process.env.EXPO_PUBLIC_API_URL}/api/user/decrypt`, token], ([url, token]) => getProfileArgs(url, token))
-  if (tokenData)
-    id = tokenData.id
-
-  const { data: user } = useSWR<GetUserRow[], string>(identity ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${id}` : null, fetcher)
+  const { data: user } = useSWR<GetUserRow[], string>(identity ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${identity.id}` : null, fetcher)
 
   if (!user) return <ThemedText>Loading...</ThemedText>;
 
@@ -54,6 +36,8 @@ export default function ProfileComp() {
     router.navigate('/');
   }
 
+  const headers = getHeaders();
+
   return (
     <ThemedView>
       <ThemedView style={styles.titleContainer}>
@@ -63,7 +47,7 @@ export default function ProfileComp() {
       <ThemedView style={styles.stepContainer}>
         <Image
           style={styles.pfpImage}
-          source={user[0].profilepicture.Valid ? {uri: `${process.env.EXPO_PUBLIC_API_URL}/${user[0].profilepicture.String}`, headers: Headers} : require('../assets/images/test.png')}
+          source={user[0].profilepicture.Valid ? {uri: `${process.env.EXPO_PUBLIC_API_URL}/${user[0].profilepicture.String}`, headers: headers} : require('../assets/images/test.png')}
         />
         <ThemedView style={styles.profileTextContainer}>
           <ThemedText style={styles.profileText}>
