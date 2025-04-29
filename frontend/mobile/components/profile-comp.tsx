@@ -1,7 +1,7 @@
-import { StyleSheet, Button, Image } from 'react-native';
+import { StyleSheet, Button, Image, View, Text } from 'react-native';
 import { Link } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import MainView from '@/components/MainView'
 import { delTokenNIdentity, IdentityContext } from '@/components/securestore';
 import useSWR from 'swr';
 import { GetUserRow } from '@/user-api-types';
@@ -18,6 +18,8 @@ const fetcher = async (url: string) => {
   return res.json();
 }
 
+let id = 1
+
 export default function ProfileComp() {
   
   const headers = getHeaders()
@@ -33,52 +35,50 @@ export default function ProfileComp() {
   const { data: user } = useSWR<GetUserRow[], string>(identity ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${id}` : null, fetcher)
 
 
-  if (!user) return <ThemedText>Loading...</ThemedText>;
+  if (!user) return <Text>Loading...</Text>;
 
   async function logoutSubmit() {
     delTokenNIdentity();
     router.navigate('/');
   }
 
-  const headers = getHeaders();
-
   return (
-    <ThemedView>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title" style={styles.title}>View Profile</ThemedText>
-        <ThemedText type="subtitle" style={styles.subtitle}>View your profile here</ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
+    <MainView>
+      <View style={styles.titleContainer}>
+        <Text style={styles.title}>View Profile</Text>
+        <Text style={styles.subtitle}>View your profile here</Text>
+      </View>
+      <View style={styles.stepContainer}>
         <Image
           style={styles.pfpImage}
           source={user[0].profilepicture.Valid ? {uri: `${process.env.EXPO_PUBLIC_API_URL}/${user[0].profilepicture.String}`, headers: headers} : require('../assets/images/test.png')}
         />
-        <ThemedView style={styles.profileTextContainer}>
-          <ThemedText style={styles.profileText}>
+        <View style={styles.profileTextContainer}>
+          <Text style={styles.profileText}>
             Username: {user[0].username}
-          </ThemedText>
-          <ThemedText style={styles.profileText}>
+          </Text>
+          <Text style={styles.profileText}>
             Name: {user[0].firstname.Valid ? user[0].firstname.String : "N/A"} {user[0].lastname.Valid ? user[0].lastname.String : "N/A"}
-          </ThemedText>
-          <ThemedText style={styles.profileText}>
+          </Text>
+          <Text style={styles.profileText}>
             Email: {user[0].email}
-          </ThemedText>
-          <ThemedText style={styles.profileText}>
+          </Text>
+          <Text style={styles.profileText}>
             Phone: {user[0].phone}
-          </ThemedText>
-        </ThemedView>
-      </ThemedView>
-      <ThemedView style={styles.buttons}>
-        <ThemedView style={styles.logoutButton}>
+          </Text>
+        </View>
+      </View>
+      <View style={styles.buttons}>
+        <View style={styles.logoutButton}>
           <Button title="Logout" onPress={logoutSubmit}></Button>
-        </ThemedView>
-        <ThemedView style={styles.editButton}>
+        </View>
+        <View style={styles.editButton}>
           <Link href="/editProfile" asChild>
             <Button title="Edit Profile"></Button>
           </Link>
-        </ThemedView>
-      </ThemedView>
-    </ThemedView>
+        </View>
+      </View>
+    </MainView>
   );
 }
 

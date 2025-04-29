@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, ActivityIndicator, Platform } from 'react-nativ
 import MapView, { Polygon, Marker } from 'react-native-maps';
 import useSWR, { Fetcher } from 'swr';
 import { GetUserRow, JobSite } from '@/user-api-types';
-import { getToken, IdentityContext } from '@/components/securestore';
+import { IdentityContext } from '@/components/securestore';
 import { Material } from '@/material-api-types';
 import { getHeaders } from '@/constants/header-options';
 
@@ -39,9 +39,8 @@ export default function Jobsites() {
 
   const { data: materials, error: errorMaterials } = useSWR<Material[]>(
     currentUser
-      ? `${process.env.EXPO_PUBLIC_API_URL}/api/material/material/search?site=${
-          currentUser[0].jobsite_id.Valid ? currentUser[0].jobsite_id.Int64 : undefined
-        }`
+      ? `${process.env.EXPO_PUBLIC_API_URL}/api/material/material/search?site=${currentUser[0].jobsite_id.Valid ? currentUser[0].jobsite_id.Int64 : undefined
+      }`
       : null,
     materialFetcher
   );
@@ -139,9 +138,8 @@ export default function Jobsites() {
                 longitude: material.location_lng.Float64,
               }}
               title={material.name?.Valid ? material.name.String : 'Unnamed Material'}
-              description={`Type: ${
-                material.type?.Valid ? material.type.String : 'Unknown'
-              }\nQty: ${material.quantity} ${material.unit}`}
+              description={`Type: ${material.type?.Valid ? material.type.String : 'Unknown'
+                }\nQty: ${material.quantity} ${material.unit}`}
             />
           );
         })}

@@ -9,6 +9,7 @@ import useSWRMutation from 'swr/mutation'
 import { SignUpUser } from "@/user-api-types"
 import { setToken } from "@/components/securestore"
 import { useRouter } from 'expo-router'
+import MainView from '@/components/MainView'
 
 const formSchema = z.object({
   username: z.string().nonempty(),
@@ -77,7 +78,7 @@ export default function SignupForm() {
   }
 
   return (
-    <View>
+    <MainView>
       <View style={styles.titleContainer}>
         <Text style={styles.title}>Signup</Text>
       </View>
@@ -177,7 +178,7 @@ export default function SignupForm() {
           <Text style={styles.logInLink}>Log In!</Text>
         </Link>
       </View>
-    </View>
+    </MainView>
   );
 }
 
