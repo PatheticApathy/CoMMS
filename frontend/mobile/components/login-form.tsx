@@ -8,6 +8,7 @@ import useSWRMutation from 'swr/mutation'
 import { LogInUser } from "@/user-api-types"
 import { setToken } from "@/components/securestore"
 import { Notify } from './notify';
+import MainView from '@/components/MainView'
 
 const formSchema = z.object({
   username: z.string().nonempty(),
@@ -59,7 +60,7 @@ export default function LoginForm() {
 
   //if (error) { <Text>{error.message}</Text> }
   return (
-    <View>
+    <MainView>
       <View style={styles.titleContainer}>
         <Text style={styles.title}>Login</Text>
       </View>
@@ -107,7 +108,7 @@ export default function LoginForm() {
           <Text style={styles.signUpLink}>Sign Up!</Text>
         </Link>
       </View>
-    </View>
+    </MainView>
   );
 }
 
@@ -125,7 +126,7 @@ const styles = StyleSheet.create({
   title: {
     paddingTop: 30,
     fontSize: 30,
-    color: 'white'
+    color: 'white',
   },
   subtitle: {
     fontSize: 20,
@@ -136,6 +137,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 8,
     marginLeft: 10,
+    width: '100%',
     marginRight: 10,
   },
   button: {
@@ -150,7 +152,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
     borderColor: 'gray',
-    color: 'gray'
+    color: 'gray',
   },
   signUpText: {
     alignSelf: 'center'
