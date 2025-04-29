@@ -35,7 +35,6 @@ export default function ProfileComp() {
 
   const { data: user } = useSWR<GetUserRow[], string>(identity ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${id}` : null, fetcher)
 
-
   if (!user) return <Text>Loading...</Text>;
 
   async function logoutSubmit() {

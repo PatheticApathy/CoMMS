@@ -251,14 +251,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     marginLeft: 10,
     marginRight: 10,
+    width: "80%"
   },
   input: {
     height: 40,
     margin: 5,
     borderWidth: 1,
     padding: 10,
-    borderColor: 'white',
-    color: 'white'
   },
   buttons: {
     flexDirection: 'row',
