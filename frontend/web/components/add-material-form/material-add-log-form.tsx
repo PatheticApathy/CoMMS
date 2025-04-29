@@ -94,9 +94,9 @@ export default function AddMaterialLogForm({ materials }: { materials: Material[
       <form onSubmit={form.handleSubmit(SendAddMaterialLogRequest)}>
         <MatetrialLogComboBox />
         <br />
-        <FormTextInput name="note" placeholder="Note" description="Note to add" form={form} />
-        <FormInput name="quantity_change" placeholder="Quantity change" description="Quantity changed if any" form={form} />
-        <ComboboxFormField form_attr={{ name: "status", description: "Initial status of item", form: form }} default_label={"In Stock"} options={status} />
+        <FormTextInput name="note" placeholder="Note" description="" form={form} />
+        <FormInput name="quantity_change" placeholder="Quantity change" description="" form={form} />
+        <ComboboxFormField form_attr={{ name: "status", description: "", form: form }} default_label={"In Stock"} options={status} />
         {isMutating ? <Button variant={'ghost'}>Sending</Button> : <Button variant="yellow" type="submit">Send Request</Button>}
       </form>
     </Form >

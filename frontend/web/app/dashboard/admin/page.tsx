@@ -36,11 +36,14 @@ export default function AdminPage() {
     return (
       <div className="flex flex-col justify-center items-center w-full px-4">
         <h1 className="font-bold text-5xl">Admin</h1>
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center mt-10">
           <Button variant="yellow" onClick={() => setShowFirstTable(!showFirstTable)}>
             Switch Table
           </Button>
-          {showFirstTable ? <UserTable /> : 
+          {showFirstTable ?
+            <div className="ml-24 mr-20 mt-10 mb-10">
+              <UserTable /> 
+            </div>: 
           <div>
           <FilterAndTable route={user && user[0] ? `/api/material/material/search?site=${user[0].jobsite_id.Valid ? user[0].jobsite_id.Int64 : undefined}` : undefined} header="" materials={materials} />
           <InitAddFormDialouge route={user && user[0] ? `/api/material/material/search?site=${user[0].jobsite_id.Valid ? user[0].jobsite_id.Int64 : undefined}` : undefined} materials={materials} />
