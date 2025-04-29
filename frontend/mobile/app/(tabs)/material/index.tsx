@@ -9,6 +9,8 @@ import { IdentityContext } from '@/components/securestore';
 import MaterialList from '@/components/MaterialList';
 import { getHeaders } from '@/constants/header-options';
 import { Link } from 'expo-router';
+import { useColorScheme } from '@/hooks/useColorScheme.web';
+import { Colors } from '@/constants/Colors';
 
 const fetcher: Fetcher<Material[], string> = async (...args) => fetch(...args, {
   headers: await getHeaders()
@@ -27,14 +29,18 @@ export default function Materials() {
   const { data: user } = useSWR(identity ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${identity.id}` : null, fetchUser,)
   const { data: materials, error, isLoading } = useSWR(user && user[0] ? `${process.env.EXPO_PUBLIC_API_URL}/api/material/material/search?site=${user[0].jobsite_id.Valid ? user[0].jobsite_id.Int64 : undefined}` : null, fetcher)
 
+  const color_scheme = useColorScheme()
+  const color_text = color_scheme === 'dark' ? Colors.dark_text : Colors.light_text
+  const color = color_scheme === 'dark' ? Colors.dark_box : Colors.light_box
+
   if (isLoading) { return (<MainView><ActivityIndicator style={{ justifyContent: 'center', height: ScreenHeight }} /></MainView>) }
   if (error) { return (<MainView><Text style={{ color: 'red', justifyContent: 'center', height: '100%' }}>Error occured while trying to load materials</Text></MainView>) }
   if (!materials) { return (<MainView><Text style={{ justifyContent: 'center', height: '100%' }}>No materials to display</Text></MainView>) }
   return (
     <MainView>
-      <Text style={{ paddingTop: ScreenHeight * 0.01, color: 'white', flex: 1, alignSelf: 'center', fontSize: 40, textAlign: 'center' }}>{`Materials for Jobsite ${user && user[0] && user[0].jobsite_id.Valid ? user[0].jobsite_id.Int64 : "Unknown"}`} </Text>
+      <Text style={{ paddingTop: ScreenHeight * 0.01, flex: 1, alignSelf: 'center', fontSize: 40, textAlign: 'center', ...color_text }}>{`Materials for Jobsite ${user && user[0] && user[0].jobsite_id.Valid ? user[0].jobsite_id.Int64 : "Unknown"}`} </Text>
       <Link style={{
-        flex: 0.5, color: 'white', fontSize: 40, backgroundColor: 'gray',
+        flex: 0.5, ...color_text, fontSize: 40, ...color,
         width: ScreenWidth * 0.95,
         padding: 10,
         marginBottom: 10,

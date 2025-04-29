@@ -39,6 +39,13 @@ export const Colors = {
     backgroundColor: '#2176AE',
   },
 
+  dark_box_lighter: {
+    backgroundColor: '#4e2c3c',
+  },
+  light_box_darker: {
+    backgroundColor: '#1b608d',
+  },
+
   dark_border: {
     borderColor: '#C9ADA7',
   },
