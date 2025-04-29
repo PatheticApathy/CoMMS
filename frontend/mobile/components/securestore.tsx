@@ -10,8 +10,6 @@ export const IdentityContext = createContext<Token | undefined>(undefined)
 export async function getToken() {
   const tkn = await SecureStore.getItemAsync('token'); // Use `getItemAsync` and await the result
   if (!tkn) {
-    Notify.error("No token found");
-    router.push("/login");
     return null; // Return null if no token is found
   }
   return tkn.trim()

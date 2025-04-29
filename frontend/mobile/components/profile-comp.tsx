@@ -9,10 +9,9 @@ import { useRouter } from 'expo-router';
 import { getHeaders } from '@/constants/header-options';
 import { useContext } from "react"
 
-
 const fetcher = async (url: string) => {
   const headers = await getHeaders();
-  const res = await fetch(url, { headers });
+  const res = await fetch(url, { headers: headers });
   if (!res.ok) {
     throw new Error('Failed to fetch');
   }
@@ -20,16 +19,21 @@ const fetcher = async (url: string) => {
 }
 
 export default function ProfileComp() {
+  
+  const headers = getHeaders()
 
   const identity = useContext(IdentityContext)
   const router = useRouter()
 
-  const { data: user } = useSWR<GetUserRow[], string>(identity ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${identity.id}` : null, fetcher)
+  console.log(identity)
+
+  if (identity)
+    id = identity.id
+
+  const { data: user } = useSWR<GetUserRow[], string>(identity ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${id}` : null, fetcher)
+
 
   if (!user) return <ThemedText>Loading...</ThemedText>;
-
-  if (user[0].profilepicture)
-    console.log(user[0].profilepicture.String)
 
   async function logoutSubmit() {
     delTokenNIdentity();
