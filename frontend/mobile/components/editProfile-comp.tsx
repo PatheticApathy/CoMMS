@@ -8,9 +8,10 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, Controller } from 'react-hook-form';
 import { GetUserRow, Firstname, Lastname } from '@/user-api-types'
-import { getToken, IdentityContext } from '@/components/securestore'
+import { IdentityContext } from '@/components/securestore'
 import { useContext } from "react"
-import { Headers } from '@/constants/header-options'
+import { getHeaders } from '@/constants/header-options'
+import { useState } from 'react';
 
 const formSchema = z.object({
   username: z.string(),
@@ -18,28 +19,22 @@ const formSchema = z.object({
   lastname: z.string(),
   email: z.string(),
   phone: z.string(),
+  picture: z.instanceof(Blob).optional()
 })
 
-async function getProfileArgs(url: string, arg: string) {
-  return fetch(url, {
-    method: 'POST',
-    headers: Headers,
-    redirect: 'follow',
-    body: arg
-  }).then(res => res.json())
-}
-
 async function changeProfile(url: string, { arg }) {
+  const headers = await getHeaders()
   return fetch(url, {
-      headers: Headers,
+      headers: headers,
       method: 'PUT',
       body: JSON.stringify(arg)
   }).then(res => res.json())
 }
 
 const fetcher = async  (url: string) => {
+  const headers = await getHeaders()
   const res = await fetch(url, {
-    headers: Headers
+    headers: headers
   })
   if (!res.ok) {
     throw new Error("Failed to fetch data");
@@ -49,16 +44,15 @@ const fetcher = async  (url: string) => {
 
 let id = 1
 
-export default function EditProfileComp() {
+export default function EditProfileComp() {  
 
-  let token = getToken()
+  const headers = getHeaders()
 
   const identity = useContext(IdentityContext)
   const router = useRouter()
 
-  const { data: tokenData } = useSWR([`${process.env.EXPO_PUBLIC_API_URL}/api/user/decrypt`, token], ([url, token]) => getProfileArgs(url, token))
-  if (tokenData)
-    id = tokenData.id
+  if (identity)
+    id = identity.id
 
   const { trigger } = useSWRMutation(`${process.env.EXPO_PUBLIC_API_URL}/api/user/update`, changeProfile, {throwOnError: false})
 
@@ -78,6 +72,7 @@ export default function EditProfileComp() {
       lastname: user[0].lastname.Valid? user[0].lastname.String : "",
       email: user[0].email,
       phone: user[0].phone,
+      picture: undefined
     },
   })
 
@@ -110,9 +105,6 @@ export default function EditProfileComp() {
       phone,
       ID: identity ? id : 0,
     }
-    trigger(values2)
-    userMutate()
-    router.navigate('/profile')
   }
 
   return (
@@ -124,10 +116,7 @@ export default function EditProfileComp() {
       <ThemedView style={styles.stepContainer}>
         <Image
           style={styles.pfpImage}
-          source={require('../assets/images/test.png')}
-          //source={{
-          //  uri: `${process.env.EXPO_PUBLIC_API_URL}/${user[0].profilepicture.String}`, headers: Headers
-          //}}
+          source={user[0].profilepicture.Valid ? {uri: `${process.env.EXPO_PUBLIC_API_URL}/${user[0].profilepicture.String}`, headers: headers} : require('../assets/images/test.png')}
         />
         <Controller
           control={control}
