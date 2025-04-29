@@ -30,13 +30,6 @@ export default function TabLayout({ children }: { children: ReactNode }) {
             }),
           }}>
           <Tabs.Screen
-            name="home"
-            options={{
-              title: 'Home',
-              tabBarIcon: ({ color }) => <MaterialCommunityIcons size={28} name="home" color={color} />,
-            }}
-          />
-          <Tabs.Screen
             name="jobsites"
             options={{
               title: 'Jobsites',
@@ -48,6 +41,13 @@ export default function TabLayout({ children }: { children: ReactNode }) {
             options={{
               title: 'Materials',
               tabBarIcon: ({ color }) => <MaterialCommunityIcons size={28} name="alpha-m-circle" color={color} />,
+            }}
+          />
+          <Tabs.Screen
+            name="home"
+            options={{
+              title: 'Home',
+              tabBarIcon: ({ color }) => <MaterialCommunityIcons size={28} name="home" color={color} />,
             }}
           />
           <Tabs.Screen
