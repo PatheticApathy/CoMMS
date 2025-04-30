@@ -20,7 +20,7 @@ const Item = ({ material }: { material: Material }) => {
   return (
   <View style={{ ...style.segment, ...color }}>
     <Link style={{ ...style.title, ...color_text, ...color_lighter }} href={{ pathname: '/(tabs)/material/[id]', params: { id: material.id } }}>{material.name.Valid ? material.name.String : "No name"}</Link>
-    <Text style={{ ...style.text, ...color_text }}> Type: {material.type.Valid ? material.type.String : "No name"}</Text>
+    <Text style={{ ...style.text, ...color_text }}>Type: {material.type.Valid ? material.type.String : "No name"}</Text>
     <Text style={{ ...style.text, ...color_text }}>{material.status} with {material.quantity} {material.unit}</Text>
     <Text style={{ ...style.text, ...color_text }}>{material.last_checked_out.Valid ? `Last checked out on: ${new Date(material.last_checked_out.Time).toISOString()}` : "Never checked out"}</Text>
   </View>
@@ -43,14 +43,17 @@ const style = StyleSheet.create({
     fontSize: 30
   },
   title: {
-    fontSize: 40,
+    fontSize: 35,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    borderRadius: 15,
   },
   segment: {
     padding: 10,
     marginBottom: 10,
     gap: 10,
     justifyContent: 'space-between',
-    borderRadius: 6,
+    borderRadius: 20,
   }
 
 })
