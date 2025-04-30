@@ -7,8 +7,9 @@ import { BlockingHeaders, getHeaders } from "@/constants/header-options";
 import { CheckoutLog, Material, MaterialLog } from "@/material-api-types";
 import { GetUserRow } from "@/user-api-types";
 import { Link, useLocalSearchParams } from "expo-router";
-import { Image, ActivityIndicator, StyleSheet, Text, ScrollView, View } from "react-native";
+import { Image, ActivityIndicator, StyleSheet, Text, ScrollView, View, useColorScheme } from "react-native";
 import useSWR, { Fetcher } from "swr";
+import { Colors } from '@/constants/Colors';
 
 const fetcher: Fetcher<Material[], string> = async (...args) => fetch(...args, {
   headers: await getHeaders()
@@ -20,6 +21,7 @@ const UsersFetcher: Fetcher<GetUserRow[], string> = async (...args) => fetch(...
 const RenderImage = ({ image_url }: { image_url: string }) => {
   if (image_url.split('.').pop() == 'svg') { return <FileSVG /> }
   return (
+    <View style={{padding: 30}}>
     <Image
       alt="Could not find picture of material"
       source={{
@@ -30,6 +32,7 @@ const RenderImage = ({ image_url }: { image_url: string }) => {
       height={280}
       borderRadius={10}
     />
+    </View>
   )
 }
 
@@ -53,6 +56,8 @@ const DisplayMaterialLogs = ({ material_logs, error, isLoading }: { material_log
 }
 
 const DisplayCheckouts = ({ checkout_logs, error, isLoading, users }: { checkout_logs: CheckoutLog[] | undefined, error: boolean, isLoading: boolean, users: GetUserRow[] | undefined }) => {
+  const color_scheme = useColorScheme()
+  const color_text = color_scheme === 'dark' ? Colors.dark_text : Colors.light_text
   if (isLoading) {
     return <ActivityIndicator />
   }
@@ -74,7 +79,7 @@ const DisplayCheckouts = ({ checkout_logs, error, isLoading, users }: { checkout
       </View>
     )
   } else {
-    return <Text style={{ textAlign: 'center' }}>Never Checked out</Text>;
+    return <Text style={{ textAlign: 'center', ...color_text}}>Never Checked out</Text>;
   }
 }
 
@@ -102,7 +107,9 @@ export default function MaterialPage() {
         }}
           style={style.OptionContainer}
         >
+          <View>
           <Text style={style.OptionLink}>Actions</Text>
+          </View>
         </Link>
         <Text style={style.ItemTitle}>{material[0].name.Valid ? material[0].name.String : 'Material'}</Text>
         <RenderImage image_url={ImageUrl} />
@@ -127,7 +134,10 @@ const style = StyleSheet.create({
   },
   OptionLink:
   {
-    backgroundColor: 'red',
+    backgroundColor: '#FFE74C',
+    borderRadius: 20,
+    padding: 1,
+    position: "fixed",
   },
   OptionContainer: {
     zIndex: 1,

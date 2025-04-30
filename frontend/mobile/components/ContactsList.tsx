@@ -43,13 +43,16 @@ const style = StyleSheet.create({
   },
   title: {
     fontSize: 40,
+    borderRadius: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
   segment: {
     padding: 10,
     marginBottom: 10,
     gap: 10,
     justifyContent: 'space-between',
-    borderRadius: 6,
+    borderRadius: 20,
   }
 
 })

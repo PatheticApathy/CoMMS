@@ -1,6 +1,7 @@
 import { CheckoutLog } from "@/material-api-types";
 import { StyleSheet, Text, View } from "react-native";
-import { FlatList } from "react-native";
+import { FlatList, useColorScheme } from "react-native";
+import { Colors } from "@/constants/Colors"
 
 
 export interface LogListElement extends CheckoutLog {
@@ -12,11 +13,16 @@ export interface CheckoutLogListInput {
 
 }
 
-const Item = ({ log }: { log: LogListElement }) => (
+const Item = ({ log }: { log: LogListElement }) => {
+  const color_scheme = useColorScheme()
+  const color_text = color_scheme === 'dark' ? Colors.dark_text : Colors.light_text
+  const color_box = color_scheme === 'dark' ? Colors.dark_box : Colors.light_box
+  return (
   <>
-    <View style={style.segment}>
-      <Text>Chekout pertains to user: {log.user || log.user_id}</Text>
-      <Text>
+    <View style={{...color_box, ...style.segment}}>
+    
+      <Text style={{ ...color_text }}>Chekout pertains to user: {log.user || log.user_id}</Text>
+      <Text style={{ ...color_text }}>
         {(() => {
           const checkout = new Date(log.checkout_time);
           return (
@@ -25,8 +31,8 @@ const Item = ({ log }: { log: LogListElement }) => (
         })()
         }
       </Text>
-      <Text>{`Amount checked out ${Math.abs(log.amount)}`}</Text>
-      <Text>
+      <Text style={{ ...color_text }}>{`Amount checked out ${Math.abs(log.amount)}`}</Text>
+      <Text style={{ ...color_text }}>
         {
           (() => {
 
@@ -43,12 +49,14 @@ const Item = ({ log }: { log: LogListElement }) => (
       </Text>
     </View>
   </>
-)
+)}
 
 
 export default function CheckoutLogList({ checkout_logs }: CheckoutLogListInput) {
+  const color_scheme = useColorScheme()
+  const color_text = color_scheme === 'dark' ? Colors.dark_text : Colors.light_text
   return <FlatList
-    ListHeaderComponent={() => (<Text style={{ textAlign: 'center', color: 'white', fontSize: 22, fontWeight: 'bold' }}>Checkout Logs</Text>)}
+    ListHeaderComponent={() => (<Text style={{ textAlign: 'center', fontSize: 22, fontWeight: 'bold', ...color_text }}>Checkout Logs</Text>)}
     data={checkout_logs}
     renderItem={(iteminfo) => <Item log={iteminfo.item} />}
     keyExtractor={material_log => String(material_log.id)}
@@ -70,10 +78,11 @@ const style = StyleSheet.create({
   segment: {
     flexDirection: 'column',
     marginBottom: 10,
+    margin: 25,
+    padding: 25,
     gap: 10,
-    backgroundColor: '#696969',
     justifyContent: 'space-between',
-    borderRadius: 6,
+    borderRadius: 20,
   }
 
 })

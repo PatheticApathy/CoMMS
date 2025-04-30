@@ -54,7 +54,7 @@ export default function Coworkers() {
   
   return (
     <MainView>
-      <Text style={{ paddingTop: ScreenHeight * 0.01, flex: 1, alignSelf: 'center', fontSize: 40, textAlign: 'center', ...color_text }}>Coworkers</Text>
+      <Text style={{ paddingTop: '20%', flex: 1, alignSelf: 'center', fontSize: 40, textAlign: 'center', fontWeight: 'bold', ...color_text }}>Coworkers</Text>
       <TextInput 
         style={{ ...styles.searchInput, ...color_text }}
         placeholder="Search coworkers..."
@@ -62,7 +62,7 @@ export default function Coworkers() {
         value={searchQuery}
         onChangeText={handleSearch}
       />
-      <View style={{ flex: 7 }}>
+      <View style={{ flex: 10 }}>
         <ContactsList coworkers={searchQuery ? filteredCoworkers : coworkers} />
       </View>
     </MainView>
@@ -71,11 +71,9 @@ export default function Coworkers() {
 
 const styles = StyleSheet.create({
   searchInput: {
-    backgroundColor: '#333',
-    color: 'white',
-    padding: 10,
     margin: 10,
-    borderRadius: 5,
-    fontSize: 18,
+    borderRadius: 10,
+    fontSize: 20,
+    
   },
 });
