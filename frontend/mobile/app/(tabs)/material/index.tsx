@@ -38,7 +38,7 @@ export default function Materials() {
   if (!materials) { return (<MainView><Text style={{ justifyContent: 'center', height: '100%' }}>No materials to display</Text></MainView>) }
   return (
     <MainView>
-      <Text style={{ paddingTop: '20%', flex: 0, alignSelf: 'center', fontSize: 50, textAlign: 'center', fontWeight: 'bold', ...color_text }}>{`Materials for Jobsite ${user && user[0] && user[0].jobsite_id.Valid ? user[0].jobsite_id.Int64 : "Unknown"}`} </Text>
+      <Text style={{ paddingTop: '5%', alignSelf: 'center', fontSize: 50, textAlign: 'center', fontWeight: 'bold', ...color_text }}>{`Materials for Jobsite ${user && user[0] && user[0].jobsite_id.Valid ? user[0].jobsite_id.Int64 : "Unknown"}`} </Text>
       <Link style={{
         flex: 0.5, ...color_text, fontSize: 40, ...color,
         width: '95%',
