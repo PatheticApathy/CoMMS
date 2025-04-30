@@ -91,7 +91,7 @@ const style = StyleSheet.create({
     margin: 20,
     padding: 15,
     flex: 1,
-    backgroundColor: 'gray',
+    backgroundColor: '#FFE74C',
     borderRadius: 20,
     alignContent: 'center',
     justifyContent: 'center',
