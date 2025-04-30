@@ -1,7 +1,7 @@
 import { Headers } from "@/constants/header-options";
 import { ChangeQuantity, CheckoutLog, Material } from "@/material-api-types";
 import { useContext, useEffect, useState } from "react";
-import { ActivityIndicator, Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Modal, Pressable, StyleSheet, Text, TextInput, useColorScheme, View } from "react-native";
 import useSWRMutation from "swr/dist/mutation";
 import { Notify } from "@/components/notify";
 import { Link, router } from "expo-router";
@@ -11,6 +11,7 @@ import MainView from "@/components/MainView";
 import useSWR, { Fetcher } from "swr";
 import { useLocalSearchParams } from "expo-router/build/hooks";
 import { set } from "react-hook-form";
+import { Colors } from "@/constants/Colors";
 
 //TODO: Test api calls
 //TODO: Test delete calls
@@ -34,6 +35,7 @@ interface CheckoutActionTypes {
   check: boolean
   setVisible: (visible: boolean) => void
 }
+
 const CheckoutAction = ({ check, setCount, setVisible, setFile, handle_checkout, counter, picture, visible, checkout_loading, checkout_error }: CheckoutActionTypes) => {
   if (checkout_loading) {
     return (
@@ -49,7 +51,9 @@ const CheckoutAction = ({ check, setCount, setVisible, setFile, handle_checkout,
       </View>
     )
   }
-  console.log(picture)
+  const color_scheme = useColorScheme()
+  const color = color_scheme === 'dark' ? Colors.dark_box : Colors.light_box
+
   return (
     <>
       <Modal
@@ -57,9 +61,14 @@ const CheckoutAction = ({ check, setCount, setVisible, setFile, handle_checkout,
         transparent={true}
         visible={visible}
       >
-        <View style={{ padding: '10%', marginTop: '50%', backgroundColor: 'green' }}>
-          <Text>Please add a picture to finish your request</Text>
-          <TextInput style={{ backgroundColor: 'blue' }} inputMode='decimal' value={counter} onChangeText={setCount} />
+        <View style={{ padding: '10%', marginTop: '50%', ...color }}>
+          <Text>Quantity Change</Text>
+          <TextInput style={{
+            borderWidth: 1,
+            borderColor: '#000',
+            borderRadius: 5,
+            width: `80%`
+          }} inputMode='decimal' value={counter} onChangeText={setCount} />
           <FormPictueInput OnPicture={setFile} />
           <Pressable onPress={() => {
             setFile([undefined, ''])
@@ -70,7 +79,7 @@ const CheckoutAction = ({ check, setCount, setVisible, setFile, handle_checkout,
         </View>
       </Modal>
       <View style={style.ActionTheme}>
-        <Pressable style={{ flex: 1, backgroundColor: 'white' }} onPress={() => setVisible(true)}><Text>{check ? 'Checkin' : 'Checkout'}</Text></Pressable>
+        <Pressable style={{ padding: 20, borderRadius: 10, flex: 1, backgroundColor: 'white' }} onPress={() => setVisible(true)}><Text>{check ? 'Checkin' : 'Checkout'}</Text></Pressable>
       </View>
     </>
   )
@@ -97,6 +106,7 @@ export default function MaterialOptions() {
   const { trigger: checkin } = useSWRMutation(`${process.env.EXPO_PUBLIC_API_URL}/api/material/checkout/in`, CheckIn)
   const { trigger: send_amount } = useSWRMutation(`${process.env.EXPO_PUBLIC_API_URL}/api/material/material/change`, QuantityChange)
 
+
   const { trigger } = useSWRMutation(`${process.env.EXPO_PUBLIC_API_URL}/api/material/material/delete`, DeleteMaterial, {
     onError(err) {
       console.error(err)
@@ -118,7 +128,11 @@ export default function MaterialOptions() {
   })
 
 
+  const color_scheme = useColorScheme()
+  const color_text = color_scheme === 'dark' ? Colors.dark_text : Colors.light_text
+  const color = color_scheme === 'dark' ? Colors.dark_box : Colors.light_box
   const handle_checkout = async () => {
+
     setWaiting(true)
     try {
       if (picture) {
@@ -212,8 +226,8 @@ export default function MaterialOptions() {
           <ActivityIndicator /> :
           <>
             <View style={style.ActionTheme}>
-              <Pressable style={{ flex: 1, backgroundColor: 'white' }} onPress={async () => await handle_add_amount()}><Text>Add Stock:</Text></Pressable>
-              <TextInput style={{ flex: 2, backgroundColor: 'blue' }} inputMode='decimal' value={add_counter} onChangeText={(n) => setaddcount(n)} />
+              <Pressable style={{ padding: 20, borderBottomLeftRadius: 10, borderTopLeftRadius: 10, flex: 1, backgroundColor: 'white' }} onPress={handle_add_amount}><Text>Add Stock:</Text></Pressable>
+              <TextInput style={{ padding: 20, borderBottomRightRadius: 10, borderTopRightRadius: 10, flex: 1, backgroundColor: '#FFE74C' }} inputMode='decimal' value={add_counter} onChangeText={setaddcount} />
             </View>
             <CheckoutAction
               check={check}
@@ -228,7 +242,7 @@ export default function MaterialOptions() {
               handle_checkout={handle_checkout}
             />
             <View style={style.ActionTheme}>
-              <Pressable style={{ flex: 1, backgroundColor: 'white' }} onPress={async () => await trigger(id)}><Text>Delete Material</Text></Pressable>
+              <Pressable style={{ padding: 20, borderRadius: 10, flex: 1, backgroundColor: 'red' }} onPress={async () => await trigger(id)}><Text>Delete Material</Text></Pressable>
             </View>
             <Link href={{ pathname: "/(tabs)/material/[id]/add_log", params: { id: material_id } }}><Text>Add New Log</Text></Link>
           </>
@@ -242,6 +256,7 @@ const style = StyleSheet.create({
   ActionTheme: {
     width: '75%',
     flexDirection: 'row',
-    padding: 10
+    padding: 10,
+    margin: 30
   }
 })

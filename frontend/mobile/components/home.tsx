@@ -80,30 +80,29 @@ export default function Dashboard({
 const styles = StyleSheet.create({
   container: {
     padding: 16,
-    paddingTop: '25%'
+    paddingTop: '20%'
   },
   sectionTitle: {
     padding: 5,
-    fontSize: 20,
+    fontSize: 45,
     fontWeight: 'bold',
   },
   card: {
     backgroundColor: '#f0f0f0',
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 16,
+    padding: 45,
+    borderRadius: 20,
   },
   cardTitle: {
-    fontSize: 18,
+    fontSize: 45,
     fontWeight: 'bold',
     marginBottom: 4,
   },
   cardSubtitle: {
-    fontSize: 14,
+    fontSize: 20,
     color: '#555',
   },
   noJobsitesText: {
-    fontSize: 14,
+    fontSize: 20,
     color: '#999',
     textAlign: 'center',
     marginTop: 16,
