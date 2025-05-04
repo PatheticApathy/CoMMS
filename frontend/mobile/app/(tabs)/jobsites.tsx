@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { StyleSheet, View, Text, ActivityIndicator, Platform } from 'react-native';
+import { StyleSheet, View, Text, ActivityIndicator } from 'react-native';
 import MapView, { Polygon, Marker } from 'react-native-maps';
 import useSWR, { Fetcher } from 'swr';
 import { GetUserRow, JobSite } from '@/user-api-types';
@@ -51,20 +51,23 @@ function createFixedBoundingBox(lat: number, lon: number, meters: number) {
 export default function Jobsites() {
   const identity = useContext(IdentityContext);
 
-  const { data: currentUser, error: errorUser } = useSWR<GetUserRow[]>(
+  const { data: currentUser, error: errorUser, mutate: mutateUser } = useSWR<GetUserRow[]>(
     identity ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${identity?.id}` : null,
     fetchUser
   );
 
-  const { data: currentSite, error: errorSite } = useSWR<JobSite>(
+  const { data: currentSite, error: errorSite, mutate: mutateSite } = useSWR<JobSite>(
     currentUser && currentUser[0].jobsite_id.Valid
       ? `${process.env.EXPO_PUBLIC_API_URL}/api/sites/search?id=${currentUser[0].jobsite_id.Int64}`
       : null,
     jobSiteFetcher
   );
 
-  const { data: materials, error: errorMaterials } = useSWR<Material[]>(
+  const { data: materials, error: errorMaterials, mutate: mutateMaterials } = useSWR<Material[]>(
     currentUser
+      ? `${process.env.EXPO_PUBLIC_API_URL}/api/material/material/search?site=${
+          currentUser[0].jobsite_id.Valid ? currentUser[0].jobsite_id.Int64 : undefined
+        }`
       ? `${process.env.EXPO_PUBLIC_API_URL}/api/material/material/search?site=${
           currentUser[0].jobsite_id.Valid ? currentUser[0].jobsite_id.Int64 : undefined
         }`
@@ -110,6 +113,17 @@ export default function Jobsites() {
     }
   }, [lat, lng]);
 
+  // Reload the page every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      mutateUser();
+      mutateSite();
+      mutateMaterials();
+    }, 30000);
+
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, [mutateUser, mutateSite, mutateMaterials]);
+
   if (!identity) {
     return (
       <View style={styles.centered}>
@@ -134,15 +148,6 @@ export default function Jobsites() {
       </View>
     );
   }
-
-  // Check if the platform is iOS
-  //if (Platform.OS !== 'ios') {
-  //  return (
-  //    <View style={styles.centered}>
-  //      <Text>Maps are only available on iOS</Text>
-  //    </View>
-  //  );
-  //}
 
   return (
     <View style={styles.map}>

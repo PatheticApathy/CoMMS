@@ -27,8 +27,12 @@ export default function Materials() {
   }
   logHeaders();
   const { data: user } = useSWR(identity ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${identity.id}` : null, fetchUser,)
-  const { data: materials, error, isLoading } = useSWR(user && user[0] ? `${process.env.EXPO_PUBLIC_API_URL}/api/material/material/search?site=${user[0].jobsite_id.Valid ? user[0].jobsite_id.Int64 : undefined}` : null, fetcher)
+  const { data: materials, error, isLoading, mutate: mutateMaterials } = useSWR(user && user[0] ? `${process.env.EXPO_PUBLIC_API_URL}/api/material/material/search?site=${user[0].jobsite_id.Valid ? user[0].jobsite_id.Int64 : undefined}` : null, fetcher)
 
+
+  const handleRefresh = async () => {
+    await mutateMaterials();
+  };
   const color_scheme = useColorScheme()
   const color_text = color_scheme === 'dark' ? Colors.dark_text : Colors.light_text
   const color = color_scheme === 'dark' ? Colors.dark_box : Colors.light_box
@@ -48,7 +52,9 @@ export default function Materials() {
         gap: 10,
       }} href={'/(tabs)/material/add_materials'}>Add a new Material</Link>
       <View style={{ flex: 7 }}>
-        <MaterialList materials={materials} />
+        <MaterialList materials={materials} 
+        onRefresh={handleRefresh}
+        refreshing={isLoading} />
       </View>
     </MainView>
   );
