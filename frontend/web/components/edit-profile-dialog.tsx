@@ -138,7 +138,7 @@ export function EditProfile() {
         const resp = await download({ type: extension, file: values.picture[0] })
         if (!resp.ok) {
           console.log("Resp 1: ", resp)
-          const message = await resp.json() as { message : string }
+          const message = await resp.json() as { message: string }
           console.log("Message: ", message)
           toast.error(message.message || "Error has occurred")
           return
@@ -172,10 +172,10 @@ export function EditProfile() {
             <DialogDescription>Edit your profile here. Click Save Changes when you&apos;re done.</DialogDescription>
           </DialogHeader>
           <form onSubmit={form.handleSubmit(profileSubmit)} className="space-y-8">
-              <div className="rounded-full overflow-hidden h-28 w-28">
-                <Image alt='Profile picture' src={user[0].profilepicture.Valid ? user[0].profilepicture.String : '/test.png'} width={120} height={120}></Image>
-              </div>
-            <FormFileInput name="picture" placeholder="Add picture" description="" form={form}/>
+            <div className="rounded-full overflow-hidden h-28 w-28">
+              <Image alt='Profile picture' src={user[0].profilepicture.Valid ? `/uploads${user[0].profilepicture.String}` : '/test.png'} width={120} height={120}></Image>
+            </div>
+            <FormFileInput name="picture" placeholder="Add picture" description="" form={form} />
             <FormField
               control={form.control}
               name="username"

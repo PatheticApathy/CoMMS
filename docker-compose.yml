@@ -31,10 +31,20 @@ services:
     ports:
       - 8080:8080
 
+  file_server:
+    build:
+      context: ./frontend/file_server/
+      dockerfile: ./frontend/file_server/Dockerfile
+    ports:
+      - 8083:8083
+    volumes:
+      - images:/app/public
+
   nextjs:
     restart: always
     environment:
       - API=user_api:8082
+      - PICTURE=file_server:8083
     build:
       context: ./frontend/web
       args:
@@ -44,8 +54,6 @@ services:
       - user_api
     ports:
       - 3000:3000
-    volumes:
-      - images:/app/public
 volumes:
   materialdb:
   userdb:
