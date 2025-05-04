@@ -29,7 +29,9 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED=1
 ARG API
+ARG PICTURES
 ENV API=$API
+ENV PICTURES=$PICTURES
 
 RUN \
   if [ -f yarn.lock ]; then yarn run build; \

@@ -9,4 +9,4 @@ VOLUME ./public/
 
 RUN npm install
 
-CMD [ "npm start" ]
+CMD [ "npm", "start" ]
