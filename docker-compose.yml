@@ -34,7 +34,7 @@ services:
   file_server:
     build:
       context: ./frontend/file_server/
-      dockerfile: ./frontend/file_server/Dockerfile
+      dockerfile: Dockerfile
     ports:
       - 8083:8083
     volumes:
