@@ -113,9 +113,6 @@ routes:
   /user/search:
     methods:
       - GET
-    roles:
-      - admin
-      - user
   /user/update:
     methods:
       - PUT
