@@ -40,7 +40,10 @@
         {
           "configureAndroidBackup": true
         }
-      ]
+      ],
+      "expo-font",
+      "expo-maps",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true
