@@ -31,21 +31,31 @@ services:
     ports:
       - 8080:8080
 
+  file_server:
+    build:
+      context: ./frontend/file_server/
+      dockerfile: Dockerfile
+    ports:
+      - 8083:8083
+    volumes:
+      - images:/app/public
+
   nextjs:
     restart: always
     environment:
       - API=user_api:8082
+      - PICTURES=file_server:8083
     build:
       context: ./frontend/web
       args:
         API: user_api:8082
+        PICTURES: file_server:8083
     depends_on:
       - material_api
       - user_api
+      - file_server
     ports:
       - 3000:3000
-    volumes:
-      - images:/app/public
 volumes:
   materialdb:
   userdb:
