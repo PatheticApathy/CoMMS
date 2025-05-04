@@ -13,10 +13,10 @@ export default function ComboboxFormField({ default_label, options, OnClickSet }
         onRequestClose={() => setModalVisible(!modalVisible)}
       >
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', }}>
-          <View style={{ backgroundColor: 'yellow', padding: 40, borderRadius: 20 }}>
+          <View style={{ backgroundColor: '#FFE74C', padding: 40, borderRadius: 20 }}>
             {(() =>
               options.map((option) => (
-                <View key={option.label} style={{ backgroundColor: 'cyan', margin: '10', borderRadius: 20 }}>
+                <View key={option.label} style={{ backgroundColor: '#C9ADA7', margin: '10', borderRadius: 20 }}>
                   <Button
                     title={option.label}
                     onPress={() => {

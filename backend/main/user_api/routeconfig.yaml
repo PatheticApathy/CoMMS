@@ -1,5 +1,5 @@
 routes:
-###############################Checkout realted routes#############################################
+  ###############################Checkout realted routes#############################################
   /material/checkout/all:
     methods:
       - GET
@@ -23,7 +23,7 @@ routes:
     roles:
       - admin
       - user
-###################################Material related routes##############################################
+  ###################################Material related routes##############################################
   /material/material/add:
     methods:
       - POST
@@ -53,7 +53,7 @@ routes:
     roles:
       - admin
       - user
-##################################Material Log related routes###############################################################
+  ##################################Material Log related routes###############################################################
   /material/mlogs/add:
     methods:
       - POST
@@ -84,7 +84,7 @@ routes:
     roles:
       - admin
       - user
-##################################User related routes#############################################
+  ##################################User related routes#############################################
   /user/all:
     methods:
       - GET
@@ -113,16 +113,10 @@ routes:
     roles:
       - admin
       - roles
-  /user/search:
-    methods:
-      - GET
-    roles:
-      - admin
-      - user
   /user/update:
     methods:
       - PUT
-    roles: 
+    roles:
       - admin
       - user
   #Signup does not require authorizatin
@@ -132,7 +126,7 @@ routes:
   #neithe should login/loggout
   /user/loggout:
   /user/loggin:
-##################################Jobsite related routes#############################################
+  ##################################Jobsite related routes#############################################
   /sites/add:
     methods:
       - POST
@@ -149,7 +143,7 @@ routes:
     roles:
       - admin
       - user
-##############################Comapny related Routes################################################
+  ##############################Comapny related Routes################################################
   /company/all:
     methods:
       - GET
@@ -166,4 +160,3 @@ routes:
     roles:
       - admin
       - user
-

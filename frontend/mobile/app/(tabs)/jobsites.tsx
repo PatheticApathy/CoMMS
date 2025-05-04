@@ -3,10 +3,11 @@ import { StyleSheet, View, Text, ActivityIndicator, Platform } from 'react-nativ
 import MapView, { Polygon, Marker } from 'react-native-maps';
 import useSWR, { Fetcher } from 'swr';
 import { GetUserRow, JobSite } from '@/user-api-types';
-import { getToken, IdentityContext } from '@/components/securestore';
+import { IdentityContext } from '@/components/securestore';
 import { Material } from '@/material-api-types';
 import { getHeaders } from '@/constants/header-options';
 
+// Fetchers
 const fetchUser: Fetcher<GetUserRow[], string> = async (...args) =>
   fetch(...args, {
     headers: await getHeaders(),
@@ -21,6 +22,31 @@ const materialFetcher: Fetcher<Material[], string> = async (...args) =>
   fetch(...args, {
     headers: await getHeaders(),
   }).then((res) => res.json());
+
+// Fetch Nominatim Zone
+async function fetchNominatimZone(lat: number, lon: number) {
+  const baseUrl = process.env.NOMIN || "https://nominatim.openstreetmap.org";
+  const url = `${baseUrl}/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&polygon_geojson=1`;
+  console.log("Calling Nominatim with:", url);
+  const res = await fetch(url, {
+    headers: {
+      "User-Agent": "CoMMS (mjl036@gmail.com)", // Required by Nominatim TOS
+    },
+  });
+  if (!res.ok) throw new Error("Failed to fetch from Nominatim");
+  return res.json();
+}
+
+// Create a fixed bounding box as a fallback
+function createFixedBoundingBox(lat: number, lon: number, meters: number) {
+  const offset = meters / 111320; // ~degrees per meter
+  return [
+    { latitude: lat - offset, longitude: lon - offset },
+    { latitude: lat - offset, longitude: lon + offset },
+    { latitude: lat + offset, longitude: lon + offset },
+    { latitude: lat + offset, longitude: lon - offset },
+  ];
+}
 
 export default function Jobsites() {
   const identity = useContext(IdentityContext);
@@ -47,19 +73,40 @@ export default function Jobsites() {
   );
 
   const [zonePolygon, setZonePolygon] = useState<any | null>(null);
+  const [fallbackPolygon, setFallbackPolygon] = useState<any | null>(null);
 
   const lat = currentSite?.location_lat?.Float64;
   const lng = currentSite?.location_lng?.Float64;
 
   useEffect(() => {
     if (lat && lng) {
-      // Simulate fetching a polygon or bounding box for the job site
-      setZonePolygon([
-        { latitude: lat - 0.001, longitude: lng - 0.001 },
-        { latitude: lat - 0.001, longitude: lng + 0.001 },
-        { latitude: lat + 0.001, longitude: lng + 0.001 },
-        { latitude: lat + 0.001, longitude: lng - 0.001 },
-      ]);
+      fetchNominatimZone(lat, lng)
+        .then((data) => {
+          if (data.geojson && data.geojson.type === "Polygon") {
+            setZonePolygon(data.geojson.coordinates[0].map(([lon, lat]: [number, number]) => ({
+              latitude: lat,
+              longitude: lon,
+            })));
+            setFallbackPolygon(null);
+          } else if (data.boundingbox) {
+            const [south, north, west, east] = data.boundingbox.map(parseFloat);
+            setFallbackPolygon([
+              { latitude: south, longitude: west },
+              { latitude: south, longitude: east },
+              { latitude: north, longitude: east },
+              { latitude: north, longitude: west },
+            ]);
+            setZonePolygon(null);
+          } else {
+            setFallbackPolygon(createFixedBoundingBox(lat, lng, 100)); // 100m fallback
+            setZonePolygon(null);
+          }
+        })
+        .catch((err) => {
+          console.error("Nominatim error:", err);
+          setFallbackPolygon(createFixedBoundingBox(lat, lng, 100)); // 100m fallback
+          setZonePolygon(null);
+        });
     }
   }, [lat, lng]);
 
@@ -89,13 +136,13 @@ export default function Jobsites() {
   }
 
   // Check if the platform is iOS
-  if (Platform.OS !== 'ios') {
-    return (
-      <View style={styles.centered}>
-        <Text>Maps are only available on iOS</Text>
-      </View>
-    );
-  }
+  //if (Platform.OS !== 'ios') {
+  //  return (
+  //    <View style={styles.centered}>
+  //      <Text>Maps are only available on iOS</Text>
+  //    </View>
+  //  );
+  //}
 
   return (
     <View style={styles.map}>
@@ -112,6 +159,16 @@ export default function Jobsites() {
         {zonePolygon && (
           <Polygon
             coordinates={zonePolygon}
+            strokeColor="purple"
+            fillColor="rgba(128, 0, 128, 0.2)"
+            strokeWidth={2}
+          />
+        )}
+
+        {/* Fallback Polygon */}
+        {fallbackPolygon && (
+          <Polygon
+            coordinates={fallbackPolygon}
             strokeColor="purple"
             fillColor="rgba(128, 0, 128, 0.2)"
             strokeWidth={2}

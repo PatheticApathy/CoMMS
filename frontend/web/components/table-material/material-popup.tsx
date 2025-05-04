@@ -291,7 +291,7 @@ export default function MaterialSheet({ material, route, children, token }: Read
                     </SheetDescription>
                   </SheetHeader>
                   <div className="flex flex-col gap-10 text-lg">
-                    <Image src={material.picture.Valid ? material.picture.String : '/file.svg'} alt="No Picture of Item found" width={500} height={500}></Image>
+                    <Image src={material.picture.Valid ? `/uploads${material.picture.String}` : '/file.svg'} alt="No Picture of Item found" width={500} height={500}></Image>
                   </div>
                   <div >
                     {material.type.Valid ? `Type: ${material.type.String}` : "No type found"}

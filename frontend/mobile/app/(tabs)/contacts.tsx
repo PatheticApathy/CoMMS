@@ -7,6 +7,8 @@ import { useContext, useState } from 'react';
 import { IdentityContext } from '@/components/securestore';
 import ContactsList from '@/components/ContactsList';
 import { getHeaders } from '@/constants/header-options';
+import { useColorScheme } from '@/hooks/useColorScheme.web';
+import { Colors } from '@/constants/Colors';
 
 const fetcher: Fetcher<Coworker[], string> = async (...args) => fetch(...args, {
   headers: await getHeaders()
@@ -43,20 +45,24 @@ export default function Coworkers() {
     }
   };
 
+  const color_scheme = useColorScheme()
+  const color_text = color_scheme === 'dark' ? Colors.dark_text : Colors.light_text
+
   if (isLoading) { return (<MainView><ActivityIndicator style={{ justifyContent: 'center', height: ScreenHeight }} /></MainView>) }
   if (error) { return (<MainView><Text style={{ color: 'red', justifyContent: 'center', height: '100%' }}>Error occured while trying to load coworkers</Text></MainView>) }
   if (!coworkers) { return (<MainView><Text style={{ justifyContent: 'center', height: '100%' }}>No coworkers to display</Text></MainView>) }
+  
   return (
     <MainView>
-      <Text style={{ paddingTop: ScreenHeight * 0.01, color: 'white', flex: 1, alignSelf: 'center', fontSize: 40, textAlign: 'center' }}>Coworkers</Text>
+      <Text style={{ paddingTop: '20%', flex: 1, alignSelf: 'center', fontSize: 40, textAlign: 'center', fontWeight: 'bold', ...color_text }}>Coworkers</Text>
       <TextInput 
-        style={styles.searchInput}
+        style={{ ...styles.searchInput, ...color_text }}
         placeholder="Search coworkers..."
-        placeholderTextColor="#ccc"
+        placeholderTextColor = {color_scheme === 'dark' ? '#C9ADA7' : '#00272B'}
         value={searchQuery}
         onChangeText={handleSearch}
       />
-      <View style={{ flex: 7 }}>
+      <View style={{ flex: 10 }}>
         <ContactsList coworkers={searchQuery ? filteredCoworkers : coworkers} />
       </View>
     </MainView>
@@ -65,11 +71,9 @@ export default function Coworkers() {
 
 const styles = StyleSheet.create({
   searchInput: {
-    backgroundColor: '#333',
-    color: 'white',
-    padding: 10,
     margin: 10,
-    borderRadius: 5,
-    fontSize: 18,
+    borderRadius: 10,
+    fontSize: 20,
+    
   },
 });

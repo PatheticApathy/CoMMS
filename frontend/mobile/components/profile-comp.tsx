@@ -1,80 +1,87 @@
-import { StyleSheet, Button, Image } from 'react-native';
+import { StyleSheet, Button, Image, View, Text } from 'react-native';
 import { Link } from 'expo-router';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import MainView from '@/components/MainView'
 import { delTokenNIdentity, IdentityContext } from '@/components/securestore';
 import useSWR from 'swr';
 import { GetUserRow } from '@/user-api-types';
 import { useRouter } from 'expo-router';
 import { getHeaders } from '@/constants/header-options';
 import { useContext } from "react"
-
+import { useColorScheme } from '@/hooks/useColorScheme.web';
+import { Colors } from '@/constants/Colors';
 
 const fetcher = async (url: string) => {
   const headers = await getHeaders();
-  const res = await fetch(url, { headers });
+  const res = await fetch(url, { headers: headers });
   if (!res.ok) {
     throw new Error('Failed to fetch');
   }
   return res.json();
 }
 
+let id = 1
+
 export default function ProfileComp() {
+  
+  const headers = getHeaders()
 
   const identity = useContext(IdentityContext)
   const router = useRouter()
 
-  const { data: user } = useSWR<GetUserRow[], string>(identity ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${identity.id}` : null, fetcher)
+  console.log(identity)
 
-  if (!user) return <ThemedText>Loading...</ThemedText>;
+  if (identity)
+    id = identity.id
 
-  if (user[0].profilepicture)
-    console.log(user[0].profilepicture.String)
+  const { data: user } = useSWR<GetUserRow[], string>(identity ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${id}` : null, fetcher)
+
+  if (!user) return <Text>Loading...</Text>;
 
   async function logoutSubmit() {
     delTokenNIdentity();
     router.navigate('/');
   }
 
-  const headers = getHeaders();
+  const color_scheme = useColorScheme()
+  const color_text = color_scheme === 'dark' ? Colors.dark_text : Colors.light_text
 
   return (
-    <ThemedView>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title" style={styles.title}>View Profile</ThemedText>
-        <ThemedText type="subtitle" style={styles.subtitle}>View your profile here</ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
+    <MainView>
+      <View style={styles.titleContainer}>
+        <Text style={{ ...styles.title, ...color_text }}>View Profile</Text>
+        <Text style={{ ...styles.subtitle, ...color_text }}>View your profile here</Text>
+      </View>
+      <View style={styles.stepContainer}>
         <Image
           style={styles.pfpImage}
           source={user[0].profilepicture.Valid ? {uri: `${process.env.EXPO_PUBLIC_API_URL}/${user[0].profilepicture.String}`, headers: headers} : require('../assets/images/test.png')}
         />
-        <ThemedView style={styles.profileTextContainer}>
-          <ThemedText style={styles.profileText}>
+        <View style={styles.profileTextContainer}>
+          <Text style={{ ...styles.profileText, ...color_text }}>
             Username: {user[0].username}
-          </ThemedText>
-          <ThemedText style={styles.profileText}>
+          </Text>
+          <Text style={{ ...styles.profileText, ...color_text }}>
             Name: {user[0].firstname.Valid ? user[0].firstname.String : "N/A"} {user[0].lastname.Valid ? user[0].lastname.String : "N/A"}
-          </ThemedText>
-          <ThemedText style={styles.profileText}>
+          </Text>
+          <Text style={{ ...styles.profileText, ...color_text }}>
             Email: {user[0].email}
-          </ThemedText>
-          <ThemedText style={styles.profileText}>
+          </Text>
+          <Text style={{ ...styles.profileText, ...color_text }}>
             Phone: {user[0].phone}
-          </ThemedText>
-        </ThemedView>
-      </ThemedView>
-      <ThemedView style={styles.buttons}>
-        <ThemedView style={styles.logoutButton}>
+          </Text>
+        </View>
+      </View>
+      <View style={styles.buttons}>
+        <View style={styles.logoutButton}>
           <Button title="Logout" onPress={logoutSubmit}></Button>
-        </ThemedView>
-        <ThemedView style={styles.editButton}>
+        </View>
+        <View style={styles.editButton}>
           <Link href="/editProfile" asChild>
             <Button title="Edit Profile"></Button>
           </Link>
-        </ThemedView>
-      </ThemedView>
-    </ThemedView>
+        </View>
+      </View>
+    </MainView>
   );
 }
 
