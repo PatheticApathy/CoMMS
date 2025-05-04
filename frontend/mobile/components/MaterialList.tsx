@@ -7,7 +7,8 @@ import { Colors } from '@/constants/Colors';
 
 export interface MaterialListInput {
   materials: Material[]
-
+  onRefresh: () => void;
+  refreshing: boolean;
 }
 
 const Item = ({ material }: { material: Material }) => {
@@ -27,11 +28,13 @@ const Item = ({ material }: { material: Material }) => {
 )
 }
 
-export default function MaterialList({ materials }: MaterialListInput) {
+export default function MaterialList({ materials, onRefresh, refreshing }: MaterialListInput) {
   return (<FlatList
     data={materials}
     renderItem={(iteminfo) => <Item material={iteminfo.item} />}
     keyExtractor={material => String(material.id)}
+    onRefresh={onRefresh}
+    refreshing={refreshing}
   />
   )
 }

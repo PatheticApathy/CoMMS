@@ -1,6 +1,6 @@
 import React from 'react';
 import MainView from '@/components/MainView';
-import { ActivityIndicator, StyleSheet, Text } from 'react-native';
+import { ActivityIndicator, Text } from 'react-native';
 import useSWR, { Fetcher } from 'swr';
 import { IdentityContext } from '@/components/securestore';
 import { MaterialWithLogs } from '@/material-api-types';
@@ -47,16 +47,3 @@ export default function HomePage() {
     <Dashboard jobsite={jobsite} jobsites={jobsites} materials={materials} />
   );
 }
-
-const styles = StyleSheet.create({
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});

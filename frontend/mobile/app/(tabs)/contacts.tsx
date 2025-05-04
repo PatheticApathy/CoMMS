@@ -10,20 +10,32 @@ import { getHeaders } from '@/constants/header-options';
 import { useColorScheme } from '@/hooks/useColorScheme.web';
 import { Colors } from '@/constants/Colors';
 
-const fetcher: Fetcher<Coworker[], string> = async (...args) => fetch(...args, {
-  headers: await getHeaders()
-}).then(res => res.json())
-const fetchUser: Fetcher<GetUserRow[], string> = async (...args) => fetch(...args, {
-  headers: await getHeaders()
-}).then(res => res.json())
+const fetcher: Fetcher<Coworker[], string> = async (...args) =>
+  fetch(...args, {
+    headers: await getHeaders(),
+  }).then((res) => res.json());
+const fetchUser: Fetcher<GetUserRow[], string> = async (...args) =>
+  fetch(...args, {
+    headers: await getHeaders(),
+  }).then((res) => res.json());
 
 export default function Coworkers() {
   const identity = useContext(IdentityContext);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredCoworkers, setFilteredCoworkers] = useState<Coworker[]>([]);
-  
-  const { data: user } = useSWR(identity ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${identity.id}` : null, fetchUser,)
-  const { data: coworkers, error, isLoading } = useSWR(user && user[0] ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/coworkers?user=${user[0].id}&company=${user[0].company_id.Valid ? user[0].company_id.Int64 : undefined}&site=${user[0].jobsite_id.Valid ? user[0].jobsite_id.Int64 : undefined}` : null, fetcher);
+
+  const { data: user } = useSWR(
+    identity ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/search?id=${identity.id}` : null,
+    fetchUser
+  );
+  const { data: coworkers, error, isLoading, mutate: mutateCoworkers } = useSWR(
+    user && user[0]
+      ? `${process.env.EXPO_PUBLIC_API_URL}/api/user/coworkers?user=${user[0].id}&company=${
+          user[0].company_id.Valid ? user[0].company_id.Int64 : undefined
+        }&site=${user[0].jobsite_id.Valid ? user[0].jobsite_id.Int64 : undefined}`
+      : null,
+    fetcher
+  );
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -45,25 +57,65 @@ export default function Coworkers() {
     }
   };
 
-  const color_scheme = useColorScheme()
-  const color_text = color_scheme === 'dark' ? Colors.dark_text : Colors.light_text
+  const handleRefresh = async () => {
+    await mutateCoworkers();
+  };
 
-  if (isLoading) { return (<MainView><ActivityIndicator style={{ justifyContent: 'center', height: ScreenHeight }} /></MainView>) }
-  if (error) { return (<MainView><Text style={{ color: 'red', justifyContent: 'center', height: '100%' }}>Error occured while trying to load coworkers</Text></MainView>) }
-  if (!coworkers) { return (<MainView><Text style={{ justifyContent: 'center', height: '100%' }}>No coworkers to display</Text></MainView>) }
-  
+  const color_scheme = useColorScheme();
+  const color_text = color_scheme === 'dark' ? Colors.dark_text : Colors.light_text;
+
+  if (isLoading) {
+    return (
+      <MainView>
+        <ActivityIndicator style={{ justifyContent: 'center', height: ScreenHeight }} />
+      </MainView>
+    );
+  }
+  if (error) {
+    return (
+      <MainView>
+        <Text style={{ color: 'red', justifyContent: 'center', height: '100%' }}>
+          Error occurred while trying to load coworkers
+        </Text>
+      </MainView>
+    );
+  }
+  if (!coworkers) {
+    return (
+      <MainView>
+        <Text style={{ justifyContent: 'center', height: '100%' }}>No coworkers to display</Text>
+      </MainView>
+    );
+  }
+
   return (
     <MainView>
-      <Text style={{ paddingTop: '20%', flex: 1, alignSelf: 'center', fontSize: 40, textAlign: 'center', fontWeight: 'bold', ...color_text }}>Coworkers</Text>
-      <TextInput 
+      <Text
+        style={{
+          paddingTop: '20%',
+          flex: 1,
+          alignSelf: 'center',
+          fontSize: 40,
+          textAlign: 'center',
+          fontWeight: 'bold',
+          ...color_text,
+        }}
+      >
+        Coworkers
+      </Text>
+      <TextInput
         style={{ ...styles.searchInput, ...color_text }}
         placeholder="Search coworkers..."
-        placeholderTextColor = {color_scheme === 'dark' ? '#C9ADA7' : '#00272B'}
+        placeholderTextColor={color_scheme === 'dark' ? '#C9ADA7' : '#00272B'}
         value={searchQuery}
         onChangeText={handleSearch}
       />
       <View style={{ flex: 10 }}>
-        <ContactsList coworkers={searchQuery ? filteredCoworkers : coworkers} />
+        <ContactsList
+          coworkers={searchQuery ? filteredCoworkers : coworkers}
+          onRefresh={handleRefresh}
+          refreshing={isLoading}
+        />
       </View>
     </MainView>
   );
