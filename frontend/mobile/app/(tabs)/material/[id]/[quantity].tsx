@@ -10,12 +10,10 @@ import FormPictueInput from "@/components/form/FormPictureInput";
 import MainView from "@/components/MainView";
 import useSWR, { Fetcher } from "swr";
 import { useLocalSearchParams } from "expo-router/build/hooks";
-import { set } from "react-hook-form";
 import { Colors } from "@/constants/Colors";
 
 //TODO: Test api calls
 //TODO: Test delete calls
-//TODO: Make look less like shit
 const CheckOut = async (url: string, { arg }: { arg: { checkout_picture: string, user_id: number, item_id: number, amount: number } }) => await fetch(url, { headers: Headers, method: 'POST', body: JSON.stringify(arg) })
 const CheckIn = async (url: string, { arg }: { arg: { checkin_picture: string, user_id: number, item_id: number } }) => await fetch(url, { headers: Headers, method: 'PUT', body: JSON.stringify(arg) })
 const QuantityChange = async (url: string, { arg }: { arg: ChangeQuantity }) => await fetch(url, { headers: Headers, method: 'PUT', body: JSON.stringify(arg) })
