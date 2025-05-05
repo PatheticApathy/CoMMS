@@ -1,8 +1,8 @@
-import { Headers } from "@/constants/header-options";
+import { getHeaders } from "@/constants/header-options";
 import { ChangeQuantity, CheckoutLog, Material } from "@/material-api-types";
 import { useContext, useEffect, useState } from "react";
 import { ActivityIndicator, Modal, Pressable, StyleSheet, Text, TextInput, useColorScheme, View } from "react-native";
-import useSWRMutation from "swr/dist/mutation";
+import useSWRMutation from "swr/mutation";
 import { Notify } from "@/components/notify";
 import { Link, router } from "expo-router";
 import { IdentityContext } from "@/components/securestore";
@@ -16,12 +16,12 @@ import { Colors } from "@/constants/Colors";
 //TODO: Test api calls
 //TODO: Test delete calls
 //TODO: Make look less like shit
-const CheckOut = async (url: string, { arg }: { arg: { checkout_picture: string, user_id: number, item_id: number, amount: number } }) => await fetch(url, { headers: Headers, method: 'POST', body: JSON.stringify(arg) })
-const CheckIn = async (url: string, { arg }: { arg: { checkin_picture: string, user_id: number, item_id: number } }) => await fetch(url, { headers: Headers, method: 'PUT', body: JSON.stringify(arg) })
+const CheckOut = async (url: string, { arg }: { arg: { checkout_picture: string, user_id: number, item_id: number, amount: number } }) => await fetch(url, { headers: await getHeaders(), method: 'POST', body: JSON.stringify(arg) })
+const CheckIn = async (url: string, { arg }: { arg: { checkin_picture: string, user_id: number, item_id: number } }) => await fetch(url, { headers: await getHeaders(), method: 'PUT', body: JSON.stringify(arg) })
 const QuantityChange = async (url: string, { arg }: { arg: ChangeQuantity }) => await fetch(url, { headers: Headers, method: 'PUT', body: JSON.stringify(arg) })
 const DeleteMaterial = async (url: string, { arg }: { arg: number }) => await fetch(url, { headers: Headers, method: 'DELETE', body: String(arg) })
-const CheckoutLogFetcher: Fetcher<CheckoutLog[], string> = async (...args) => fetch(...args, { headers: Headers, cache: 'default' }).then(res => res.json())
-const PostPicture = async (url: string, { arg }: { arg: { type: string, file: Blob } }) => await fetch(url, { headers: Headers, method: 'POST', body: arg.file });
+const CheckoutLogFetcher: Fetcher<CheckoutLog[], string> = async (...args) => fetch(...args, { headers: await getHeaders(), cache: 'default' }).then(res => res.json())
+const PostPicture = async (url: string, { arg }: { arg: { type: string, file: Blob } }) => await fetch(url, { headers: await getHeaders(), method: 'POST', body: arg.file });
 
 interface CheckoutActionTypes {
   visible: boolean
@@ -91,8 +91,8 @@ export default function MaterialOptions() {
   const identity = useContext(IdentityContext)
   const [check, setCheck] = useState(false)
   const [visible, setVisible] = useState(false)
-  const [counter, setcount] = useState('0')
-  const [add_counter, setaddcount] = useState('0')
+  const [counter, setcount] = useState(' ')
+  const [add_counter, setaddcount] = useState(' ')
   const [[picture, extension], setFile] = useState<[Blob | undefined, string]>([undefined, ""])
   const [waiting, setWaiting] = useState(false)
   const { id, quantity } = useLocalSearchParams()
@@ -242,7 +242,7 @@ export default function MaterialOptions() {
               handle_checkout={handle_checkout}
             />
             <View style={style.ActionTheme}>
-              <Pressable style={{ padding: 20, borderRadius: 10, flex: 1, backgroundColor: 'red' }} onPress={async () => await trigger(id)}><Text>Delete Material</Text></Pressable>
+              <Pressable style={{ padding: 20, borderRadius: 10, flex: 1, backgroundColor: 'red' }} onPress={async () => await trigger(Number(id))}><Text>Delete Material</Text></Pressable>
             </View>
             <Link href={{ pathname: "/(tabs)/material/[id]/add_log", params: { id: material_id } }}><Text>Add New Log</Text></Link>
           </>
