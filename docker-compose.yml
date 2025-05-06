@@ -32,6 +32,7 @@ services:
       - 8080:8080
 
   file_server:
+    restart: always
     build:
       context: ./frontend/file_server/
       dockerfile: Dockerfile
