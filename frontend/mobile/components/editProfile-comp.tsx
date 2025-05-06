@@ -124,7 +124,7 @@ export default function EditProfileComp() {
         <View style={styles.stepContainer}>
           <Image
             style={styles.pfpImage}
-            source={user[0].profilepicture.Valid ? {uri: `${process.env.EXPO_PUBLIC_API_URL}/${user[0].profilepicture.String}`, headers: headers} : require('../assets/images/test.png')}
+            source={user[0].profilepicture.Valid ? {uri: `uploads${user[0].profilepicture.String}`, headers: headers} : require('../assets/images/test.png')}
           />
           <Controller
             control={control}
