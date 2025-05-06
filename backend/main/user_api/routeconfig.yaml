@@ -112,7 +112,7 @@ routes:
       - GET
     roles:
       - admin
-      - roles
+      - user
   /user/update:
     methods:
       - PUT
