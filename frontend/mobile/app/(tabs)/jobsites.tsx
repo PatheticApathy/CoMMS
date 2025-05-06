@@ -65,12 +65,8 @@ export default function Jobsites() {
 
   const { data: materials, error: errorMaterials, mutate: mutateMaterials } = useSWR<Material[]>(
     currentUser
-      ? `${process.env.EXPO_PUBLIC_API_URL}/api/material/material/search?site=${
-          currentUser[0].jobsite_id.Valid ? currentUser[0].jobsite_id.Int64 : undefined
-        }`
-      ? `${process.env.EXPO_PUBLIC_API_URL}/api/material/material/search?site=${
-          currentUser[0].jobsite_id.Valid ? currentUser[0].jobsite_id.Int64 : undefined
-        }`
+      ? `${process.env.EXPO_PUBLIC_API_URL}/api/material/material/search?site=${currentUser[0].jobsite_id.Valid ? currentUser[0].jobsite_id.Int64 : undefined
+      }`
       : null,
     materialFetcher
   );
@@ -201,9 +197,8 @@ export default function Jobsites() {
                 longitude: material.location_lng.Float64,
               }}
               title={material.name?.Valid ? material.name.String : 'Unnamed Material'}
-              description={`Type: ${
-                material.type?.Valid ? material.type.String : 'Unknown'
-              }\nQty: ${material.quantity} ${material.unit}`}
+              description={`Type: ${material.type?.Valid ? material.type.String : 'Unknown'
+                }\nQty: ${material.quantity} ${material.unit}`}
             />
           );
         })}
