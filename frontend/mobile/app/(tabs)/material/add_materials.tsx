@@ -5,7 +5,7 @@ import { AddMaterial, Material } from '@/material-api-types';
 import { GetUserRow, JobSite } from '@/user-api-types';
 import { Modal, Text } from 'react-native';
 import useSWR from 'swr';
-import useSWRMutation from 'swr/dist/mutation';
+import useSWRMutation from 'swr/mutation';
 import { Button } from 'react-native';
 import { z } from 'zod'
 import FormPictueInput from '@/components/form/FormPictureInput';
@@ -130,12 +130,14 @@ const AddMaterials = () => {
         if (picture) {
           if (extension === '') {
             Notify.error("Invalid file extension");
+            setDownload(false)
             return
           }
           const resp = await download({ type: extension, file: picture })
           if (!resp.ok) {
             const message = await resp.json() as { message: string }
             Notify.error(message.message || "Error has occured");
+            setDownload(false)
             return
           }
           const name = await resp.json() as { name: string }
