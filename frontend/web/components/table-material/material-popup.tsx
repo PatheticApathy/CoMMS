@@ -125,6 +125,10 @@ const DisplayCheckouts = (checkout_logs: CheckoutLog[] | undefined, error: boole
                   );
                 })()
                 }
+                <div className="border-r-amber-100 border">
+                  <Image src={log.checkin_picture ? `/uploads${log.checkin_picture}` : '/file.svg'} alt="No Picture of Item found" width={400} height={300}></Image>
+                  <Image src={log.checkout_picture ? `/uploads${log.checkout_picture}` : '/file.svg'} alt="No Picture of Item found" width={400} height={300}></Image>
+                </div>
                 <br />
                 {`Amount checked out ${Math.abs(log.amount)}`}
                 <br />
