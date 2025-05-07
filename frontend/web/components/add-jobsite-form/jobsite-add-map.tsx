@@ -72,7 +72,7 @@ export default function AddJobsiteMap({ form }: { form: UseFormReturn<any> }) {
         onChange={(e) => setAddress(e.target.value)} // Update address state without triggering API call
         // Trigger API call only on Enter key press
       />
-      <Button variant='yellow' type='button' className="mb-2 p-6 basis-1/4" onClick={_ => handleKeyDown}>Find</Button>
+      <Button variant='yellow' type='button' className="mb-2 p-6 basis-1/4" onClick={() => handleKeyDown}>Find</Button>
       </div>
       {coords && (
         <MapContainer center={coords} zoom={17} scrollWheelZoom={false} style={{ height: "100%", width: "100%" }}>
