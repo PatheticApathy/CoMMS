@@ -1,6 +1,6 @@
 Username,Password,Firstname,Lastname,CompanyID,JobSiteID,Role,Email,Phone,Profilepicture
 bjones,password789,Bob,Jones,1,1,admin,bjones@example.com,3456789012,/test.png
-jdoe,password123,John,Doe,1,1,user,jdoe@example.com,1234567890,/test.png
+jdoe,password123,John,Doe,1,1,admin,jdoe@example.com,1234567890,/test.png
 asmith,password456,Alice,Smith,1,1,user,asmith@example.com,2345678901,/test.png
 williams,password654,William,Williams,2,1,admin,wwilliams@example.com,5678901234,/test.png
 hclark,password000,Helen,Clark,1,1,admin,hclark@example.com,7700002345,/test.png
