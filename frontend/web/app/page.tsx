@@ -15,7 +15,7 @@ export default function Welcome() {
         <div className="pt-28">
           <div className="flex flex-col text-center items-center">
             <p className="text-pretty text-xl max-w-2xl">
-              The Construction Material Management System, or CoMMS, is a system through which employees of construction
+              The Construction Material Management Software, or CoMMS, is a system through which employees of construction
               companies, or companies in fields that require similar material tracking, can keep track of materials throughout a job site. This system
               is designed to be used through this website for easy accessibility.
             </p>
