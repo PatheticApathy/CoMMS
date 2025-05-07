@@ -67,10 +67,9 @@ export default function SignupForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const token = await trigger(values)
-      if (token) {
-        await setToken(token)
-        console.log(token)
+      const resp = await trigger(values)
+      if (resp.ok) {
+        await setToken(await resp.text())
         router.push('/home')
       }
     } catch (err) {
@@ -97,7 +96,7 @@ export default function SignupForm() {
             <TextInput
               style={{ ...styles.input, ...color_border, ...color_text }}
               placeholder="Username"
-              placeholderTextColor = {color_scheme === 'dark' ? '#C9ADA7' : '#00272B'}
+              placeholderTextColor={color_scheme === 'dark' ? '#C9ADA7' : '#00272B'}
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
@@ -114,7 +113,7 @@ export default function SignupForm() {
             <TextInput
               style={{ ...styles.input, ...color_border, ...color_text }}
               placeholder="Password"
-              placeholderTextColor = {color_scheme === 'dark' ? '#C9ADA7' : '#00272B'}
+              placeholderTextColor={color_scheme === 'dark' ? '#C9ADA7' : '#00272B'}
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
@@ -132,7 +131,7 @@ export default function SignupForm() {
             <TextInput
               style={{ ...styles.input, ...color_border, ...color_text }}
               placeholder="Confirm Password"
-              placeholderTextColor = {color_scheme === 'dark' ? '#C9ADA7' : '#00272B'}
+              placeholderTextColor={color_scheme === 'dark' ? '#C9ADA7' : '#00272B'}
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
@@ -150,7 +149,7 @@ export default function SignupForm() {
             <TextInput
               style={{ ...styles.input, ...color_border, ...color_text }}
               placeholder="Email"
-              placeholderTextColor = {color_scheme === 'dark' ? '#C9ADA7' : '#00272B'}
+              placeholderTextColor={color_scheme === 'dark' ? '#C9ADA7' : '#00272B'}
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
@@ -167,7 +166,7 @@ export default function SignupForm() {
             <TextInput
               style={{ ...styles.input, ...color_border, ...color_text }}
               placeholder="Phone"
-              placeholderTextColor = {color_scheme === 'dark' ? '#C9ADA7' : '#00272B'}
+              placeholderTextColor={color_scheme === 'dark' ? '#C9ADA7' : '#00272B'}
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
