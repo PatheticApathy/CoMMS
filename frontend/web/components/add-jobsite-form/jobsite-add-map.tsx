@@ -5,6 +5,7 @@ import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import { useEffect, useState } from "react";
 import "leaflet/dist/leaflet.css";
 import { UseFormReturn } from "react-hook-form";
+import { Button } from "../ui/button";
 
 const defaultIcon = new L.Icon({
   iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
@@ -43,37 +44,36 @@ function Recenter({ coords }: { coords: [number, number] }) {
   return null;
 }
 
-export default function AddJobsiteMap({form} : {form: UseFormReturn<any>}) {
+export default function AddJobsiteMap({ form }: { form: UseFormReturn<any> }) {
   const [address, setAddress] = useState("");
   const [coords, setCoords] = useState<[number, number] | null>(null);
 
-  useEffect(() => {
-    if (!address) return;
-
-    fetchCoordsFromAddress(address)
-      .then(({ lat, lng }) => setCoords([lat, lng]))
-      .catch((err) => console.error("Geocode failed:", err));
-  }, [address]);
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      fetchCoordsFromAddress(address)
+        .then(({ lat, lng }) => {
+          setCoords([lat, lng]);
+          form.setValue("location_lat", lat);
+          form.setValue("location_lng", lng);
+          form.setValue("addr", address);
+        })
+        .catch((err) => console.error("Geocode failed:", err));
+    }
+  };
 
   return (
     <div className="w-full h-[300px]">
+      <div className="mb-2 p-2 w-full flex flex-row">
       <input
         type="text"
-        className="mb-2 p-2 border rounded w-full"
+        className="mb-2 p-2 border rounded basis-3/4"
         placeholder="Enter address..."
         value={address}
-        onChange={(e) => {
-            setAddress(e.target.value)
-            console.log(address)
-            form.setValue('addr', address)
-            if (coords && coords.length > 0){
-              console.log(coords[0])
-              form.setValue('location_lat', coords[0])
-              console.log(coords[1])
-              form.setValue('location_lng', coords[1])
-            }
-        }}
+        onChange={(e) => setAddress(e.target.value)} // Update address state without triggering API call
+        // Trigger API call only on Enter key press
       />
+      <Button variant='yellow' type='button' className="mb-2 p-6 basis-1/4" onClick={() => handleKeyDown}>Find</Button>
+      </div>
       {coords && (
         <MapContainer center={coords} zoom={17} scrollWheelZoom={false} style={{ height: "100%", width: "100%" }}>
           <TileLayer
