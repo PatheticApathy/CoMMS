@@ -57,18 +57,18 @@ cd $OG
 
 #setup material db
 cd ./backend/databases/Materialdb/
-$GOOSE down-to 0
-$GOOSE up
-$SQLC generate
+go tool goose down-to 0
+go tool goose up
+go tool sqlc generate
 cd ./../../
 go run scripts/csv_to_material/main.go scripts/csv_to_material/materials.csv
 cd $OG
 
 #setup userdb
 cd ./backend/databases/Userdb/
-$GOOSE down-to 0
-$GOOSE up
-$SQLC generate
+go tool goose down-to 0
+go tool goose up
+go sqlc generate
 cd ./../../
 go run scripts/csv_to_companies/main.go scripts/csv_to_companies/companies.csv
 go run scripts/csv_to_jobsites/main.go scripts/csv_to_jobsites/jobsites.csv
@@ -77,10 +77,10 @@ cd $OG
 
 #setup swagger material docs
 cd ./backend/main/material_api/
-$SWAG init -pdl 3 -o ../../docs/material/
+go tool swag init -pdl 3 -o ../../docs/material/
 cd $OG
 
 #setup swagger user docs
 cd ./backend/main/user_api/
-$SWAG init -pdl 3 -o ../../docs/users/
+go tool swag init -pdl 3 -o ../../docs/users/
 cd $OG
