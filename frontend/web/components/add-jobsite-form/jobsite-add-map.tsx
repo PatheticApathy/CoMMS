@@ -5,6 +5,7 @@ import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import { useEffect, useState } from "react";
 import "leaflet/dist/leaflet.css";
 import { UseFormReturn } from "react-hook-form";
+import { Button } from "../ui/button";
 
 const defaultIcon = new L.Icon({
   iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
@@ -62,14 +63,17 @@ export default function AddJobsiteMap({ form }: { form: UseFormReturn<any> }) {
 
   return (
     <div className="w-full h-[300px]">
+      <div className="mb-2 p-2 w-full flex flex-row">
       <input
         type="text"
-        className="mb-2 p-2 border rounded w-full"
+        className="mb-2 p-2 border rounded basis-3/4"
         placeholder="Enter address..."
         value={address}
         onChange={(e) => setAddress(e.target.value)} // Update address state without triggering API call
-        onKeyDown={handleKeyDown} // Trigger API call only on Enter key press
+        // Trigger API call only on Enter key press
       />
+      <Button variant='yellow' type='button' className="mb-2 p-6 basis-1/4" onClick={_ => handleKeyDown}>Find</Button>
+      </div>
       {coords && (
         <MapContainer center={coords} zoom={17} scrollWheelZoom={false} style={{ height: "100%", width: "100%" }}>
           <TileLayer
