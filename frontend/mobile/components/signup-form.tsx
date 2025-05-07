@@ -11,6 +11,7 @@ import { useRouter } from 'expo-router'
 import MainView from '@/components/MainView'
 import { useColorScheme } from '@/hooks/useColorScheme.web';
 import { Colors } from '@/constants/Colors';
+import { Notify } from './notify';
 
 const formSchema = z.object({
   username: z.string().nonempty(),
@@ -73,7 +74,7 @@ export default function SignupForm() {
         router.push('/home')
       }
     } catch (err) {
-      console.error(err)
+      Notify.error(String(err))
     }
   }
 
