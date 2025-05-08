@@ -46,7 +46,6 @@ routes:
       - DELETE
     roles:
       - admin
-      - user
   /material/material/search:
     methods:
       - GET
